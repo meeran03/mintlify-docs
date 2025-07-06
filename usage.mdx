@@ -1,0 +1,59 @@
+---
+title: Usage
+description: "How to use Burki Voice AI: dashboard, phone, and API"
+---
+
+# Usage
+
+This page explains how to use Burki Voice AI as an end user, admin, or developer.
+
+## Web Dashboard
+The web dashboard is the main interface for managing assistants, viewing analytics, and configuring your system.
+
+### Common Tasks
+- **Log in** with your credentials or Google account.
+- **Create or edit assistants**: Set up personalities, assign phone numbers, and configure integrations.
+- **View call history**: Access transcripts, recordings, and analytics.
+- **Manage users and organizations**: Add team members, set roles, and manage permissions.
+
+<Callout type="info">
+The dashboard is available at [http://localhost:8000](http://localhost:8000) by default.
+</Callout>
+
+## Phone Call Flow
+Burki can answer and manage real phone calls via Twilio.
+
+### Example Flow
+1. **Customer calls your Twilio number**.
+2. **Burki answers** and starts real-time transcription and processing.
+3. **AI assistant responds** using natural language and TTS.
+4. **Call is recorded** and available for review in the dashboard.
+
+## API Usage
+Burki exposes a RESTful API for programmatic access.
+
+### Example: Get Call History
+```http
+GET /api/calls
+Authorization: Bearer <your_api_key>
+```
+
+### Example: Create an Assistant
+```json
+{
+  "name": "SupportBot",
+  "llm_provider": "openai"
+}
+```
+*Add other assistant settings as needed.*
+
+For a full list of endpoints, see the [API Reference](api-reference/introduction).
+
+## User Flows
+- **Admin:** Set up organization, invite users, configure assistants, monitor analytics.
+- **Agent:** Review call transcripts, listen to recordings, update assistant settings.
+- **Developer:** Integrate Burki with other systems via API or webhooks.
+
+<Callout type="success">
+For advanced usage, see the [Configuration](configuration) and [Deployment](deployment) guides. 
+</Callout>

@@ -1,0 +1,88 @@
+---
+title: TTS Providers
+---
+
+# TTS Providers
+
+<Callout type="info">
+Text-to-Speech (TTS) gives your assistant a natural, human-like voice. Burki Voice AI supports multiple providers—choose the one that fits your needs!
+</Callout>
+
+---
+
+## Provider & Model Comparison
+
+| Provider    | Example Models         | Voices         | Speed      | Special Features                |
+|-------------|-----------------------|----------------|------------|---------------------------------|
+| ElevenLabs  | Flash v2.5, v3, Turbo | Rachel, Domi…  | Fast       | Multilingual, voice cloning     |
+| Deepgram    | Aura-2, Aura          | Luna, Stella…  | Ultra Fast | Phone-optimized, low latency    |
+| Inworld     | TTS-1, TTS-1-Max      | Hades, Ashley… | Fast       | Voice cloning, emotional markup |
+| Resemble    | Default               | Custom UUID    | Fast       | WebSocket streaming             |
+
+---
+
+## How to Set Up Each Provider
+
+<Accordion title="ElevenLabs">
+1. [Sign up for ElevenLabs](https://elevenlabs.io/)
+2. Get your API key from the dashboard
+3. Paste your key in the TTS API Key field
+4. Choose a model (Flash v2.5, v3, Turbo, etc.)
+5. Pick a voice (Rachel, Domi, or your own custom voice)
+6. (Optional) Adjust stability, similarity, style, and language
+
+<Callout type="tip">Use Flash v2.5 for phone calls (ultra-low latency). Try v3 for maximum expressiveness.</Callout>
+</Accordion>
+
+<Accordion title="Deepgram">
+1. [Sign up for Deepgram](https://console.deepgram.com/)
+2. Get your API key
+3. Paste your key in the TTS API Key field
+4. Choose a model (Aura-2, Aura)
+5. Pick a voice (Luna, Stella, etc.)
+6. (Optional) Set encoding/sample rate for phone quality
+
+<Callout type="tip">Aura-2 is the latest and best for real-time calls. Use µ-law encoding for Twilio/phone integration.</Callout>
+</Accordion>
+
+<Accordion title="Inworld.ai">
+1. [Sign up for Inworld](https://studio.inworld.ai/)
+2. Get your API key
+3. Paste your key in the TTS API Key field
+4. Choose a model (TTS-1, TTS-1-Max)
+5. Pick a voice (Hades, Ashley, or custom voice ID)
+6. (Optional) Set language and use voice cloning
+
+<Callout type="tip">Inworld supports free zero-shot voice cloning and emotional markup (e.g., [happy], [whispering]).</Callout>
+</Accordion>
+
+<Accordion title="Resemble AI">
+1. [Sign up for Resemble](https://app.resemble.ai/)
+2. Get your API key and project UUID
+3. Paste your key and UUID in the TTS settings
+4. Enter your custom voice UUID
+5. (Optional) Enable WebSocket streaming for real-time responses
+
+<Callout type="tip">WebSocket streaming requires a Business plan. Each voice is unique to your account.</Callout>
+</Accordion>
+
+---
+
+## Advanced Controls & Features
+
+- **Stability/Similarity/Style:** Fine-tune how consistent, accurate, or expressive the voice is (mainly ElevenLabs)
+- **Speaker Boost:** Enhance clarity and reduce background noise
+- **Voice Cloning:** Use your own custom voice (ElevenLabs, Inworld, Resemble)
+- **Multilingual:** Many models support multiple languages—select in the UI
+- **Encoding/Sample Rate:** For phone quality, use µ-law or 8000Hz
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common Issues">
+- **Voice not available:** Make sure your account has access to the selected voice/model
+- **Audio quality issues:** Try adjusting encoding/sample rate or enable Speaker Boost
+- **Latency too high:** Use Flash v2.5 (ElevenLabs) or Aura-2 (Deepgram) for fastest response
+- **Custom voice not working:** Double-check your voice ID and provider requirements
+</Accordion> 

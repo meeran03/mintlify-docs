@@ -1,0 +1,51 @@
+---
+title: FAQ
+description: "Frequently asked questions and troubleshooting for Burki Voice AI"
+---
+
+# FAQ
+
+Find answers to common questions and troubleshooting tips for Burki Voice AI.
+
+## General
+**Q: What is Burki Voice AI?**
+A: An open-source, AI-powered voice assistant platform for handling customer calls.
+
+**Q: Who can use Burki?**
+A: Startups, enterprises, developers, and anyone needing advanced voice automation.
+
+## Setup & Installation
+**Q: I get a database connection error.**
+A: Check your `DATABASE_URL` and ensure PostgreSQL is running and accessible.
+
+**Q: The app can't find my API keys.**
+A: Make sure your `.env` file is present, filled out, and loaded by your process manager or deployment platform.
+
+**Q: How do I enable audio denoising?**
+A: Run `./scripts/build_rnnoise.sh` and set `AUDIO_DENOISING_METHOD=rnnoise` in your `.env`.
+
+## Usage
+**Q: How do I add a new assistant?**
+A: Use the web dashboard or POST to `/api/assistants` with the required fields.
+
+**Q: Where can I find call recordings and transcripts?**
+A: In the dashboard under call history, or in your S3 bucket if configured.
+
+**Q: How do I reset my password?**
+A: Use the password reset link on the login page or contact your admin.
+
+## Deployment
+**Q: How do I deploy to production?**
+A: See the [Deployment](deployment) guide for Docker, Railway, and manual options.
+
+**Q: How do I set environment variables in Railway or Docker?**
+A: Use the platform's dashboard or the `--env-file` option for Docker.
+
+## Troubleshooting
+**Q: I see a parsing error in the docs.**
+A: Check for unclosed tags or invalid syntax in your MDX files.
+
+**Q: The app crashes on startup.**
+A: Check logs for missing dependencies, invalid config, or port conflicts.
+
+For more help, open an issue on [GitHub](https://github.com/meeran03/burki/issues). 

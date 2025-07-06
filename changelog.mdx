@@ -1,0 +1,177 @@
+---
+title: Changelog
+---
+
+# Changelog
+
+<Callout type="info">
+Stay up-to-date with the latest features, improvements, and bug fixes in Burki Voice AI. We're constantly improving the platform based on user feedback and emerging technologies.
+</Callout>
+
+---
+
+## Version 2.1.0 (Latest)
+*Released: January 2024*
+
+### 🚀 New Features
+- **Multi-Provider TTS Support**: Added support for Deepgram, Inworld, and Resemble TTS providers
+- **Enhanced STT Models**: Support for Deepgram Nova-3 with keyterms functionality
+- **Advanced Tools Configuration**: Improved end call and transfer call tools with custom scenarios
+- **Audio Denoising**: Real-time noise reduction using RNNoise for better transcription accuracy
+- **Background Sound Support**: Add ambient audio to create realistic call environments
+
+### ✨ Improvements
+- **Provider Fallback System**: Automatic fallback to backup providers when primary fails
+- **Enhanced Voice Selection**: Expanded voice options across all TTS providers
+- **Improved Interruption Handling**: Better management of conversation flow and overlapping speech
+- **Recording Enhancements**: Support for MP3 format with quality improvements
+- **UI/UX Improvements**: Streamlined assistant configuration interface
+
+### 🐛 Bug Fixes
+- Fixed WebSocket connection stability issues
+- Resolved audio quality problems in noisy environments
+- Fixed provider switching edge cases
+- Improved error handling for API failures
+
+---
+
+## Version 2.0.0
+*Released: December 2023*
+
+### 🚀 New Features
+- **Multi-Provider LLM Support**: Added support for Anthropic, Gemini, xAI, and Groq
+- **RAG (Knowledge Base)**: Upload documents and web pages for context-aware responses
+- **Data Extraction**: Automatically extract structured data from conversations
+- **Webhook Integration**: Real-time notifications for call events
+- **Outbound Calling**: AI-initiated calls with custom agendas
+
+### ✨ Improvements
+- **Modular Architecture**: Complete refactor for better scalability and maintainability
+- **Enhanced Security**: Improved authentication and data protection
+- **Better Analytics**: More detailed call metrics and reporting
+- **Performance Optimizations**: Faster response times and reduced latency
+
+### 🐛 Bug Fixes
+- Multiple stability improvements
+- Enhanced error handling and logging
+- Fixed various edge cases in call management
+
+---
+
+## Version 1.5.0
+*Released: October 2023*
+
+### 🚀 New Features
+- **Multi-Tenant Support**: Isolated environments for multiple organizations
+- **Custom Voice Cloning**: Support for custom voice models
+- **Advanced Call Controls**: Improved call flow management
+- **Recording Storage**: S3 integration for call recordings
+
+### ✨ Improvements
+- **UI Enhancements**: Redesigned dashboard and configuration interface
+- **API Improvements**: More robust and comprehensive API endpoints
+- **Documentation**: Enhanced guides and examples
+
+---
+
+## Version 1.0.0
+*Released: August 2023*
+
+### 🚀 Initial Release
+- **Core Voice AI**: Basic voice assistant functionality
+- **Twilio Integration**: Phone call handling and media streaming
+- **ElevenLabs TTS**: High-quality text-to-speech
+- **Deepgram STT**: Real-time speech-to-text transcription
+- **OpenAI Integration**: GPT-powered conversation handling
+- **Web Dashboard**: Basic configuration and monitoring interface
+
+---
+
+## Upcoming Features
+
+<Callout type="note">
+These features are in development and subject to change based on user feedback and technical considerations.
+</Callout>
+
+### 🔮 Coming Soon
+- **Advanced Analytics Dashboard**: Real-time insights and performance metrics
+- **A/B Testing Framework**: Test different configurations and measure results
+- **Custom Integration Builder**: Visual tool for creating custom integrations
+- **Voice Biometrics**: Speaker identification and authentication
+- **Sentiment Analysis**: Real-time emotion detection during calls
+- **Multi-Language Support**: Expanded language options and automatic detection
+
+### 🛠️ Under Consideration
+- **Video Calling Support**: Expand beyond voice to video interactions
+- **Advanced AI Models**: Integration with latest language models
+- **Edge Computing**: Reduced latency through edge deployment
+- **Advanced Compliance Tools**: Enhanced features for regulated industries
+
+---
+
+## How to Update
+
+<Accordion title="Self-Hosted Deployments">
+1. **Backup your data** before updating
+2. **Check compatibility** with your current configuration
+3. **Follow migration guides** for breaking changes
+4. **Test thoroughly** in staging environment
+5. **Deploy to production** with monitoring
+
+**Update Commands:**
+```bash
+git pull origin main
+pip install -r requirements.txt
+alembic upgrade head
+```
+</Accordion>
+
+<Accordion title="Cloud/Managed Deployments">
+Updates are handled automatically with:
+- **Zero-downtime deployments**
+- **Automatic rollback** on issues
+- **Advance notification** of major changes
+- **Staging environment** for testing
+
+Contact support for custom update schedules.
+</Accordion>
+
+---
+
+## Breaking Changes
+
+<Callout type="warning">
+Major version updates may include breaking changes. Always review the migration guide before updating.
+</Callout>
+
+### Version 2.0.0 Breaking Changes
+- **Configuration Format**: Updated assistant configuration schema
+- **API Endpoints**: Some endpoints renamed or restructured
+- **Environment Variables**: New required environment variables
+- **Database Schema**: Migration required for existing installations
+
+### Migration Support
+- **Automated Migration**: Database schema updates handled automatically
+- **Configuration Converter**: Tool to convert old configurations
+- **Support**: Dedicated support for migration assistance
+
+---
+
+## Feedback & Requests
+
+<Callout type="success">
+We value your feedback! Help us prioritize features and improvements.
+</Callout>
+
+**How to Submit Feedback:**
+- **GitHub Issues**: Report bugs and request features
+- **Community Forum**: Discuss ideas with other users
+- **Direct Contact**: Email support for urgent issues
+- **User Surveys**: Participate in periodic feedback surveys
+
+**Feature Request Process:**
+1. **Submit Request**: Describe the feature and use case
+2. **Community Voting**: Other users can vote on requests
+3. **Review Process**: Our team evaluates feasibility and impact
+4. **Development**: Approved features enter development pipeline
+5. **Beta Testing**: Early access for testing and feedback 

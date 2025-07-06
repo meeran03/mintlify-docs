@@ -1,0 +1,110 @@
+---
+title: STT Providers & Settings
+---
+
+# STT Providers & Settings
+
+<Callout type="info">
+Speech-to-Text (STT) converts what callers say into text for your AI to understand. Burki Voice AI uses Deepgram for high-quality, real-time transcription.
+</Callout>
+
+---
+
+## Deepgram Models Comparison
+
+| Model     | Features                    | Keywords | Keyterms | Best For                  |
+|-----------|----------------------------|----------|----------|---------------------------|
+| Nova-3    | Latest, keyterms support   | ❌       | ✅       | English calls, best accuracy |
+| Nova-2    | Keywords support           | ✅       | ❌       | Multi-language, reliable  |
+| Nova      | Keywords support           | ✅       | ❌       | Balanced performance      |
+| Enhanced  | Keywords support           | ✅       | ❌       | Legacy support            |
+| Base      | Keywords support           | ✅       | ❌       | Basic transcription       |
+
+<Callout type="tip">
+**Recommended:** Use Nova-3 for English calls (supports keyterms) or Nova-2 for other languages (supports keywords).
+</Callout>
+
+---
+
+## Key Settings
+
+<Accordion title="Model & Language">
+- **Model:** Choose based on your needs (Nova-3 recommended for English)
+- **Language:** Select from common options or enter a custom language code
+- **Custom Language:** Enter any Deepgram-supported language code (e.g., `fr-FR`, `es-ES`)
+</Accordion>
+
+<Accordion title="Timing Controls">
+- **Silence Threshold:** How long to wait before considering speech ended (default: 500ms)
+- **Min Silence Duration:** Minimum silence before processing (default: 500ms)
+- **Utterance End:** Time to wait before finalizing transcript (default: 1000ms)
+- **VAD Turnoff:** Voice activity detection timeout (default: 500ms)
+
+<Callout type="warning">
+Adjust these carefully—too short and the AI cuts callers off, too long and there are awkward pauses.
+</Callout>
+</Accordion>
+
+<Accordion title="Processing Options">
+<Checklist>
+- **Punctuation:** Add punctuation to transcripts (recommended: ✅)
+- **Interim Results:** Show partial transcripts as users speak (recommended: ✅)
+- **Smart Format:** Format numbers, dates, etc. naturally (recommended: ✅)
+- **Audio Denoising:** Remove background noise using RNNoise (optional)
+</Checklist>
+</Accordion>
+
+<Accordion title="Keywords & Keyterms">
+**Keywords** (Nova-2, Nova, Enhanced, Base):
+- Boost recognition of specific words
+- Format: `word:boost_factor` (e.g., `Deepgram:2.0, API:1.5`)
+- Great for company names, technical terms
+
+**Keyterms** (Nova-3 only, English only):
+- Advanced keyword detection
+- Format: `word1, word2, word3`
+- More sophisticated than keywords
+
+<Callout type="tip">
+Use keywords/keyterms for your company name, product names, and industry-specific terms to improve accuracy.
+</Callout>
+</Accordion>
+
+---
+
+## Audio Denoising
+
+<Callout type="info">
+Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes background noise before transcription.
+</Callout>
+
+**When to Enable:**
+- Noisy environments (restaurants, offices, outdoors)
+- Poor phone connections
+- Background music or chatter
+
+**Trade-offs:**
+- Slightly increases latency (~50-100ms)
+- Improves transcription accuracy in noisy conditions
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common STT Issues">
+- **AI misses words:** Enable denoising or add keywords for important terms
+- **Cuts off callers:** Increase silence threshold and utterance end timing
+- **Long pauses:** Decrease timing settings, but test carefully
+- **Wrong language:** Set correct language code or use "custom" option
+- **Technical terms not recognized:** Add them as keywords/keyterms
+</Accordion>
+
+---
+
+## Best Practices
+
+- **Start with defaults** and adjust based on testing
+- **Test with real calls** in your target environment
+- **Use keywords** for your business-specific terminology
+- **Enable denoising** if you expect background noise
+- **Monitor call quality** and adjust timing as needed 

@@ -1,0 +1,120 @@
+---
+title: RAG (Knowledge Base)
+---
+
+# RAG (Knowledge Base)
+
+<Callout type="info">
+RAG (Retrieval-Augmented Generation) lets you give your assistant custom knowledge by uploading documents, FAQs, and other content. Your AI can then reference this information to give accurate, specific answers.
+</Callout>
+
+---
+
+## What is RAG?
+
+**RAG** combines your custom knowledge with the AI's general intelligence:
+
+1. **Upload documents** (PDFs, text files, web pages, etc.)
+2. **AI processes and indexes** the content
+3. **During calls**, the AI searches your knowledge base
+4. **Combines** retrieved information with its response
+
+<Callout type="success">
+Think of RAG as giving your AI a "company handbook" it can instantly reference during conversations.
+</Callout>
+
+---
+
+## How to Set Up RAG
+
+<Accordion title="Step 1: Prepare Your Content">
+**Supported Formats:**
+- PDF documents
+- Text files (.txt, .md)
+- Web pages (URLs)
+- Structured data (JSON, CSV)
+
+**Content Tips:**
+- Keep documents focused and well-organized
+- Use clear headings and sections
+- Include FAQs, product info, policies, etc.
+- Remove outdated or irrelevant information
+</Accordion>
+
+<Accordion title="Step 2: Upload to Your Assistant">
+1. Go to your assistant's **RAG Configuration** section
+2. Click **"Upload Documents"** or **"Add Knowledge"**
+3. Upload files or paste URLs
+4. Wait for processing (may take a few minutes)
+5. Test with sample questions
+
+<Callout type="tip">
+Start with your most important documents—you can always add more later!
+</Callout>
+</Accordion>
+
+<Accordion title="Step 3: Configure RAG Settings">
+- **Similarity Threshold:** How closely questions must match content
+- **Max Results:** Number of knowledge pieces to retrieve
+- **Context Window:** How much text to include in responses
+
+<Callout type="warning">
+Higher similarity thresholds are more selective but may miss relevant content. Start with default settings and adjust based on testing.
+</Callout>
+</Accordion>
+
+---
+
+## Use Cases
+
+<Accordion title="Customer Support">
+- Product manuals and troubleshooting guides
+- Company policies and procedures
+- FAQ documents
+- Return/refund policies
+
+**Example:** "How do I return a product?" → AI finds your return policy and gives specific instructions.
+</Accordion>
+
+<Accordion title="Sales & Information">
+- Product catalogs and specifications
+- Pricing information
+- Company background and history
+- Service descriptions
+
+**Example:** "What services do you offer?" → AI references your service catalog for accurate details.
+</Accordion>
+
+<Accordion title="Internal Knowledge">
+- Employee handbooks
+- Internal procedures
+- Technical documentation
+- Training materials
+
+**Example:** "What's our vacation policy?" → AI finds the relevant HR policy section.
+</Accordion>
+
+---
+
+## Best Practices
+
+- **Quality over quantity:** Better to have fewer, high-quality documents than many poor ones
+- **Keep content updated:** Regularly review and update your knowledge base
+- **Test thoroughly:** Ask questions you expect callers to ask and verify accuracy
+- **Use clear language:** Write content in plain language, avoiding jargon when possible
+- **Organize logically:** Group related information together
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common RAG Issues">
+- **AI doesn't find relevant info:** Check similarity threshold, add more specific keywords
+- **Outdated information:** Remove or update old documents
+- **Conflicting answers:** Ensure documents don't contradict each other
+- **Too much irrelevant content:** Use more focused, specific documents
+</Accordion>
+
+<Callout type="tip">
+RAG works best when combined with a well-written system prompt that tells the AI how to use the knowledge base effectively.
+</Callout> 

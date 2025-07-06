@@ -1,0 +1,180 @@
+---
+title: Tools Configuration
+---
+
+# Tools Configuration
+
+<Callout type="info">
+Tools let your assistant perform actions during calls—like ending conversations gracefully or transferring to human agents. Configure when and how these tools should be used.
+</Callout>
+
+---
+
+## Available Tools
+
+<Accordion title="End Call Tool">
+**What it does:** Allows the assistant to end calls automatically when appropriate.
+
+**Configuration:**
+- **Enable/Disable:** Toggle the tool on or off
+- **Scenarios:** Define when the assistant should end calls
+- **Custom Message:** What to say before ending the call
+
+**Example Scenarios:**
+- "Customer says goodbye"
+- "Issue resolved"
+- "Request completed"
+- "Complaint escalated"
+
+<Callout type="tip">
+Use specific scenarios to help the AI understand when it's appropriate to end a call. Be clear about completion criteria.
+</Callout>
+</Accordion>
+
+<Accordion title="Transfer Call Tool">
+**What it does:** Transfers calls to human agents or other phone numbers.
+
+**Configuration:**
+- **Enable/Disable:** Toggle the tool on or off
+- **Transfer Numbers:** List of phone numbers to transfer to
+- **Scenarios:** Define when transfers should happen
+- **Custom Message:** What to say before transferring
+
+**Example Transfer Numbers:**
+- `+1234567890` (Sales team)
+- `+0987654321` (Technical support)
+- `+1122334455` (Manager)
+
+**Example Scenarios:**
+- "Technical issue beyond AI capability"
+- "Billing inquiry"
+- "Escalation request"
+- "Customer requests human agent"
+
+<Callout type="warning">
+Make sure transfer numbers are valid and staffed. Failed transfers create poor customer experiences.
+</Callout>
+</Accordion>
+
+<Accordion title="Custom Tools">
+**What they are:** Advanced tools you can define for specific use cases.
+
+**Use Cases:**
+- Database lookups
+- API integrations
+- Custom business logic
+- External system interactions
+
+**Configuration:**
+- **Tool Definition:** JSON schema defining the tool
+- **Parameters:** Input parameters the tool accepts
+- **Description:** How the AI should use the tool
+
+<Callout type="note">
+Custom tools require development work to implement the actual functionality. Contact your development team for custom tool implementation.
+</Callout>
+</Accordion>
+
+---
+
+## How to Configure Tools
+
+<Accordion title="Step 1: Enable Tools">
+1. Go to your assistant's configuration
+2. Navigate to the **Tools** section
+3. Enable the tools you want to use
+4. Configure each tool's settings
+
+<Callout type="tip">
+Start with basic tools (End Call, Transfer Call) before implementing custom tools.
+</Callout>
+</Accordion>
+
+<Accordion title="Step 2: Define Scenarios">
+**For End Call Tool:**
+- List specific situations when calls should end
+- Be clear about completion criteria
+- Consider both successful and unsuccessful outcomes
+
+**For Transfer Call Tool:**
+- Define when human intervention is needed
+- Specify different transfer destinations for different scenarios
+- Include escalation triggers
+
+**Example Scenarios Format:**
+```
+customer says goodbye, issue resolved, request completed, complaint escalated
+```
+</Accordion>
+
+<Accordion title="Step 3: Set Custom Messages">
+**End Call Messages:**
+- Professional and friendly
+- Confirm completion of the interaction
+- Leave a positive impression
+
+**Transfer Messages:**
+- Explain what's happening
+- Set expectations for wait time
+- Reassure the customer
+
+**Examples:**
+- End Call: "Thank you for calling! I've helped resolve your issue. Have a great day!"
+- Transfer: "I'm connecting you with a specialist who can better assist you. Please hold for just a moment."
+</Accordion>
+
+---
+
+## Best Practices
+
+- **Test thoroughly:** Try different scenarios to ensure tools work as expected
+- **Keep scenarios specific:** Vague scenarios lead to unpredictable behavior
+- **Monitor usage:** Track when and why tools are being used
+- **Update regularly:** Refine scenarios based on real call data
+- **Train your team:** Ensure human agents are prepared for transfers
+
+---
+
+## Tool Usage Examples
+
+<Accordion title="Customer Service Scenario">
+**Setup:**
+- End Call Tool: Enabled
+- Transfer Call Tool: Enabled
+- Transfer Numbers: Support team, billing department
+
+**Scenarios:**
+- End Call: "issue resolved, customer satisfied, information provided"
+- Transfer: "billing question, technical problem, escalation requested"
+
+**Result:** AI handles simple inquiries but transfers complex issues to appropriate teams.
+</Accordion>
+
+<Accordion title="Sales Scenario">
+**Setup:**
+- End Call Tool: Enabled
+- Transfer Call Tool: Enabled
+- Transfer Numbers: Sales team, manager
+
+**Scenarios:**
+- End Call: "information provided, not interested, callback scheduled"
+- Transfer: "ready to purchase, complex pricing question, wants to speak to sales"
+
+**Result:** AI qualifies leads and transfers hot prospects to sales team.
+</Accordion>
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common Tool Issues">
+- **Tools not triggering:** Check scenario definitions are specific enough
+- **Wrong transfers:** Verify phone numbers are correct and active
+- **Premature call endings:** Refine end call scenarios to be more specific
+- **Failed transfers:** Ensure target numbers can receive calls
+- **Unclear messages:** Test custom messages with real users
+</Accordion>
+
+<Callout type="tip">
+Use call recordings and transcripts to analyze tool usage and improve configurations.
+</Callout> 

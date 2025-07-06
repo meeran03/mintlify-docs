@@ -1,0 +1,288 @@
+---
+title: Advanced Features
+---
+
+# Advanced Features
+
+<Callout type="info">
+Burki Voice AI includes powerful advanced features for complex use cases—from data extraction and webhooks to multi-tenant management and outbound calling.
+</Callout>
+
+---
+
+## Data Extraction
+
+<Accordion title="What is Data Extraction?">
+**Purpose:** Automatically extract structured data from conversations (names, phone numbers, addresses, etc.).
+
+**Use Cases:**
+- Lead qualification forms
+- Customer information collection
+- Order processing
+- Appointment scheduling
+- Survey responses
+
+**How it works:**
+1. Define fields you want to extract
+2. AI identifies relevant information during calls
+3. Data is stored in structured format
+4. Export or integrate with your systems
+</Accordion>
+
+<Accordion title="Setting Up Data Extraction">
+**Field Configuration:**
+- **Field Name:** What to call the extracted data
+- **Field Type:** Text, number, email, phone, date, etc.
+- **Required:** Whether the field must be collected
+- **Validation:** Rules for valid data
+
+**Example Fields:**
+```json
+{
+  "name": {"type": "text", "required": true},
+  "phone": {"type": "phone", "required": true},
+  "email": {"type": "email", "required": false},
+  "budget": {"type": "number", "required": false}
+}
+```
+
+<Callout type="tip">
+Start with essential fields only. You can always add more later as you refine your process.
+</Callout>
+</Accordion>
+
+---
+
+## Webhook Integrations
+
+<Accordion title="Webhook Overview">
+**What are webhooks?** Real-time notifications sent to your systems when events occur.
+
+**Common Events:**
+- Call started
+- Call ended
+- Data extracted
+- Tool used (transfer, end call)
+- Errors occurred
+
+**Use Cases:**
+- Update CRM systems
+- Trigger follow-up emails
+- Log call analytics
+- Sync with databases
+- Notify team members
+</Accordion>
+
+<Accordion title="Webhook Configuration">
+**Setup Steps:**
+1. Provide your webhook URL
+2. Choose which events to send
+3. Configure authentication (if needed)
+4. Test webhook delivery
+
+**Webhook Payload Example:**
+```json
+{
+  "event": "call_ended",
+  "call_sid": "CA123456789",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "duration": 180,
+  "extracted_data": {
+    "name": "John Doe",
+    "phone": "+1234567890"
+  }
+}
+```
+
+<Callout type="warning">
+Ensure your webhook endpoint can handle the expected volume of calls and responds quickly (< 3 seconds).
+</Callout>
+</Accordion>
+
+---
+
+## Multi-Tenant Management
+
+<Accordion title="Multi-Tenancy Overview">
+**What is multi-tenancy?** Support multiple organizations or clients with isolated data and configurations.
+
+**Benefits:**
+- Separate assistants per client
+- Isolated data and settings
+- Custom branding per tenant
+- Centralized management
+- Scalable pricing models
+
+**Use Cases:**
+- Agency serving multiple clients
+- SaaS platform with voice features
+- Enterprise with multiple departments
+- White-label solutions
+</Accordion>
+
+<Accordion title="Tenant Configuration">
+**Setup Steps:**
+1. Create tenant accounts
+2. Assign phone numbers to tenants
+3. Configure tenant-specific assistants
+4. Set up isolated data storage
+5. Manage billing and usage
+
+**Tenant Isolation:**
+- Separate databases/schemas
+- Isolated API keys
+- Custom domain support
+- Tenant-specific analytics
+- Independent scaling
+
+<Callout type="note">
+Multi-tenancy requires careful planning of data architecture and security. Consult with your development team for implementation.
+</Callout>
+</Accordion>
+
+---
+
+## Background Sounds
+
+<Accordion title="Background Audio Features">
+**Purpose:** Add ambient sounds to create realistic environments.
+
+**Use Cases:**
+- Restaurant sounds for food ordering
+- Office ambiance for business calls
+- Hold music for transfers
+- Brand-specific audio
+- Noise masking
+
+**Configuration:**
+- **Audio File:** Upload your background sound
+- **Volume:** Adjust relative to voice
+- **Loop:** Continuous or one-time playback
+- **Fade:** Smooth transitions
+
+<Callout type="tip">
+Keep background sounds subtle (10-20% volume) to avoid interfering with conversation clarity.
+</Callout>
+</Accordion>
+
+---
+
+## Interruption Handling
+
+<Accordion title="Smart Interruption Management">
+**What it does:** Handles when callers speak over the AI.
+
+**Configuration:**
+- **Interruption Threshold:** How many words trigger interruption
+- **Min Speaking Time:** Minimum time AI must speak before interruption
+- **Cooldown Period:** Time between interruptions
+- **Buffer Management:** How to handle overlapping speech
+
+**Settings:**
+- **Threshold:** 3 words (default)
+- **Min Time:** 0.5 seconds (default)
+- **Cooldown:** 2.0 seconds (default)
+
+<Callout type="warning">
+Too sensitive = choppy conversations. Too insensitive = poor user experience. Test and adjust based on your use case.
+</Callout>
+</Accordion>
+
+---
+
+## Outbound Calling
+
+<Accordion title="Outbound Call Features">
+**What it enables:** AI-initiated calls to customers.
+
+**Use Cases:**
+- Appointment reminders
+- Follow-up calls
+- Survey collection
+- Lead nurturing
+- Customer check-ins
+- Payment reminders
+
+**Configuration:**
+- **Campaign Setup:** Define call lists and timing
+- **Custom Scripts:** Tailored messages per campaign
+- **Scheduling:** When to make calls
+- **Compliance:** Do-not-call list management
+</Accordion>
+
+<Accordion title="Outbound Call Setup">
+**Steps:**
+1. Upload contact lists
+2. Configure call scripts/agendas
+3. Set calling schedules
+4. Configure compliance settings
+5. Monitor campaign performance
+
+**API Integration:**
+```python
+# Example outbound call API
+response = burki_api.create_outbound_call(
+    to_phone="+1234567890",
+    assistant_id=123,
+    agenda="Appointment reminder for tomorrow",
+    custom_message="Hi, this is a reminder about your appointment..."
+)
+```
+
+<Callout type="warning">
+Outbound calling requires compliance with local regulations (TCPA, GDPR, etc.). Ensure you have proper consent and follow all applicable laws.
+</Callout>
+</Accordion>
+
+---
+
+## Advanced Analytics
+
+<Accordion title="Analytics & Reporting">
+**Available Metrics:**
+- Call volume and duration
+- Completion rates
+- Data extraction success
+- Tool usage patterns
+- Customer satisfaction scores
+- Cost per call
+
+**Custom Reports:**
+- Performance dashboards
+- Trend analysis
+- A/B testing results
+- ROI calculations
+- Quality metrics
+
+**Integration:**
+- Export to BI tools
+- API for custom analytics
+- Real-time monitoring
+- Automated alerts
+</Accordion>
+
+---
+
+## Best Practices
+
+- **Start simple:** Implement basic features before advanced ones
+- **Test thoroughly:** Advanced features require more testing
+- **Monitor performance:** Track impact on call quality and user experience
+- **Document configurations:** Keep detailed records of settings and changes
+- **Security first:** Ensure proper authentication and data protection
+- **Compliance:** Follow industry regulations and best practices
+
+---
+
+## Getting Help
+
+<Callout type="note">
+Advanced features often require technical expertise. Consider working with your development team or contacting support for complex implementations.
+</Callout>
+
+**Resources:**
+- API documentation
+- Developer guides
+- Community forums
+- Professional services
+- Technical support 

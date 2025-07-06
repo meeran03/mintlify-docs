@@ -1,0 +1,101 @@
+---
+title: LLM Providers
+---
+
+# LLM Providers
+
+<Callout type="info">
+Burki Voice AI lets you choose from the best language models (LLMs) on the market—or even use your own custom endpoint. Mix and match for reliability and performance!
+</Callout>
+
+---
+
+## Provider Comparison
+
+| Provider   | Example Models         | Speed      | Quality    | Cost      | Notes                  |
+|------------|-----------------------|------------|------------|-----------|------------------------|
+| OpenAI     | GPT-4o, GPT-3.5-turbo | Fast       | Excellent  | $$        | Most popular, reliable |
+| Anthropic  | Claude 3.5, Haiku     | Fast       | Advanced   | $$        | Safety-focused         |
+| Gemini     | Gemini 2.0 Flash      | Fast       | Multimodal | $$        | Google's latest        |
+| xAI        | Grok Beta, Grok 2     | Very Fast  | Good       | $         | Real-time, less strict |
+| Groq       | Llama 3.3, 3.1        | Ultra Fast | Good       | $         | Speed-focused          |
+| Custom     | Any                   | ?          | ?          | ?         | Bring your own!        |
+
+---
+
+## How to Set Up Each Provider
+
+<Accordion title="OpenAI (GPT)">
+1. [Sign up for OpenAI](https://platform.openai.com/)
+2. Go to API Keys and create a new key
+3. Paste your key in the LLM API Key field
+4. Choose a model (GPT-4o, GPT-3.5-turbo, etc.)
+5. (Optional) Set a custom base URL for Azure/OpenAI-compatible endpoints
+
+<Callout type="tip">GPT-4o is best for complex conversations. GPT-3.5-turbo is cheaper for simple tasks.</Callout>
+</Accordion>
+
+<Accordion title="Anthropic (Claude)">
+1. [Sign up for Anthropic](https://console.anthropic.com/)
+2. Create an API key
+3. Paste your key in the LLM API Key field
+4. Choose a model (Claude 3.5 Sonnet, Haiku, etc.)
+
+<Callout type="tip">Claude models are great for advanced reasoning and safety-critical use cases.</Callout>
+</Accordion>
+
+<Accordion title="Google Gemini">
+1. [Sign up for Google AI Studio](https://aistudio.google.com/)
+2. Get your API key
+3. Paste your key in the LLM API Key field
+4. Choose a model (Gemini 2.0 Flash, 1.5 Pro, etc.)
+5. Set the base URL (auto-filled for Gemini)
+
+<Callout type="tip">Gemini is multimodal—great for tasks involving text, images, and more.</Callout>
+</Accordion>
+
+<Accordion title="xAI (Grok)">
+1. [Sign up for xAI](https://console.x.ai/)
+2. Get your API key
+3. Paste your key in the LLM API Key field
+4. Choose a model (Grok Beta, Grok 2, etc.)
+5. Set the base URL (auto-filled for xAI)
+
+<Callout type="tip">Grok is fast and less restrictive—good for real-time or experimental use.</Callout>
+</Accordion>
+
+<Accordion title="Groq (Llama)">
+1. [Sign up for Groq](https://console.groq.com/)
+2. Get your API key
+3. Paste your key in the LLM API Key field
+4. Choose a model (Llama 3.3 70B, 3.1 8B, etc.)
+
+<Callout type="tip">Groq is all about speed—perfect for high-volume or latency-sensitive apps.</Callout>
+</Accordion>
+
+<Accordion title="Custom Endpoint">
+1. Enter your custom API endpoint URL
+2. (Optional) Add an API key if required
+3. Specify the model name
+
+<Callout type="warning">Custom endpoints are for advanced users. Make sure your API is OpenAI-compatible!</Callout>
+</Accordion>
+
+---
+
+## Fallback Chains
+
+<Callout type="success">
+You can add up to 3 fallback LLM providers. If your main provider fails, Burki Voice AI will automatically try the next one—keeping your assistant reliable.
+</Callout>
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common Issues">
+- **Invalid API key:** Double-check your key and provider dashboard
+- **Model not available:** Make sure your account has access to the selected model
+- **Timeouts or errors:** Try a different provider or set up fallbacks
+- **Custom endpoint issues:** Ensure your API matches the OpenAI API spec
+</Accordion> 

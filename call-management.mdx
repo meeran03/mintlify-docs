@@ -1,0 +1,180 @@
+---
+title: Call Management
+---
+
+# Call Management
+
+<Callout type="info">
+Burki Voice AI provides comprehensive call management features—from routing and recording to background sounds and call controls. Manage every aspect of your voice assistant's phone interactions.
+</Callout>
+
+---
+
+## Call Routing & Setup
+
+<Accordion title="Twilio Integration">
+**Prerequisites:**
+- Twilio account with purchased phone number
+- Media Streams enabled
+- Webhook configured to point to your Burki backend
+
+**Setup Steps:**
+1. Configure your Twilio webhook URL
+2. Enable Media Streams in your Twilio console
+3. Test incoming calls to ensure proper routing
+4. Monitor call quality and connection stability
+
+<Callout type="tip">
+Use Twilio's debugger to troubleshoot webhook and media stream issues.
+</Callout>
+</Accordion>
+
+<Accordion title="Phone Number Management">
+- **Multiple Numbers:** Route different numbers to different assistants
+- **Number Formatting:** Ensure proper E.164 format (+1234567890)
+- **Geographic Routing:** Use local numbers for better caller experience
+- **Fallback Numbers:** Configure backup routing for high availability
+</Accordion>
+
+---
+
+## Recording Settings
+
+<Accordion title="Recording Configuration">
+**Available Options:**
+- **User Audio:** Record what callers say
+- **Assistant Audio:** Record AI responses
+- **Mixed Audio:** Combined recording of both parties
+
+**Formats:**
+- **MP3:** Recommended for quality and compression
+- **WAV:** Uncompressed, larger file size
+
+**Sample Rates:**
+- **8000 Hz:** Phone quality (default)
+- **22050 Hz:** Higher quality (upsampled for MP3)
+
+<Callout type="warning">
+Recording settings affect storage costs and processing time. Choose based on your compliance and quality needs.
+</Callout>
+</Accordion>
+
+<Accordion title="Recording Storage">
+- **Local Storage:** Save recordings to your server
+- **S3 Integration:** Store recordings in AWS S3
+- **Auto-Save:** Automatically save when calls end
+- **Database Records:** Create database entries for recordings
+- **Directory Structure:** Organize recordings by date/assistant/call
+</Accordion>
+
+---
+
+## Background Sound
+
+<Accordion title="Background Audio Options">
+**Use Cases:**
+- Restaurant ambiance for food ordering
+- Office sounds for business calls
+- Music for on-hold experiences
+- Custom brand audio
+
+**Configuration:**
+- **Audio File:** Upload your background sound file
+- **Volume Level:** Adjust background audio volume
+- **Loop Settings:** Continuous or one-time playback
+- **Fade In/Out:** Smooth audio transitions
+
+<Callout type="tip">
+Keep background sounds subtle—they should enhance, not distract from the conversation.
+</Callout>
+</Accordion>
+
+---
+
+## Call Controls
+
+<Accordion title="Call Flow Management">
+**Start of Call:**
+- **Greeting Message:** What the AI says first
+- **Timeout Settings:** How long to wait for caller response
+- **Language Detection:** Automatically detect caller language
+
+**During Call:**
+- **Interruption Handling:** How to manage when callers speak over the AI
+- **Silence Detection:** When to prompt for more input
+- **Transfer Options:** Route to human agents when needed
+
+**End of Call:**
+- **Goodbye Message:** Final message before hanging up
+- **Call Summary:** Generate and store call summaries
+- **Follow-up Actions:** Trigger webhooks or notifications
+</Accordion>
+
+<Accordion title="Advanced Call Features">
+- **Call Forwarding:** Transfer calls to human agents
+- **Conference Calling:** Multi-party call support
+- **Call Queuing:** Handle multiple simultaneous calls
+- **Priority Routing:** VIP caller handling
+- **Time-based Routing:** Different behavior by time of day
+</Accordion>
+
+---
+
+## Monitoring & Analytics
+
+<Accordion title="Real-time Monitoring">
+**Live Call Dashboard:**
+- Active calls in progress
+- Call duration and status
+- Transcription quality metrics
+- Error rates and connection issues
+
+**Alerts:**
+- Failed call attempts
+- High error rates
+- Unusual call patterns
+- System performance issues
+</Accordion>
+
+<Accordion title="Call Analytics">
+**Metrics to Track:**
+- Call volume and duration
+- Successful completion rates
+- Common caller intents
+- Response accuracy
+- Customer satisfaction scores
+
+**Reports:**
+- Daily/weekly/monthly summaries
+- Trend analysis
+- Performance comparisons
+- Cost analysis
+</Accordion>
+
+---
+
+## Best Practices
+
+- **Test thoroughly** with different phone types and carriers
+- **Monitor call quality** regularly and adjust settings as needed
+- **Keep recordings** for compliance and quality assurance
+- **Use background sounds sparingly** to avoid distraction
+- **Set appropriate timeouts** to balance responsiveness and patience
+- **Plan for peak traffic** and scale accordingly
+- **Regular maintenance** of phone numbers and routing rules
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common Call Issues">
+- **Calls not connecting:** Check Twilio webhook configuration
+- **Poor audio quality:** Verify media stream settings and network
+- **Recordings not saving:** Check storage permissions and disk space
+- **Background audio too loud:** Adjust volume levels in settings
+- **Calls dropping:** Monitor network stability and Twilio logs
+</Accordion>
+
+<Callout type="tip">
+Use Twilio's comprehensive logging and debugging tools to diagnose call issues quickly.
+</Callout> 

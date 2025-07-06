@@ -1,0 +1,102 @@
+---
+title: AI Configuration (Deep Dive)
+---
+
+# AI Configuration (Deep Dive)
+
+<Callout type="info">
+This is where you give your assistant its brain, voice, and ears! Configure how your AI thinks, speaks, and listens.
+</Callout>
+
+---
+
+## The Tabbed Interface
+
+When creating or editing an assistant, you'll see three main tabs:
+
+<Tabs>
+  <Tab label="LLM (Language Model)">
+
+  ### What is the LLM?
+  The LLM (Large Language Model) is the "brain" of your assistant. It understands what callers say and generates smart, helpful responses.
+
+  ### Key Settings
+  <Checklist>
+  - **Provider:** Choose from OpenAI, Anthropic, Gemini, xAI, Groq, or a custom endpoint.
+  - **API Key:** Paste your provider's API key (get it from their dashboard).
+  - **Model:** Pick the model (e.g., GPT-4o, Claude 3.5, Gemini 2.0 Flash).
+  - **Base URL:** (For some providers) Set a custom API endpoint.
+  - **Temperature:** Controls creativity. Lower = more predictable, higher = more creative. <br/> <Callout type="tip">0.7 is a good starting point!</Callout>
+  - **Max Tokens:** Limits response length. <br/> <Callout type="tip">1000 tokens ≈ 250 words. Good for phone calls.</Callout>
+  - **System Prompt:** Set your AI's personality and instructions (e.g., "You are a friendly assistant...").
+  - **Greeting Message:** The first thing callers hear.
+  - **Fallback Providers:** Add up to 3 backup LLMs for reliability.
+  </Checklist>
+
+  <Accordion title="How do Fallbacks Work?">
+  If your main LLM provider fails (e.g., rate limit, downtime), the system automatically tries your backup providers in order. This keeps your assistant reliable—even if one provider has issues.
+  </Accordion>
+
+  </Tab>
+  <Tab label="TTS (Text-to-Speech)">
+
+  ### What is TTS?
+  TTS turns the AI's text responses into a natural-sounding voice.
+
+  ### Key Settings
+  <Checklist>
+  - **Provider:** ElevenLabs, Deepgram, Inworld, or Resemble
+  - **Model:** Choose the voice quality/speed (e.g., Flash v2.5, Aura-2)
+  - **Voice:** Pick a character (Rachel, Luna, custom, etc.)
+  - **Language:** (For multilingual models) Select the spoken language
+  - **Latency/Speed:** How fast the voice responds (lower = faster, may reduce quality)
+  - **Stability/Similarity/Style:** Fine-tune voice consistency, accuracy, and expressiveness (provider-specific)
+  - **Speaker Boost:** Enhance clarity and reduce background noise
+  - **Custom Voice ID:** Use your own cloned or custom voice (where supported)
+  - **Encoding/Sample Rate:** (Advanced) Control audio format for phone quality
+  - **Project UUID:** (Resemble) Required for WebSocket streaming
+  </Checklist>
+
+  <Accordion title="Tips for Best Voice Quality">
+  - For phone calls, use Flash v2.5 (ElevenLabs) or Aura-2 (Deepgram) for ultra-low latency
+  - Use Speaker Boost for noisy environments
+  - Test different voices to match your brand
+  </Accordion>
+
+  </Tab>
+  <Tab label="STT (Speech-to-Text)">
+
+  ### What is STT?
+  STT converts what the caller says into text for the AI to understand.
+
+  ### Key Settings
+  <Checklist>
+  - **Model:** Nova-3, Nova-2, Enhanced, etc. (Deepgram)
+  - **Language:** Choose the spoken language (or enter a custom code)
+  - **Silence Threshold/Min Silence:** Fine-tune how the system detects when someone is done speaking
+  - **Utterance End/VAD Turnoff:** Controls for advanced timing
+  - **Punctuation/Interim Results/Smart Format:** Make transcripts easier to read and use
+  - **Audio Denoising:** Remove background noise for better accuracy (uses RNNoise)
+  - **Keywords/Keyterms:** Boost recognition of important words (e.g., company names)
+  </Checklist>
+
+  <Accordion title="Troubleshooting STT">
+  - If the AI misses words, try enabling denoising or adding keywords
+  - For non-English calls, set the correct language code
+  - Adjust silence settings if the AI cuts callers off too soon or waits too long
+  </Accordion>
+
+  </Tab>
+</Tabs>
+
+---
+
+## Best Practices
+
+- **Start simple:** Use recommended defaults, then experiment with advanced settings
+- **Test with real calls:** Try different voices, models, and fallback setups
+- **Document your changes:** Keep track of what works best for your use case
+
+<Callout type="tip">
+If you get stuck, check the tooltips in the UI or visit the [FAQ](./faq)!
+</Callout> 

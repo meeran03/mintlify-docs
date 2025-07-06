@@ -1,0 +1,62 @@
+---
+title: Configuration
+description: "Reference for Burki Voice AI environment variables and settings"
+---
+
+# Configuration
+
+This page lists all key environment variables and configuration options for Burki Voice AI.
+
+## Environment Variables
+Set these in your `.env` file or as environment variables in your deployment platform.
+
+### Database
+- `DATABASE_URL` — PostgreSQL connection string (e.g., `postgresql://user:pass@host:5432/dbname`)
+
+### Telephony
+- `TWILIO_ACCOUNT_SID` — Twilio account SID
+- `TWILIO_AUTH_TOKEN` — Twilio auth token
+
+### Speech-to-Text
+- `DEEPGRAM_API_KEY` — Deepgram API key
+
+### Language Models
+- `OPENAI_API_KEY` — OpenAI API key
+- `ELEVENLABS_API_KEY` — ElevenLabs API key
+- `INWORLD_BEARER_TOKEN` — Inworld API token (optional)
+- `RESEMBLE_API_KEY` — Resemble API key (optional)
+
+### Storage
+- `S3_ACCESS_KEY_ID` — S3 access key (if using S3)
+- `S3_SECRET_ACCESS_KEY` — S3 secret key
+- `S3_BUCKET_NAME` — S3 bucket name
+- `S3_REGION` — S3 region
+
+### Security & Auth
+- `SECRET_KEY` — Secret for session and JWT signing
+- `GOOGLE_CLIENT_ID` — Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` — Google OAuth client secret
+
+### Other
+- `AUDIO_DENOISING_METHOD` — (optional) `rnnoise`, `fallback`, or `auto`
+- `AUDIO_DENOISING_DEFAULT` — (optional) `true` or `false`
+
+## Example .env File
+```env
+DATABASE_URL=postgresql://user:pass@localhost:5432/burki
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_token
+DEEPGRAM_API_KEY=your_deepgram_key
+OPENAI_API_KEY=your_openai_key
+ELEVENLABS_API_KEY=your_elevenlabs_key
+SECRET_KEY=supersecretkey
+```
+
+## Configuration Tips
+- Never commit your `.env` file or secrets to version control.
+- Use different secrets for development and production.
+- For cloud deployment, set environment variables in your platform's dashboard.
+
+<Callout type="info">
+For advanced deployment and scaling, see the [Deployment](deployment) guide.
+</Callout> 
