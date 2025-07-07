@@ -194,7 +194,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://burki.ai/dashboard"
+      "href": "https://burki.dev/dashboard"
     }
   },
   "footer": {
