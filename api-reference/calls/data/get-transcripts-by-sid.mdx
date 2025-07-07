@@ -1,4 +1,41 @@
 ---
 title: 'Get Transcripts by Call SID'
 openapi: 'GET /api/v1/calls/sid/{call_sid}/transcripts'
---- 
+---
+
+This endpoint retrieves a list of all transcript entries for a specific call, identified by its Twilio Call SID.
+
+### Path Parameters
+
+- `call_sid` (string, **required**): The unique Call SID from Twilio.
+
+### Query Parameters
+
+- `speaker` (string, optional): Filter transcripts by the speaker.
+  - Allowed values: `user`, `assistant`.
+- `include_interim` (boolean, optional, default: false): Whether to include non-final (interim) transcript entries.
+
+### Response
+
+The response is a JSON array of transcript objects.
+
+```json Response
+[
+  {
+    "id": 1,
+    "call_id": 101,
+    "text": "Hello, how can I help you today?",
+    "speaker": "assistant",
+    "is_final": true,
+    "timestamp": "2023-10-30T10:00:05Z"
+  },
+  {
+    "id": 2,
+    "call_id": 101,
+    "text": "Yes, I'd like to check the status of my order.",
+    "speaker": "user",
+    "is_final": true,
+    "timestamp": "2023-10-30T10:00:10Z"
+  }
+]
+``` 

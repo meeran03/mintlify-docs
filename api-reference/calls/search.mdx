@@ -1,4 +1,37 @@
 ---
 title: 'Search Calls'
 openapi: 'GET /api/v1/calls/search'
---- 
+---
+
+This endpoint allows you to perform a full-text search across your call records. The search will look for matches in fields like assistant name, phone numbers, and transcript content.
+
+### Query Parameters
+
+- `q` (string, **required**): The search query. Must be at least 3 characters long.
+- `limit` (integer, optional, default: 50): The maximum number of search results to return.
+
+### Response
+
+The response is a JSON array of call objects that match the search query. The structure of each call object is the same as the one returned by the [List Calls](/api-reference/calls/list) endpoint.
+
+```json Response
+[
+  {
+    "id": 101,
+    "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "assistant_id": 123,
+    "to_phone_number": "+15551234567",
+    "customer_phone_number": "+15559876543",
+    "status": "completed",
+    "started_at": "2023-10-30T10:00:00Z",
+    "ended_at": "2023-10-30T10:05:00Z",
+    "duration": 300,
+    "cost": 0.05,
+    "metadata": {
+      "customer_id": "cust_abc123"
+    },
+    "created_at": "2023-10-30T10:00:00Z",
+    "updated_at": "2023-10-30T10:05:00Z"
+  }
+]
+``` 

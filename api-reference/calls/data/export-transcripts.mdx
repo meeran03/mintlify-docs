@@ -1,4 +1,58 @@
 ---
 title: 'Export Transcripts'
 openapi: 'GET /api/v1/calls/{call_id}/transcripts/export'
---- 
+---
+
+This endpoint allows you to export the full transcript of a specific call to a file. You can choose from several formats.
+
+The response from this endpoint will be a file download.
+
+### Path Parameters
+
+- `call_id` (integer, **required**): The unique identifier for the call whose transcript you want to export.
+
+### Query Parameters
+
+- `format` (string, optional, default: `txt`): The desired file format.
+  - Allowed values: `txt`, `json`, `csv`.
+- `speaker` (string, optional): Filter transcripts to include only a specific speaker (`user` or `assistant`).
+
+### Response Formats
+
+**If `format=txt`:**
+
+You will receive a plain text file (`.txt`) with the conversation formatted for readability.
+
+```text Text Content
+[2023-10-30T10:00:05Z] assistant: Hello, how can I help you today?
+[2023-10-30T10:00:10Z] user: Yes, I'd like to check the status of my order.
+```
+
+**If `format=json`:**
+
+You will receive a JSON file (`.json`) containing an array of transcript objects.
+
+```json JSON Content
+[
+  {
+    "speaker": "assistant",
+    "text": "Hello, how can I help you today?",
+    "timestamp": "2023-10-30T10:00:05Z"
+  },
+  {
+    "speaker": "user",
+    "text": "Yes, I'd like to check the status of my order.",
+    "timestamp": "2023-10-30T10:00:10Z"
+  }
+]
+```
+
+**If `format=csv`:**
+
+You will receive a CSV file (`.csv`) with the transcript data.
+
+```csv CSV Content
+"timestamp","speaker","text"
+"2023-10-30T10:00:05Z","assistant","Hello, how can I help you today?"
+"2023-10-30T10:00:10Z","user","Yes, I'd like to check the status of my order."
+``` 

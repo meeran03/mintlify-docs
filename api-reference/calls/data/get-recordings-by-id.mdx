@@ -1,4 +1,27 @@
 ---
 title: 'Get Recordings by Call ID'
 openapi: 'GET /api/v1/calls/{call_id}/recordings'
---- 
+---
+
+This endpoint retrieves a list of all recordings associated with a specific call, identified by its database ID.
+
+### Path Parameters
+
+- `call_id` (integer, **required**): The unique identifier for the call.
+
+### Response
+
+The response is a JSON array of recording objects. Each object contains details about a recording, including a URL to the audio file.
+
+```json Response
+[
+  {
+    "id": 1,
+    "call_id": 101,
+    "recording_sid": "RExxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "url": "https://api.twilio.com/2010-04-01/Accounts/AC.../Recordings/RE...",
+    "duration": 300,
+    "created_at": "2023-10-30T10:05:01Z"
+  }
+]
+``` 
