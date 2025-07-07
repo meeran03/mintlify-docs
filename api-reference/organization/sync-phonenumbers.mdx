@@ -1,4 +1,20 @@
 ---
 title: 'Sync Phone Numbers'
 openapi: 'POST /api/v1/assistants/organization/phone-numbers/sync'
---- 
+---
+
+This endpoint triggers a synchronization process with your linked Twilio account. It fetches all phone numbers from Twilio and adds any numbers that are not already present in your organization's database.
+
+This is useful for ensuring that your local database is up-to-date with the phone numbers available in your Twilio account. The request does not require a body.
+
+### Response
+
+A successful sync will return a JSON object confirming the operation and stating how many new numbers were added.
+
+```json Response
+{
+  "success": true,
+  "message": "Successfully synced 3 phone numbers from Twilio",
+  "synced_count": 3
+}
+``` 

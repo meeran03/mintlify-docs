@@ -1,4 +1,46 @@
 ---
 title: 'List Organization Phone Numbers'
 openapi: 'GET /api/v1/assistants/organization/phone-numbers'
---- 
+---
+
+This endpoint retrieves a list of all phone numbers belonging to your organization. It includes information about each number's assignment status.
+
+### Query Parameters
+
+- `include_assigned` (boolean, optional, default: true): Set to `false` to exclude numbers that are currently assigned to an assistant.
+- `include_unassigned` (boolean, optional, default: true): Set to `false` to exclude numbers that are not currently assigned to any assistant.
+
+### Response
+
+The response is a JSON array of phone number objects. If a number is assigned, the `assistant` field will contain details about the assistant it's linked to.
+
+```json Response
+[
+  {
+    "id": 1,
+    "phone_number": "+15551234567",
+    "friendly_name": "Main Support Line",
+    "twilio_sid": "PNxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "is_active": true,
+    "capabilities": { "voice": true, "sms": true, "mms": true },
+    "assistant": {
+      "id": 123,
+      "name": "Customer Service Bot",
+      "is_active": true
+    },
+    "created_at": "2023-10-01T10:00:00Z",
+    "updated_at": "2023-10-26T11:00:00Z"
+  },
+  {
+    "id": 2,
+    "phone_number": "+15557654321",
+    "friendly_name": "Sales Department",
+    "twilio_sid": "PNyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+    "is_active": true,
+    "capabilities": { "voice": true, "sms": false, "mms": false },
+    "assistant": null,
+    "created_at": "2023-10-02T12:00:00Z",
+    "updated_at": null
+  }
+]
+``` 

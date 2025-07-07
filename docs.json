@@ -3,9 +3,12 @@
   "theme": "mint",
   "name": "Burki Voice AI Docs",
   "colors": {
-    "primary": "#3b82f6",
-    "light": "#8b5cf6",
-    "dark": "#0f172a"
+    "primary": "#10B981",
+    "light": "#A3FFAE",
+    "dark": "#0D1117",
+    "background": {
+        "dark": "#0D1117"
+    }
   },
   "favicon": "/favicon.svg",
   "navigation": {

@@ -1,4 +1,28 @@
 ---
 title: 'List Available Phone Numbers'
 openapi: 'GET /api/v1/assistants/organization/phone-numbers/available'
---- 
+---
+
+This endpoint is a convenient way to retrieve a list of all phone numbers in your organization that are not currently assigned to an assistant. This is useful for finding numbers that are available to be linked to a new or existing assistant.
+
+This endpoint takes no parameters.
+
+### Response
+
+The response is a JSON array of phone number objects. The `assistant` field for each object will be `null`.
+
+```json Response
+[
+  {
+    "id": 2,
+    "phone_number": "+15557654321",
+    "friendly_name": "Sales Department",
+    "twilio_sid": "PNyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+    "is_active": true,
+    "capabilities": { "voice": true, "sms": false, "mms": false },
+    "assistant": null,
+    "created_at": "2023-10-02T12:00:00Z",
+    "updated_at": null
+  }
+]
+``` 

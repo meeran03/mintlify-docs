@@ -95,6 +95,35 @@ You can always add more advanced features later!
 
 ---
 
+## 5. Making Your First API Call
+
+Once your assistant is created, you can interact with it using the API. All API requests must be authenticated using a Bearer Token.
+
+### A. Get Your API Key
+
+1.  From the web interface, click on your profile/organization name in the top right corner.
+2.  Navigate to **API Keys**.
+3.  Click **"Generate New API Key"**.
+4.  Give it a descriptive name and click **"Create"**.
+5.  **Copy the key immediately!** You won't be able to see it again for security reasons.
+
+### B. Authenticate Your Request
+
+To make an authenticated API call, include the API key in the `Authorization` header of your request, prefixed with `Bearer `.
+
+Here is an example using `curl` to list your assistants:
+
+```bash
+# Replace <YOUR_API_KEY> with the key you just copied
+curl -X GET "http://localhost:8000/api/v1/assistants/" \
+     -H "Authorization: Bearer <YOUR_API_KEY>" \
+     -H "Content-Type: application/json"
+```
+
+A successful request will return a JSON array of your assistants. Now you're ready to explore the full [API Reference](/api-reference/introduction)!
+
+---
+
 ## Next Steps
 
 - [Installation & Setup](./installation)
