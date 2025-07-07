@@ -1,0 +1,646 @@
+---
+title: "Resemble AI TTS"
+description: "Custom voice creation with WebSocket streaming for brand-specific voice identity"
+---
+
+<Card title="🎯 Resemble AI: Custom Brand Voices" icon="bullseye">
+  Create unlimited custom voices with your brand's unique sound. WebSocket streaming ensures real-time responses for professional applications.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Get API Credentials">
+    1. Visit [Resemble AI](https://app.resemble.ai) and create an account
+    2. Navigate to **Settings** → **API Keys**
+    3. Generate an API key with TTS permissions
+    4. Copy your **API Key** and **Project UUID**
+  </Step>
+  <Step title="Create Custom Voice">
+    1. Go to **Voices** in your Resemble dashboard
+    2. Click **Create Voice** and upload voice samples
+    3. Wait for training completion (~30 minutes)
+    4. Copy the generated **Voice UUID**
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **Resemble AI** as provider
+    3. Enter your **API Key**, **Project UUID**, and **Voice UUID**
+  </Step>
+</Steps>
+
+<Callout type="warning">
+**Business Plan Required**: WebSocket streaming (required for real-time TTS) is only available on Business plans ($99+/month).
+</Callout>
+
+## Voice Creation Process
+
+<Card title="🎙️ Build Your Brand Voice" icon="microphone">
+  Resemble AI specializes in creating custom voices that match your brand personality and requirements.
+</Card>
+
+### Voice Training Steps
+
+<Tabs>
+  <Tab title="Voice Samples">
+    **Upload Requirements**:
+    - **Duration**: 3-10 minutes of clean audio
+    - **Format**: WAV or MP3, 22kHz+ sample rate
+    - **Content**: Read diverse sentences for best results
+    - **Quality**: Clear speech, minimal background noise
+    
+    ```text
+    Example training script:
+    "Hello, my name is [Speaker Name]. I work at [Company Name] 
+    as a customer service representative. Today I'll be reading 
+    various sentences to help train an AI voice model. 
+    The weather is beautiful today with clear blue skies. 
+    Our company provides excellent customer support services."
+    ```
+  </Tab>
+  
+  <Tab title="Training Process">
+    <Steps>
+      <Step title="Upload Audio">
+        Upload 3-10 minutes of clear voice samples
+      </Step>
+      <Step title="Processing">
+        Resemble processes and analyzes vocal characteristics
+      </Step>
+      <Step title="Training">
+        AI model trains on voice patterns (~20-30 minutes)
+      </Step>
+      <Step title="Quality Check">
+        Test generated voice with sample text
+      </Step>
+      <Step title="Deployment">
+        Voice becomes available via API with unique UUID
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Voice Quality Tips">
+    **Optimize Training Quality**:
+    
+    ✅ **Do**:
+    - Use consistent microphone and environment
+    - Speak at natural pace and volume
+    - Include various sentence types (questions, statements, emotions)
+    - Record in quiet environment
+    - Use the same speaker throughout
+    
+    ❌ **Avoid**:
+    - Background noise or echo
+    - Multiple speakers in training data
+    - Overly dramatic or unnatural speech
+    - Low-quality audio recordings
+    - Inconsistent recording conditions
+  </Tab>
+</Tabs>
+
+## Available Models
+
+<Card title="🔧 Synthesis Models" icon="cog">
+  Resemble AI focuses on custom voice synthesis rather than multiple models.
+</Card>
+
+<CardGroup cols={1}>
+  <Card title="Default Synthesis Model" icon="star">
+    **~300ms latency**
+    
+    High-quality neural synthesis optimized for custom voices
+    
+    **Features**:
+    - Custom voice support
+    - WebSocket streaming
+    - Phone-compatible formats
+    - Twilio integration ready
+    
+    **Best for**: Brand-specific applications, personalized experiences
+  </Card>
+</CardGroup>
+
+<Callout type="info">
+**Model Focus**: Unlike other providers, Resemble specializes in voice quality and customization rather than offering multiple model options.
+</Callout>
+
+## WebSocket Streaming
+
+<Card title="⚡ Real-Time Streaming" icon="bolt">
+  WebSocket streaming enables real-time TTS for live applications like phone calls and interactive experiences.
+</Card>
+
+### Streaming Setup
+
+<CodeGroup>
+
+```python Python
+import asyncio
+import websockets
+import json
+import base64
+
+async def stream_resemble_tts():
+    uri = "wss://websocket.cluster.resemble.ai/stream"
+    
+    headers = {
+        "Authorization": "Bearer YOUR_RESEMBLE_API_KEY"
+    }
+    
+    async with websockets.connect(uri, extra_headers=headers) as websocket:
+        # Initialize streaming session
+        init_message = {
+            "type": "initialize",
+            "project_uuid": "YOUR_PROJECT_UUID",
+            "voice_uuid": "YOUR_VOICE_UUID",
+            "sample_rate": 8000,
+            "precision": "MULAW",
+            "output_format": "wav"
+        }
+        
+        await websocket.send(json.dumps(init_message))
+        
+        # Send text for synthesis
+        text_message = {
+            "type": "text",
+            "text": "Hello from Resemble AI streaming!",
+            "request_id": "unique_request_id_123"
+        }
+        
+        await websocket.send(json.dumps(text_message))
+        
+        # Receive audio chunks
+        async for message in websocket:
+            data = json.loads(message)
+            
+            if data.get("type") == "audio":
+                audio_content = data.get("audio_content")
+                if audio_content:
+                    audio_data = base64.b64decode(audio_content)
+                    # Process audio chunk
+                    yield audio_data
+```
+
+```javascript JavaScript
+const WebSocket = require('ws');
+
+const streamResembleTTS = () => {
+  const ws = new WebSocket('wss://websocket.cluster.resemble.ai/stream', {
+    headers: {
+      'Authorization': 'Bearer YOUR_RESEMBLE_API_KEY'
+    }
+  });
+
+  ws.on('open', () => {
+    // Initialize streaming session
+    const initMessage = {
+      type: 'initialize',
+      project_uuid: 'YOUR_PROJECT_UUID',
+      voice_uuid: 'YOUR_VOICE_UUID',
+      sample_rate: 8000,
+      precision: 'MULAW',
+      output_format: 'wav'
+    };
+    
+    ws.send(JSON.stringify(initMessage));
+
+    // Send text for synthesis
+    const textMessage = {
+      type: 'text',
+      text: 'Hello from Resemble AI streaming!',
+      request_id: 'unique_request_id_123'
+    };
+    
+    ws.send(JSON.stringify(textMessage));
+  });
+
+  ws.on('message', (data) => {
+    const response = JSON.parse(data);
+    
+    if (response.type === 'audio') {
+      const audioData = Buffer.from(response.audio_content, 'base64');
+      // Process audio chunk
+      console.log('Received audio chunk:', audioData.length, 'bytes');
+    }
+  });
+};
+```
+
+```curl cURL
+# WebSocket connection setup (use wscat or similar tool)
+wscat -c "wss://websocket.cluster.resemble.ai/stream" \
+  -H "Authorization: Bearer YOUR_RESEMBLE_API_KEY"
+
+# Send initialization message:
+{
+  "type": "initialize",
+  "project_uuid": "YOUR_PROJECT_UUID",
+  "voice_uuid": "YOUR_VOICE_UUID",
+  "sample_rate": 8000,
+  "precision": "MULAW",
+  "output_format": "wav"
+}
+
+# Send text message:
+{
+  "type": "text",
+  "text": "Hello from Resemble AI streaming!",
+  "request_id": "unique_request_id_123"
+}
+```
+
+</CodeGroup>
+
+### Audio Format Configuration
+
+<Tabs>
+  <Tab title="Phone Calls (Recommended)">
+    ```json
+    {
+      "sample_rate": 8000,
+      "precision": "MULAW",
+      "output_format": "wav"
+    }
+    ```
+    
+    **Use Case**: Twilio, phone systems, VoIP
+    **Quality**: Optimized for voice clarity over networks
+    **Compatibility**: Universal phone system support
+  </Tab>
+  
+  <Tab title="High Quality">
+    ```json
+    {
+      "sample_rate": 22050,
+      "precision": "PCM_16",
+      "output_format": "wav"
+    }
+    ```
+    
+    **Use Case**: Web applications, content creation
+    **Quality**: High-fidelity audio for premium experiences
+    **File Size**: Larger files, better for non-real-time use
+  </Tab>
+  
+  <Tab title="Balanced">
+    ```json
+    {
+      "sample_rate": 16000,
+      "precision": "PCM_16",
+      "output_format": "wav"
+    }
+    ```
+    
+    **Use Case**: General applications, chatbots
+    **Quality**: Good balance of quality and performance
+    **Compatibility**: Works well for most use cases
+  </Tab>
+</Tabs>
+
+## Custom Voice Management
+
+<Card title="🎛️ Voice Library Management" icon="folder">
+  Organize and manage your custom voices for different use cases and brand requirements.
+</Card>
+
+### Voice Categories
+
+<Accordion title="Brand Representative Voices">
+**Use Case**: Customer service, sales, brand communication
+
+**Characteristics**:
+- Professional and approachable tone
+- Consistent with brand personality
+- Clear pronunciation and pacing
+- Suitable for extended conversations
+
+**Training Tips**:
+- Use your actual customer service representatives
+- Record in professional setting
+- Include common business phrases and terminology
+- Test with actual customer scripts
+</Accordion>
+
+<Accordion title="Character Voices">
+**Use Case**: Gaming, entertainment, interactive media
+
+**Characteristics**:
+- Distinctive personality traits
+- Appropriate for character backstory
+- Emotionally expressive range
+- Memorable and engaging
+
+**Training Tips**:
+- Work with voice actors who understand the character
+- Include emotional range in training samples
+- Record character-appropriate content
+- Test with actual dialogue scripts
+</Accordion>
+
+<Accordion title="Narrator Voices">
+**Use Case**: E-learning, audiobooks, documentation
+
+**Characteristics**:
+- Clear and educational tone
+- Good pacing for comprehension
+- Neutral but engaging delivery
+- Suitable for long-form content
+
+**Training Tips**:
+- Use experienced narrators or educators
+- Include varied sentence structures
+- Practice with actual educational content
+- Focus on clarity and comprehension
+</Accordion>
+
+### Voice UUID Management
+
+```python
+# Example voice management system
+VOICE_LIBRARY = {
+    "customer_service_female": "uuid-1234-5678-abcd",
+    "customer_service_male": "uuid-2345-6789-bcde",
+    "ceo_announcements": "uuid-3456-7890-cdef",
+    "technical_support": "uuid-4567-8901-defa",
+    "marketing_spokesperson": "uuid-5678-9012-efab"
+}
+
+def get_voice_for_context(context_type):
+    """Select appropriate voice based on interaction context"""
+    voice_mapping = {
+        "support": VOICE_LIBRARY["customer_service_female"],
+        "sales": VOICE_LIBRARY["marketing_spokesperson"],
+        "technical": VOICE_LIBRARY["technical_support"],
+        "announcements": VOICE_LIBRARY["ceo_announcements"]
+    }
+    
+    return voice_mapping.get(context_type, VOICE_LIBRARY["customer_service_female"])
+```
+
+## Integration Examples
+
+<Tabs>
+  <Tab title="Customer Service Bot">
+    ```python
+    import asyncio
+    from resemble_ai import ResembleStreaming
+    
+    class CustomerServiceTTS:
+        def __init__(self):
+            self.voice_uuid = "customer-service-voice-uuid"
+            self.project_uuid = "your-project-uuid"
+            
+        async def handle_customer_inquiry(self, customer_message, inquiry_type):
+            # Select appropriate voice based on inquiry type
+            if inquiry_type == "complaint":
+                response_tone = "empathetic"
+                text = f"I understand your concern and I'm here to help resolve this issue for you."
+            elif inquiry_type == "sales":
+                response_tone = "enthusiastic"
+                text = f"I'd be happy to tell you more about that product!"
+            else:
+                response_tone = "professional"
+                text = f"Thank you for contacting us. How may I assist you today?"
+            
+            # Stream TTS response
+            async for audio_chunk in self.stream_response(text):
+                yield audio_chunk
+                
+        async def stream_response(self, text):
+            # Implementation details for streaming
+            pass
+    ```
+  </Tab>
+  
+  <Tab title="Brand Spokesperson">
+    ```python
+    class BrandSpokesperson:
+        def __init__(self, brand_voice_uuid):
+            self.brand_voice = brand_voice_uuid
+            self.brand_phrases = {
+                "greeting": "Welcome to [Brand Name], where innovation meets excellence.",
+                "closing": "Thank you for choosing [Brand Name]. We look forward to serving you.",
+                "value_prop": "At [Brand Name], we believe in delivering exceptional value to every customer."
+            }
+            
+        async def deliver_message(self, message_type, custom_content=None):
+            if message_type in self.brand_phrases:
+                text = self.brand_phrases[message_type]
+            else:
+                text = custom_content
+                
+            # Ensure brand consistency
+            text = self.apply_brand_tone(text)
+            
+            return await self.synthesize_with_brand_voice(text)
+            
+        def apply_brand_tone(self, text):
+            # Add brand-specific modifications
+            # (tone adjustments, terminology, etc.)
+            return text
+    ```
+  </Tab>
+  
+  <Tab title="Multi-Voice Application">
+    ```python
+    class MultiVoiceSystem:
+        def __init__(self):
+            self.voices = {
+                "announcer": "announcer-voice-uuid",
+                "customer_service": "cs-voice-uuid",
+                "technical_expert": "tech-voice-uuid",
+                "sales_rep": "sales-voice-uuid"
+            }
+            
+        async def route_to_appropriate_voice(self, message, context):
+            # Determine which voice to use based on context
+            if context.get("department") == "technical":
+                voice_uuid = self.voices["technical_expert"]
+            elif context.get("intent") == "purchase":
+                voice_uuid = self.voices["sales_rep"]
+            elif context.get("type") == "announcement":
+                voice_uuid = self.voices["announcer"]
+            else:
+                voice_uuid = self.voices["customer_service"]
+                
+            return await self.synthesize_with_voice(message, voice_uuid)
+    ```
+  </Tab>
+</Tabs>
+
+## Pricing Structure
+
+<Card title="💰 Custom Voice Pricing" icon="dollar-sign">
+  Resemble AI pricing is based on usage and plan features. WebSocket streaming requires Business plans or higher.
+</Card>
+
+| Plan | Monthly Cost | Characters Included | WebSocket Streaming | Custom Voices |
+|------|-------------|-------------------|-------------------|---------------|
+| **Basic** | $29 | 200,000 | ❌ | 3 voices |
+| **Pro** | $89 | 800,000 | ❌ | 10 voices |
+| **Business** | $199 | 2,000,000 | ✅ | 25 voices |
+| **Enterprise** | Custom | Custom | ✅ | Unlimited |
+
+<Callout type="warning">
+**WebSocket Requirement**: Real-time TTS for phone calls requires Business plan ($199/month) or higher due to WebSocket streaming dependency.
+</Callout>
+
+### Cost Optimization Tips
+
+<Accordion title="Efficient Voice Usage">
+- **Voice Reuse**: Create versatile voices that work across multiple use cases
+- **Batch Processing**: Use REST API for non-real-time applications to save costs
+- **Smart Caching**: Cache frequently used phrases to reduce API calls
+- **Context-Aware Selection**: Use different voices only when necessary for user experience
+</Accordion>
+
+## Quality Assurance
+
+<Card title="🎯 Voice Quality Testing" icon="check-circle">
+  Ensure your custom voices meet production standards with systematic testing approaches.
+</Card>
+
+### Testing Framework
+
+<Steps>
+  <Step title="Initial Voice Validation">
+    Test basic voice quality with standard phrases
+  </Step>
+  <Step title="Domain-Specific Testing">
+    Test with actual content from your application domain
+  </Step>
+  <Step title="Edge Case Testing">
+    Test with numbers, abbreviations, and special cases
+  </Step>
+  <Step title="User Acceptance Testing">
+    Get feedback from actual users or stakeholders
+  </Step>
+  <Step title="Production Monitoring">
+    Monitor voice quality in real applications
+  </Step>
+</Steps>
+
+### Common Quality Issues
+
+<Accordion title="Pronunciation Problems">
+**Issue**: Custom voice mispronounces specific words
+
+**Solutions**:
+- Include problematic words in training data
+- Use phonetic spelling in TTS requests
+- Create pronunciation guide for domain-specific terms
+- Retrain voice with additional samples if needed
+
+**Example Fix**:
+```python
+# Phonetic corrections for common issues
+PRONUNCIATION_FIXES = {
+    "API": "A P I",
+    "HTTP": "H T T P",
+    "OAuth": "O Auth",
+    "UUID": "U U I D"
+}
+
+def apply_pronunciation_fixes(text):
+    for term, phonetic in PRONUNCIATION_FIXES.items():
+        text = text.replace(term, phonetic)
+    return text
+```
+</Accordion>
+
+<Accordion title="Emotional Range Limitations">
+**Issue**: Voice sounds monotone or lacks expression
+
+**Solutions**:
+- Include more emotional range in training samples
+- Use varied sentence types during training
+- Consider retraining with more expressive speaker
+- Test with TTS-specific emotional markup if available
+
+**Training Improvement**:
+```text
+Training script should include:
+- Questions: "How can I help you today?"
+- Excitement: "That's fantastic news!"
+- Concern: "I'm sorry to hear about that."
+- Professional: "Let me check that for you."
+```
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="WebSocket Connection Issues">
+**Problem**: Cannot establish WebSocket connection
+
+**Solutions**:
+- Verify Business plan subscription
+- Check API key permissions for streaming
+- Confirm project UUID is correct
+- Test connection with WebSocket debugging tools
+- Check firewall settings for WebSocket traffic
+</Accordion>
+
+<Accordion title="Voice UUID Not Found">
+**Problem**: Custom voice UUID returns error
+
+**Solutions**:
+- Verify voice training is completed
+- Check voice UUID spelling in configuration
+- Confirm voice is associated with correct project
+- Contact support if voice disappeared after training
+</Accordion>
+
+<Accordion title="Audio Quality Issues">
+**Problem**: Generated audio has artifacts or poor quality
+
+**Solutions**:
+- Adjust audio format settings (sample rate, precision)
+- Test with different output formats
+- Check if voice training data was high quality
+- Consider retraining voice with better samples
+- Verify network stability for streaming
+</Accordion>
+
+## Migration Guide
+
+<Tabs>
+  <Tab title="From Standard TTS Providers">
+    **Migration Benefits**:
+    - Custom brand voice consistency
+    - WebSocket streaming for real-time apps
+    - Unlimited voice creation potential
+    - Professional voice quality control
+    
+    **Migration Steps**:
+    1. **Voice Planning**: Decide what custom voices you need
+    2. **Training Data**: Collect high-quality voice samples
+    3. **Voice Creation**: Train your custom voices
+    4. **Testing**: Validate voice quality and performance
+    5. **Integration**: Update API calls to use custom voice UUIDs
+    6. **Monitoring**: Implement quality monitoring
+  </Tab>
+  
+  <Tab title="Voice Replacement Strategy">
+    **Generic Voice → Custom Voice Mapping**:
+    
+    ```python
+    # Migration mapping example
+    VOICE_MIGRATION = {
+        # Old generic voices → New custom voices
+        "rachel_elevenlabs": "custom_customer_service_female",
+        "josh_elevenlabs": "custom_customer_service_male",
+        "asteria_deepgram": "custom_phone_representative",
+        "ashley_inworld": "custom_friendly_assistant"
+    }
+    
+    def migrate_voice_selection(old_voice_id):
+        return VOICE_MIGRATION.get(old_voice_id, "default_custom_voice")
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+<Card title="🎯 Ready to Create Your Brand Voice?" icon="rocket">
+  Set up Resemble AI in your [assistant configuration](/ai-configuration) and start building custom voices that represent your brand perfectly!
+</Card> 

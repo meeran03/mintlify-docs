@@ -1,0 +1,948 @@
+---
+title: "TTS Best Practices"
+description: "Optimization strategies and proven techniques for exceptional TTS performance across all providers"
+---
+
+<Card title="📈 TTS Best Practices" icon="chart-line">
+  Master proven strategies to optimize performance, reduce costs, and deliver exceptional voice experiences across all TTS providers.
+</Card>
+
+## Performance Optimization
+
+<Card title="⚡ Speed & Latency Optimization" icon="bolt">
+  Minimize response times for real-time applications and improve user experience.
+</Card>
+
+### Text Preprocessing
+
+<Tabs>
+  <Tab title="Optimal Text Chunking">
+    **Chunk Size Guidelines:**
+    
+    | Provider | Optimal Chunk Size | Max Recommended | Reason |
+    |----------|-------------------|-----------------|---------|
+    | **ElevenLabs** | 50-100 chars | 500 chars | Streaming efficiency |
+    | **Deepgram** | 20-50 words | 100 words | WebSocket optimization |
+    | **Inworld** | 30-70 words | 150 words | Processing speed |
+    | **Resemble** | 40-80 words | 120 words | Streaming performance |
+    
+    ```python
+    def optimize_text_chunks(text, provider="elevenlabs"):
+        chunk_sizes = {
+            "elevenlabs": 80,
+            "deepgram": 35,
+            "inworld": 50,
+            "resemble": 60
+        }
+        
+        target_size = chunk_sizes.get(provider, 50)
+        return split_by_sentences(text, target_words=target_size)
+    ```
+  </Tab>
+  
+  <Tab title="Text Cleaning">
+    **Preprocessing Pipeline:**
+    
+    ```python
+    def clean_text_for_tts(text):
+        # Remove problematic characters
+        text = re.sub(r'[^\w\s\.,!?;:\-()"]', '', text)
+        
+        # Fix common abbreviations
+        abbreviations = {
+            "Dr.": "Doctor",
+            "Mr.": "Mister", 
+            "Mrs.": "Missus",
+            "API": "A P I",
+            "URL": "U R L",
+            "HTTP": "H T T P"
+        }
+        
+        for abbr, expansion in abbreviations.items():
+            text = text.replace(abbr, expansion)
+        
+        # Normalize whitespace
+        text = re.sub(r'\s+', ' ', text).strip()
+        
+        return text
+    ```
+    
+    **What to Remove/Fix:**
+    - Special Unicode characters
+    - Multiple consecutive punctuation
+    - Email addresses and URLs
+    - Technical abbreviations
+    - Excessive whitespace
+  </Tab>
+  
+  <Tab title="Sentence Boundary Detection">
+    **Smart Sentence Splitting:**
+    
+    ```python
+    import re
+    
+    def intelligent_sentence_split(text, max_words=50):
+        # Handle abbreviations that don't end sentences
+        text = re.sub(r'\b(Dr|Mr|Mrs|Ms|Prof)\.\s+', r'\1_DOT_ ', text)
+        
+        # Split on sentence endings
+        sentences = re.split(r'[.!?]+\s+', text)
+        
+        # Restore abbreviations
+        sentences = [s.replace('_DOT_', '.') for s in sentences]
+        
+        # Combine short sentences, split long ones
+        optimized = []
+        current = ""
+        
+        for sentence in sentences:
+            words = sentence.split()
+            if len(current.split()) + len(words) <= max_words:
+                current += " " + sentence if current else sentence
+            else:
+                if current:
+                    optimized.append(current.strip())
+                current = sentence
+        
+        if current:
+            optimized.append(current.strip())
+        
+        return optimized
+    ```
+  </Tab>
+</Tabs>
+
+### Connection Optimization
+
+<Accordion title="WebSocket Connection Management">
+**Best Practices for Streaming Providers:**
+
+```python
+class OptimizedTTSConnection:
+    def __init__(self, provider):
+        self.provider = provider
+        self.connection = None
+        self.last_activity = time.time()
+        
+    async def get_connection(self):
+        # Reuse existing connection if alive
+        if self.connection and self.is_connection_alive():
+            return self.connection
+            
+        # Create new connection
+        self.connection = await self.create_connection()
+        self.last_activity = time.time()
+        return self.connection
+    
+    async def keep_alive(self):
+        """Send periodic heartbeat to maintain connection"""
+        while self.connection:
+            await asyncio.sleep(30)  # Heartbeat every 30 seconds
+            if time.time() - self.last_activity > 300:  # 5 min timeout
+                await self.close_connection()
+                break
+            await self.send_heartbeat()
+```
+
+**Connection Pooling:**
+- Maintain pool of active connections
+- Implement connection health checks
+- Use round-robin for load distribution
+- Set appropriate timeout values
+</Accordion>
+
+<Accordion title="Caching Strategies">
+**Audio Response Caching:**
+
+```python
+import hashlib
+import pickle
+from functools import lru_cache
+
+class TTSCache:
+    def __init__(self, max_size_mb=100):
+        self.cache = {}
+        self.max_size = max_size_mb * 1024 * 1024  # Convert to bytes
+        self.current_size = 0
+    
+    def cache_key(self, text, provider, voice, settings):
+        """Generate unique cache key"""
+        key_data = f"{text}|{provider}|{voice}|{json.dumps(settings, sort_keys=True)}"
+        return hashlib.md5(key_data.encode()).hexdigest()
+    
+    def get(self, key):
+        if key in self.cache:
+            # Move to end (LRU)
+            value = self.cache.pop(key)
+            self.cache[key] = value
+            return value["audio"]
+        return None
+    
+    def set(self, key, audio_data):
+        audio_size = len(audio_data)
+        
+        # Evict if needed
+        while self.current_size + audio_size > self.max_size and self.cache:
+            oldest_key = next(iter(self.cache))
+            self.evict(oldest_key)
+        
+        self.cache[key] = {
+            "audio": audio_data,
+            "size": audio_size,
+            "timestamp": time.time()
+        }
+        self.current_size += audio_size
+```
+
+**What to Cache:**
+- Frequently used phrases
+- Greeting/closing messages
+- Error messages and notifications
+- Static content (announcements)
+</Accordion>
+
+## Provider-Specific Optimizations
+
+<Tabs>
+  <Tab title="ElevenLabs">
+    <Card title="🎭 ElevenLabs Optimization" icon="wand-magic-sparkles">
+      Maximize quality and minimize latency with ElevenLabs.
+    </Card>
+    
+    ### Model Selection Strategy
+    
+    ```python
+    def select_elevenlabs_model(use_case, latency_priority=False):
+        if latency_priority:
+            return {
+                "model": "eleven_flash_v2_5",
+                "latency": 1,  # Ultra-low latency
+                "stability": 0.5,
+                "similarity_boost": 0.75,
+                "use_speaker_boost": True
+            }
+        elif use_case == "multilingual":
+            return {
+                "model": "eleven_v3",
+                "stability": 0.5,
+                "similarity_boost": 0.75,
+                "style": 0.0
+            }
+        else:  # Balanced quality
+            return {
+                "model": "eleven_turbo_v2_5",
+                "stability": 0.5,
+                "similarity_boost": 0.75,
+                "style": 0.0,
+                "use_speaker_boost": True
+            }
+    ```
+    
+    ### Voice Selection Best Practices
+    
+    | Use Case | Recommended Voice | Settings | Reason |
+    |----------|------------------|----------|---------|
+    | **Business Calls** | Rachel | Stability: 0.6, Style: 0.0 | Professional, clear |
+    | **Customer Support** | Bella | Stability: 0.5, Style: 0.1 | Warm, helpful |
+    | **Announcements** | Antoni | Stability: 0.7, Style: 0.0 | Authoritative |
+    | **Casual Chat** | Domi | Stability: 0.4, Style: 0.2 | Friendly, expressive |
+    
+    ### Cost Optimization
+    
+    ```python
+    def optimize_elevenlabs_costs():
+        tips = {
+            "model_selection": "Use Flash v2.5 for speed, Turbo for balance",
+            "text_preprocessing": "Remove redundant words, use contractions",
+            "caching": "Cache frequent phrases to reduce API calls",
+            "voice_settings": "Find optimal settings once, don't over-tune"
+        }
+        
+        # Character counting
+        def estimate_cost(text, model="turbo"):
+            char_count = len(text)
+            rates = {
+                "flash": 0.000002,  # $0.000002 per character
+                "turbo": 0.000003,  # $0.000003 per character
+                "v3": 0.000006      # $0.000006 per character  
+            }
+            return char_count * rates.get(model, rates["turbo"])
+    ```
+  </Tab>
+  
+  <Tab title="Deepgram">
+    <Card title="⚡ Deepgram Optimization" icon="bolt">
+      Maximize Deepgram's speed advantage for real-time applications.
+    </Card>
+    
+    ### WebSocket Optimization
+    
+    ```python
+    class OptimizedDeepgramTTS:
+        async def stream_optimized(self, text_chunks):
+            # Connection optimization
+            uri = "wss://api.deepgram.com/v1/speak"
+            params = {
+                "model": "aura-2-asteria-en",
+                "encoding": "mulaw",  # Phone optimized
+                "sample_rate": 8000,
+                "container": "none"   # Reduce overhead
+            }
+            
+            async with websockets.connect(f"{uri}?{urlencode(params)}") as ws:
+                # Send chunks rapidly
+                for chunk in text_chunks:
+                    await ws.send(json.dumps({
+                        "type": "speak",
+                        "text": chunk
+                    }))
+                    
+                    # Process audio as it arrives
+                    async for message in ws:
+                        data = json.loads(message)
+                        if data.get("type") == "audio":
+                            yield base64.b64decode(data["data"])
+    ```
+    
+    ### Phone System Integration
+    
+    ```python
+    def optimize_for_twilio():
+        return {
+            "encoding": "mulaw",      # G.711 µ-law for Twilio
+            "sample_rate": 8000,      # Standard phone quality
+            "model": "aura-2-asteria-en",  # Best balance
+            "container": "wav",       # Twilio compatible
+            "bit_depth": 8           # µ-law bit depth
+        }
+    ```
+    
+    ### Text Processing for Speed
+    
+    ```python
+    def optimize_text_for_deepgram(text):
+        # Deepgram works best with natural speech patterns
+        optimizations = {
+            "chunk_size": "20-50 words for optimal streaming",
+            "punctuation": "Keep natural punctuation for proper pacing",
+            "abbreviations": "Spell out technical terms",
+            "numbers": "Use written form: 'twenty-one' not '21'"
+        }
+        
+        # Example optimization
+        text = re.sub(r'\b(\d+)\b', lambda m: num2words(int(m.group())), text)
+        return text
+    ```
+  </Tab>
+  
+  <Tab title="Inworld">
+    <Card title="🎭 Inworld Optimization" icon="masks-theater">
+      Optimize emotional expression and multilingual performance.
+    </Card>
+    
+    ### Emotional Markup Best Practices
+    
+    ```python
+    def optimize_emotional_markup(text, context="customer_service"):
+        context_emotions = {
+            "customer_service": {
+                "greeting": "[friendly]",
+                "problem": "[understanding]", 
+                "solution": "[helpful]",
+                "closing": "[grateful]"
+            },
+            "sales": {
+                "intro": "[confident]",
+                "benefit": "[excited]",
+                "objection": "[understanding]",
+                "close": "[encouraging]"
+            }
+        }
+        
+        # Apply context-appropriate emotions
+        emotions = context_emotions.get(context, {})
+        
+        # Don't overuse - max 1-2 emotions per sentence
+        sentences = text.split('.')
+        enhanced = []
+        
+        for i, sentence in enumerate(sentences):
+            if sentence.strip():
+                emotion_key = list(emotions.keys())[i % len(emotions)]
+                emotion = emotions[emotion_key]
+                enhanced.append(f"{emotion} {sentence.strip()}")
+        
+        return '. '.join(enhanced)
+    ```
+    
+    ### Language-Specific Optimization
+    
+    ```python
+    language_configs = {
+        "en": {
+            "voices": ["Ashley", "Alex", "Aria"],
+            "model": "inworld-tts-1",
+            "emotions": "full_range"
+        },
+        "es": {
+            "voices": ["Diego", "Lupita"],
+            "model": "inworld-tts-1", 
+            "emotions": "basic_range"
+        },
+        "fr": {
+            "voices": ["Hélène", "Mathieu"],
+            "model": "inworld-tts-1",
+            "emotions": "basic_range"
+        }
+    }
+    ```
+    
+    ### Model Selection Strategy
+    
+    | Content Type | Model | Reason |
+    |-------------|-------|---------|
+    | **Business Communication** | TTS-1 | Consistent, professional |
+    | **Creative Content** | TTS-1-Max | More expressive range |
+    | **Multilingual** | TTS-1 | Better language support |
+    | **Gaming/Entertainment** | TTS-1-Max | Maximum expression |
+  </Tab>
+  
+  <Tab title="Resemble">
+    <Card title="🎯 Resemble Optimization" icon="bullseye">
+      Maximize custom voice quality and streaming performance.
+    </Card>
+    
+    ### Voice Training Optimization
+    
+    ```python
+    def optimize_voice_training():
+        guidelines = {
+            "duration": "5-8 minutes optimal (not minimum 3)",
+            "content_diversity": [
+                "Business phrases",
+                "Questions and statements", 
+                "Different emotions",
+                "Technical terms",
+                "Numbers and dates"
+            ],
+            "recording_quality": {
+                "sample_rate": "22kHz minimum, 44kHz preferred",
+                "bit_depth": "16-bit minimum, 24-bit preferred",
+                "format": "WAV uncompressed",
+                "noise_floor": "-60dB or lower"
+            },
+            "speaker_guidelines": {
+                "consistency": "Same speaker throughout",
+                "environment": "Same room, same mic position",
+                "pace": "Natural speaking pace",
+                "volume": "Consistent volume level"
+            }
+        }
+        return guidelines
+    ```
+    
+    ### WebSocket Streaming Best Practices
+    
+    ```python
+    async def optimize_resemble_streaming():
+        config = {
+            "sample_rate": 8000,      # Phone optimized
+            "precision": "MULAW",     # Twilio compatible
+            "output_format": "wav",
+            "streaming": True
+        }
+        
+        # Connection management
+        async with websockets.connect(
+            "wss://websocket.cluster.resemble.ai/stream"
+        ) as ws:
+            # Maintain connection health
+            asyncio.create_task(self.heartbeat_task(ws))
+            
+            # Stream text efficiently
+            for text_chunk in optimized_chunks:
+                await ws.send(json.dumps({
+                    "type": "text",
+                    "text": text_chunk,
+                    "request_id": generate_unique_id()
+                }))
+    ```
+    
+    ### Multi-Voice Management
+    
+    ```python
+    class VoiceManager:
+        def __init__(self):
+            self.voice_contexts = {
+                "customer_service": "cs_voice_uuid",
+                "sales": "sales_voice_uuid", 
+                "technical": "tech_voice_uuid",
+                "executive": "exec_voice_uuid"
+            }
+        
+        def select_voice(self, context, fallback="customer_service"):
+            return self.voice_contexts.get(context, 
+                   self.voice_contexts[fallback])
+    ```
+  </Tab>
+</Tabs>
+
+## Cost Optimization Strategies
+
+<Card title="💰 Reduce TTS Costs" icon="dollar-sign">
+  Proven strategies to minimize TTS expenses while maintaining quality.
+</Card>
+
+### Universal Cost Reduction
+
+<Accordion title="Smart Caching Implementation">
+```python
+class SmartTTSCache:
+    def __init__(self):
+        self.phrase_frequency = defaultdict(int)
+        self.cache_hits = 0
+        self.cache_misses = 0
+        
+    def should_cache(self, text):
+        """Decide if text is worth caching"""
+        # Cache frequently used phrases
+        self.phrase_frequency[text] += 1
+        
+        criteria = [
+            len(text) > 20,  # Long enough to be worth caching
+            self.phrase_frequency[text] >= 3,  # Used multiple times
+            not self.is_time_sensitive(text),  # Not time-specific
+            not self.contains_variables(text)  # No dynamic content
+        ]
+        
+        return all(criteria)
+    
+    def cache_roi_analysis(self):
+        """Calculate cache return on investment"""
+        cache_savings = self.cache_hits * average_api_cost
+        cache_storage_cost = len(self.cache) * storage_cost_per_item
+        return cache_savings - cache_storage_cost
+```
+
+**What to Cache:**
+- Error messages and notifications
+- Greeting and closing phrases
+- FAQ responses
+- System announcements
+- Static marketing content
+</Accordion>
+
+<Accordion title="Text Optimization for Cost">
+```python
+def optimize_text_for_cost(text):
+    """Reduce character count without losing meaning"""
+    
+    # Use contractions
+    contractions = {
+        "you are": "you're",
+        "we are": "we're", 
+        "it is": "it's",
+        "that is": "that's",
+        "do not": "don't",
+        "will not": "won't"
+    }
+    
+    for full, contracted in contractions.items():
+        text = text.replace(full, contracted)
+    
+    # Remove redundant phrases
+    redundant_patterns = [
+        r'\bplease note that\b',
+        r'\bI would like to\b',
+        r'\bI want to\b', 
+        r'\bas you can see\b'
+    ]
+    
+    for pattern in redundant_patterns:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+    
+    # Normalize whitespace
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text
+
+# Example usage
+original = "Please note that I would like to inform you that your order has been processed."
+optimized = "Your order's been processed."  # 67% character reduction
+```
+</Accordion>
+
+<Accordion title="Provider Cost Comparison">
+**Cost-Effective Provider Selection:**
+
+| Provider | Cost Range | Best For | Cost Optimization |
+|----------|------------|----------|-------------------|
+| **ElevenLabs** | $0.18-0.36/1K chars | Quality-focused | Use Flash v2.5, cache aggressively |
+| **Deepgram** | $0.135/1K chars | Speed-focused | Bulk usage discounts |
+| **Inworld** | $0.08-0.20/1K chars | Multilingual | Free tier maximization |
+| **Resemble** | $0.10-0.20/1K chars | Custom voices | Business plan efficiency |
+
+```python
+def calculate_monthly_cost(chars_per_day, provider="elevenlabs"):
+    rates = {
+        "elevenlabs": 0.00018,  # Flash v2.5 rate
+        "deepgram": 0.000135,
+        "inworld": 0.00015,
+        "resemble": 0.00012
+    }
+    
+    monthly_chars = chars_per_day * 30
+    monthly_cost = monthly_chars * rates[provider]
+    
+    return {
+        "monthly_cost": monthly_cost,
+        "yearly_cost": monthly_cost * 12,
+        "cost_per_call": monthly_cost / (chars_per_day * 30 / 200)  # Assuming 200 chars per call
+    }
+```
+</Accordion>
+
+## Quality Assurance
+
+<Card title="🎯 Maintain Consistent Quality" icon="target">
+  Implement systematic quality monitoring and improvement processes.
+</Card>
+
+### Automated Quality Testing
+
+<CodeGroup>
+
+```python Quality Metrics
+class TTSQualityMonitor:
+    def __init__(self):
+        self.metrics = {
+            "latency": [],
+            "audio_quality": [],
+            "user_feedback": [],
+            "error_rate": []
+        }
+    
+    async def test_tts_quality(self, provider, test_cases):
+        results = []
+        
+        for test_case in test_cases:
+            start_time = time.time()
+            try:
+                audio = await self.synthesize_text(
+                    provider, 
+                    test_case["text"],
+                    test_case["settings"]
+                )
+                
+                latency = time.time() - start_time
+                quality_score = await self.analyze_audio_quality(audio)
+                
+                results.append({
+                    "test": test_case["name"],
+                    "latency": latency,
+                    "quality": quality_score,
+                    "success": True
+                })
+                
+            except Exception as e:
+                results.append({
+                    "test": test_case["name"],
+                    "error": str(e),
+                    "success": False
+                })
+        
+        return results
+    
+    async def analyze_audio_quality(self, audio_data):
+        """Analyze audio for quality metrics"""
+        # Implement audio analysis
+        # - Signal-to-noise ratio
+        # - Clarity measurements
+        # - Pronunciation accuracy
+        # - Natural flow assessment
+        pass
+```
+
+```python A/B Testing
+class TTSABTesting:
+    def __init__(self):
+        self.experiments = {}
+        
+    def create_experiment(self, name, variants):
+        """Create A/B test for TTS settings"""
+        self.experiments[name] = {
+            "variants": variants,
+            "results": {variant: [] for variant in variants},
+            "traffic_split": 1.0 / len(variants)
+        }
+    
+    def select_variant(self, experiment_name, user_id):
+        """Select variant for user"""
+        experiment = self.experiments[experiment_name]
+        
+        # Consistent variant selection based on user ID
+        hash_value = hash(f"{experiment_name}_{user_id}")
+        variant_index = hash_value % len(experiment["variants"])
+        
+        return experiment["variants"][variant_index]
+    
+    def record_outcome(self, experiment_name, variant, outcome):
+        """Record experiment outcome"""
+        self.experiments[experiment_name]["results"][variant].append(outcome)
+    
+    def analyze_results(self, experiment_name):
+        """Analyze experiment results"""
+        experiment = self.experiments[experiment_name]
+        analysis = {}
+        
+        for variant, results in experiment["results"].items():
+            if results:
+                analysis[variant] = {
+                    "mean_score": np.mean(results),
+                    "sample_size": len(results),
+                    "confidence_interval": self.calculate_ci(results)
+                }
+        
+        return analysis
+```
+
+</CodeGroup>
+
+### User Feedback Integration
+
+<Accordion title="Feedback Collection System">
+```python
+class TTSFeedbackSystem:
+    def __init__(self):
+        self.feedback_db = []
+        
+    def collect_implicit_feedback(self, session_data):
+        """Collect implicit feedback from user behavior"""
+        signals = {
+            "completion_rate": session_data.get("completed", False),
+            "repeat_requests": session_data.get("repeats", 0),
+            "early_termination": session_data.get("hung_up_early", False),
+            "session_duration": session_data.get("duration", 0)
+        }
+        
+        # Convert signals to quality score
+        quality_score = self.calculate_implicit_score(signals)
+        
+        return {
+            "session_id": session_data["id"],
+            "quality_score": quality_score,
+            "feedback_type": "implicit",
+            "timestamp": time.time()
+        }
+    
+    def collect_explicit_feedback(self, session_id, rating, comments=None):
+        """Collect explicit user feedback"""
+        return {
+            "session_id": session_id,
+            "rating": rating,  # 1-5 scale
+            "comments": comments,
+            "feedback_type": "explicit",
+            "timestamp": time.time()
+        }
+    
+    def aggregate_feedback(self, provider, voice, timeframe_days=30):
+        """Aggregate feedback for analysis"""
+        cutoff = time.time() - (timeframe_days * 24 * 3600)
+        
+        relevant_feedback = [
+            f for f in self.feedback_db 
+            if f["timestamp"] > cutoff 
+            and f.get("provider") == provider
+            and f.get("voice") == voice
+        ]
+        
+        if relevant_feedback:
+            avg_rating = np.mean([f["rating"] for f in relevant_feedback])
+            sample_size = len(relevant_feedback)
+            
+            return {
+                "average_rating": avg_rating,
+                "sample_size": sample_size,
+                "recommendation": self.get_recommendation(avg_rating, sample_size)
+            }
+        
+        return None
+```
+</Accordion>
+
+## Production Deployment Best Practices
+
+<Card title="🚀 Production Readiness" icon="rocket">
+  Essential practices for deploying TTS in production environments.
+</Card>
+
+### Monitoring and Alerting
+
+<Accordion title="Health Check Implementation">
+```python
+class TTSHealthChecker:
+    def __init__(self):
+        self.providers = ["elevenlabs", "deepgram", "inworld", "resemble"]
+        self.health_status = {}
+        
+    async def comprehensive_health_check(self):
+        """Run comprehensive health checks"""
+        results = {}
+        
+        for provider in self.providers:
+            try:
+                # Test basic connectivity
+                connectivity = await self.test_connectivity(provider)
+                
+                # Test response time
+                latency = await self.test_latency(provider)
+                
+                # Test quality with standard phrase
+                quality = await self.test_quality(provider, "Hello, this is a test.")
+                
+                results[provider] = {
+                    "status": "healthy" if all([connectivity, latency < 5.0, quality > 0.8]) else "degraded",
+                    "connectivity": connectivity,
+                    "latency": latency,
+                    "quality": quality,
+                    "timestamp": time.time()
+                }
+                
+            except Exception as e:
+                results[provider] = {
+                    "status": "unhealthy",
+                    "error": str(e),
+                    "timestamp": time.time()
+                }
+        
+        return results
+    
+    async def setup_monitoring_alerts(self):
+        """Setup automated monitoring and alerting"""
+        while True:
+            health_results = await self.comprehensive_health_check()
+            
+            for provider, result in health_results.items():
+                if result["status"] != "healthy":
+                    await self.send_alert(provider, result)
+            
+            await asyncio.sleep(300)  # Check every 5 minutes
+```
+</Accordion>
+
+<Accordion title="Error Handling and Recovery">
+```python
+class RobustTTSService:
+    def __init__(self):
+        self.retry_config = {
+            "max_retries": 3,
+            "backoff_multiplier": 2,
+            "base_delay": 1.0
+        }
+        
+    async def synthesize_with_retry(self, text, provider_config):
+        """Synthesize with automatic retry and fallback"""
+        last_exception = None
+        
+        for attempt in range(self.retry_config["max_retries"]):
+            try:
+                return await self.synthesize_text(text, provider_config)
+                
+            except RateLimitError as e:
+                # Handle rate limiting specially
+                delay = self.calculate_rate_limit_delay(e)
+                await asyncio.sleep(delay)
+                last_exception = e
+                
+            except (ConnectionError, TimeoutError) as e:
+                # Handle network issues
+                delay = self.retry_config["base_delay"] * (
+                    self.retry_config["backoff_multiplier"] ** attempt
+                )
+                await asyncio.sleep(delay)
+                last_exception = e
+                
+            except Exception as e:
+                # Other errors - try fallback provider
+                if attempt == self.retry_config["max_retries"] - 1:
+                    return await self.try_fallback_provider(text)
+                last_exception = e
+        
+        # All retries failed
+        raise TTSServiceError(f"All retries failed: {last_exception}")
+    
+    async def try_fallback_provider(self, text):
+        """Try alternative provider as fallback"""
+        fallback_order = ["deepgram", "elevenlabs", "inworld"]
+        
+        for provider in fallback_order:
+            try:
+                return await self.synthesize_text(text, {"provider": provider})
+            except Exception:
+                continue
+        
+        raise TTSServiceError("All providers failed")
+```
+</Accordion>
+
+### Scaling Considerations
+
+<Accordion title="Load Balancing Strategy">
+```python
+class TTSLoadBalancer:
+    def __init__(self):
+        self.provider_weights = {
+            "elevenlabs": 0.4,  # 40% of traffic
+            "deepgram": 0.3,    # 30% of traffic  
+            "inworld": 0.2,     # 20% of traffic
+            "resemble": 0.1     # 10% of traffic
+        }
+        self.health_status = {}
+        
+    def select_provider(self, requirements=None):
+        """Select provider based on requirements and health"""
+        
+        # Filter by requirements
+        candidates = self.filter_by_requirements(requirements)
+        
+        # Filter by health
+        healthy_candidates = [
+            p for p in candidates 
+            if self.health_status.get(p, {}).get("status") == "healthy"
+        ]
+        
+        if not healthy_candidates:
+            # Fallback to any healthy provider
+            healthy_candidates = [
+                p for p, status in self.health_status.items()
+                if status.get("status") == "healthy"
+            ]
+        
+        # Weighted selection
+        return self.weighted_random_selection(healthy_candidates)
+    
+    def adjust_weights_by_performance(self):
+        """Dynamically adjust weights based on performance"""
+        performance_metrics = self.get_performance_metrics()
+        
+        for provider in self.provider_weights:
+            metrics = performance_metrics.get(provider, {})
+            
+            # Adjust weight based on performance
+            if metrics.get("avg_latency", float('inf')) > 2.0:
+                self.provider_weights[provider] *= 0.9  # Reduce weight
+            elif metrics.get("error_rate", 1.0) < 0.01:
+                self.provider_weights[provider] *= 1.1  # Increase weight
+        
+        # Normalize weights
+        total_weight = sum(self.provider_weights.values())
+        for provider in self.provider_weights:
+            self.provider_weights[provider] /= total_weight
+```
+</Accordion>
+
+---
+
+<Card title="🎯 Excellence in TTS" icon="trophy">
+  Following these best practices will help you deliver exceptional voice experiences while optimizing performance and costs. Remember to continuously monitor, test, and refine your TTS implementation based on real-world usage and user feedback.
+</Card> 

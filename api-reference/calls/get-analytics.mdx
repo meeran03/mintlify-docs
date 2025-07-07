@@ -1,0 +1,53 @@
+---
+title: 'Get Call Analytics'
+openapi: 'GET /api/v1/calls/analytics'
+---
+
+This endpoint provides detailed analytics and trends for the calls within your organization over a specified time period.
+
+### Query Parameters
+
+- `period` (string, optional, default: `7d`): The time period for the analysis.
+  - Allowed values: `1d`, `7d`, `30d`, `90d`.
+
+### Response
+
+The response is a JSON object containing a comprehensive breakdown of call metrics.
+
+```json Response
+{
+  "total_calls": 150,
+  "completed_calls": 135,
+  "failed_calls": 10,
+  "ongoing_calls": 5,
+  "total_duration": 40500,
+  "avg_duration": 300,
+  "success_rate": 90,
+  "daily_stats": {
+    "2023-10-29": {
+      "total": 70,
+      "completed": 65,
+      "failed": 5
+    },
+    "2023-10-30": {
+      "total": 80,
+      "completed": 70,
+      "failed": 5
+    }
+  },
+  "top_assistants": [
+    {
+      "assistant_id": 123,
+      "assistant_name": "Support Bot",
+      "calls": 100,
+      "duration": 30000
+    },
+    {
+      "assistant_id": 456,
+      "assistant_name": "Sales Rep",
+      "calls": 50,
+      "duration": 10500
+    }
+  ]
+}
+``` 

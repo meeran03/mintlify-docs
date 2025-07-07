@@ -1,0 +1,37 @@
+---
+title: 'Initiate Outbound Call'
+openapi: 'POST /calls/initiate'
+---
+
+This endpoint is used to programmatically initiate an outbound call from one of your AI assistants to an external phone number. It is a system endpoint that you call from your own application logic, not a webhook for an external service.
+
+When you call this endpoint, it instructs Twilio to place a call. Twilio then makes a request to your `/twiml` webhook, passing along the parameters you provide here as metadata. This allows the system to route the call to the correct assistant and begin the conversation.
+
+### Request Body
+
+The request body is a JSON object specifying the details of the outbound call.
+
+- `assistant_id` (integer, **required**): The ID of the assistant that should make the call.
+- `to_phone_number` (string, **required**): The destination phone number to call, in E.164 format.
+- `welcome_message` (string, optional): A custom welcome message for the assistant to say at the beginning of the call. If not provided, the assistant's default greeting will be used.
+- `agenda` (string, optional): A specific topic or goal for the call. This can be used to guide the assistant's conversation.
+
+```json Request
+{
+  "assistant_id": 123,
+  "to_phone_number": "+15559876543",
+  "welcome_message": "Hello, this is a reminder about your appointment tomorrow at 10 AM.",
+  "agenda": "Remind the user about their upcoming appointment."
+}
+```
+
+### Response
+
+A successful request will return a `200 OK` status with a JSON object containing the `call_sid` from Twilio, confirming that the call has been initiated.
+
+```json Response
+{
+  "message": "Call initiated successfully",
+  "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+``` 

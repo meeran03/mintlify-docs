@@ -1,0 +1,33 @@
+---
+title: 'Upload Document'
+openapi: 'POST /api/v1/assistants/{assistant_id}/documents/upload'
+---
+
+This endpoint allows you to upload a document to an assistant's knowledge base for Retrieval-Augmented Generation (RAG). The document will be processed, chunked, and stored as embeddings in a vector database.
+
+The request must be sent as `multipart/form-data`.
+
+### Path Parameters
+
+- `assistant_id` (string, **required**): The unique identifier of the assistant to whom the document will be added.
+
+### Form Data
+
+- `file` (file, **required**): The document to upload. Supported file types include `.txt`, `.pdf`, `.md`, and `.docx`.
+
+### Response
+
+A successful request will immediately return a document object with a `processing` status. The document will be processed in the background. You can check the status later using the [Get Document Status](/api-reference/assistants/documents/get-status) endpoint.
+
+```json Response
+{
+  "id": "doc_1234567890",
+  "user_id": "user_12345",
+  "organization_id": "org_67890",
+  "assistant_id": "asst_a1b2c3d4e5f67890",
+  "name": "product_faq.pdf",
+  "status": "processing",
+  "created_at": "2023-10-28T16:00:00Z",
+  "updated_at": "2023-10-28T16:00:00Z"
+}
+``` 

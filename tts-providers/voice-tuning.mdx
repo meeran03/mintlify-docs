@@ -1,0 +1,746 @@
+---
+title: "Voice Tuning & Customization"
+description: "Master voice controls across all TTS providers for optimal speech quality and personality"
+---
+
+<Card title="🎛️ Voice Tuning Mastery" icon="sliders">
+  Fine-tune voice characteristics across all TTS providers to create the perfect voice experience for your application. Learn stability, similarity, style, and provider-specific controls.
+</Card>
+
+## Overview of Voice Controls
+
+<Card title="🎯 Universal Voice Parameters" icon="target">
+  While each provider has unique features, these core concepts apply across most TTS services.
+</Card>
+
+<CardGroup cols={3}>
+  <Card title="🎚️ Stability" icon="gauge">
+    **Voice Consistency**
+    
+    Controls how consistent the voice sounds across different sentences
+    
+    *Available: ElevenLabs*
+  </Card>
+  
+  <Card title="🎯 Similarity" icon="crosshairs">
+    **Voice Accuracy**
+    
+    How closely the output matches the original voice characteristics
+    
+    *Available: ElevenLabs*
+  </Card>
+  
+  <Card title="🎭 Style/Expression" icon="masks-theater">
+    **Speaking Style**
+    
+    Emotional expression and speaking style variation
+    
+    *Available: ElevenLabs, Inworld*
+  </Card>
+</CardGroup>
+
+## Provider-Specific Controls
+
+<Tabs>
+  <Tab title="ElevenLabs">
+    <Card title="🎭 ElevenLabs Voice Controls" icon="wand-magic-sparkles">
+      The most comprehensive voice tuning options available.
+    </Card>
+    
+    ### Stability (0.0 - 1.0)
+    
+    **Controls voice consistency across sentences**
+    
+    <Accordion title="Stability Settings Guide">
+    | Range | Effect | Best For | Example |
+    |-------|--------|----------|---------|
+    | **0.0-0.2** | Very expressive, inconsistent | Creative content, storytelling | Audiobooks with character voices |
+    | **0.3-0.4** | Expressive with some variation | Marketing content, presentations | Sales pitches, educational content |
+    | **0.5-0.6** | ✅ **Balanced (Recommended)** | Business applications | Customer service, professional calls |
+    | **0.7-0.8** | Very consistent, less expressive | Technical content, instructions | Help desk, documentation |
+    | **0.9-1.0** | Extremely consistent, monotone | Announcements, alerts | System notifications, alerts |
+    </Accordion>
+    
+    ```json
+    {
+      "stability": 0.5,  // Recommended starting point
+      "use_case": "balanced_professional"
+    }
+    ```
+    
+    ### Similarity Boost (0.0 - 1.0)
+    
+    **Controls how accurately the voice matches the original**
+    
+    <Accordion title="Similarity Settings Guide">
+    | Range | Effect | Best For | Trade-off |
+    |-------|--------|----------|-----------|
+    | **0.0-0.4** | Creative interpretation | Unique voice variations | Less like original voice |
+    | **0.5-0.7** | Balanced accuracy | Most applications | Good balance of creativity/accuracy |
+    | **0.75** | ✅ **Optimal (Recommended)** | Production use | Best overall quality |
+    | **0.8-0.9** | Very accurate | Brand consistency | May sound slightly robotic |
+    | **0.95-1.0** | Extremely accurate | Voice cloning | Potential quality degradation |
+    </Accordion>
+    
+    ```json
+    {
+      "similarity_boost": 0.75,  // Sweet spot for most uses
+      "note": "Recommended by ElevenLabs"
+    }
+    ```
+    
+    ### Style (0.0 - 1.0)
+    
+    **Controls speaking style and expressiveness**
+    
+    <Accordion title="Style Settings Guide">
+    | Range | Effect | Best For | Personality |
+    |-------|--------|----------|-------------|
+    | **0.0** | ✅ **Natural baseline** | Business calls | Professional, neutral |
+    | **0.1-0.3** | Slight style variation | Customer service | Friendly, approachable |
+    | **0.4-0.6** | Moderate expression | Marketing content | Engaging, enthusiastic |
+    | **0.7-0.9** | High expressiveness | Entertainment | Dramatic, animated |
+    | **1.0** | Maximum style variation | Character voices | Highly expressive, theatrical |
+    </Accordion>
+    
+    ```json
+    {
+      "style": 0.0,  // Keep at 0.0 for business applications
+      "business_rule": "Higher values can sound unprofessional"
+    }
+    ```
+    
+    ### Speaker Boost
+    
+    **Enhanced audio quality and clarity**
+    
+    <CardGroup cols={2}>
+      <Card title="✅ Enabled (Recommended)" icon="volume-high">
+        **Benefits:**
+        - Clearer voice quality
+        - Reduced background noise
+        - Better phone call clarity
+        - Enhanced speech intelligibility
+        
+        **Best for:** All applications
+      </Card>
+      
+      <Card title="❌ Disabled" icon="volume-low">
+        **When to use:**
+        - Specific audio pipeline requirements
+        - Custom post-processing needs
+        - Legacy system compatibility
+        
+        **Trade-off:** Lower audio quality
+      </Card>
+    </CardGroup>
+    
+    ### Latency Optimization (0-3)
+    
+    | Setting | Latency | Quality | Best For |
+    |---------|---------|---------|----------|
+    | **0** | ~50ms | Lower | Experimental ultra-low latency |
+    | **1** | ✅ **~75ms** | Good | ✅ **Phone calls (Recommended)** |
+    | **2** | ~150ms | Better | General applications |
+    | **3** | ~250ms | Best | High-quality content creation |
+  </Tab>
+  
+  <Tab title="Inworld.ai">
+    <Card title="🎭 Inworld Emotional Controls" icon="masks-theater">
+      Emotional markup and contextual expression controls.
+    </Card>
+    
+    ### Emotional Markup
+    
+    **Direct emotional control through text tags**
+    
+    <Accordion title="Basic Emotions">
+    ```markdown
+    [happy] Great to hear from you!
+    [sad] I'm sorry about that issue.
+    [excited] This is fantastic news!
+    [concerned] Let me help you with that.
+    [confident] I can definitely assist you.
+    [grateful] Thank you for your patience.
+    ```
+    
+    **Best Practices:**
+    - Use 1-2 emotion tags per sentence maximum
+    - Match emotions to content context
+    - Test different emotions with your chosen voice
+    - Don't overuse - natural text is still important
+    </Accordion>
+    
+    <Accordion title="Speaking Styles">
+    ```markdown
+    [whispering] This is confidential information.
+    [emphasizing] This is VERY important.
+    [casual] Hey there, how's it going?
+    [professional] Thank you for contacting our office.
+    [friendly] I'm happy to help you today!
+    ```
+    
+    **Usage Guidelines:**
+    - Use styles that match your brand voice
+    - Consider your audience and context
+    - Test styles with different voices
+    - Combine with basic emotions carefully
+    </Accordion>
+    
+    ### Language-Specific Tuning
+    
+    | Language | Voice Recommendations | Emotional Range | Production Ready |
+    |----------|----------------------|-----------------|------------------|
+    | **English** | Ashley, Alex, Aria | Full range | ✅ Production |
+    | **Spanish** | Diego, Lupita | Good range | ✅ Production |
+    | **French** | Hélène, Mathieu | Good range | ✅ Production |
+    | **German** | Johanna, Josef | Limited range | 🟡 Beta |
+    | **Chinese** | Yichen, Xiaoyin | Limited range | 🟡 Beta |
+    | **Other** | Various | Basic range | 🟡 Beta |
+    
+    ### Model Selection for Expression
+    
+    <CardGroup cols={2}>
+      <Card title="TTS-1" icon="star">
+        **Balanced Expression**
+        
+        - Good emotional range
+        - Consistent quality
+        - ✅ Recommended for business
+        - ~200ms latency
+      </Card>
+      
+      <Card title="TTS-1-Max" icon="sparkles">
+        **Maximum Expression**
+        
+        - Enhanced emotional range
+        - More dramatic expressions
+        - Best for creative content
+        - ~250ms latency
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="Deepgram & Resemble">
+    <Card title="⚡ Speed-Focused Providers" icon="bolt">
+      These providers focus on speed and custom voices rather than extensive tuning options.
+    </Card>
+    
+    ### Deepgram Aura
+    
+    **Limited but effective controls:**
+    
+    <Accordion title="Voice Selection Strategy">
+    **Choose the right voice for your use case:**
+    
+    | Voice | Personality | Best For |
+    |-------|------------|----------|
+    | **Asteria** | Warm, professional | Customer service |
+    | **Luna** | Soft, gentle | Healthcare, support |
+    | **Stella** | Clear, bright | Announcements |
+    | **Orion** | Authoritative | Business calls |
+    | **Helios** | Energetic | Marketing |
+    | **Thalia** | Professional | Corporate |
+    </Accordion>
+    
+    <Accordion title="Audio Format Optimization">
+    **Phone calls:**
+    ```json
+    {
+      "encoding": "mulaw",
+      "sample_rate": 8000,
+      "voice": "aura-asteria-en"
+    }
+    ```
+    
+    **High quality:**
+    ```json
+    {
+      "encoding": "linear16",
+      "sample_rate": 24000,
+      "voice": "aura-2-thalia-en"
+    }
+    ```
+    </Accordion>
+    
+    ### Resemble AI
+    
+    **Custom voice optimization:**
+    
+    <Accordion title="Voice Training Quality">
+    **Optimize your custom voice training:**
+    
+    - **Training Data**: 3-10 minutes of clear speech
+    - **Consistency**: Same speaker, environment, microphone
+    - **Content**: Diverse sentences and emotions
+    - **Quality**: Clean audio, minimal background noise
+    
+    ```python
+    # Voice training optimization
+    training_guidelines = {
+        "duration": "3-10 minutes",
+        "sample_rate": "22kHz or higher",
+        "format": "WAV (preferred) or MP3",
+        "content": "diverse_sentences_with_emotions",
+        "environment": "quiet_professional_setting"
+    }
+    ```
+    </Accordion>
+    
+    <Accordion title="Streaming Configuration">
+    **WebSocket streaming optimization:**
+    
+    ```json
+    {
+      "sample_rate": 8000,
+      "precision": "MULAW",
+      "output_format": "wav",
+      "streaming": true
+    }
+    ```
+    
+    **Best for phone calls and real-time applications**
+    </Accordion>
+  </Tab>
+</Tabs>
+
+## Recommended Settings by Use Case
+
+<Tabs>
+  <Tab title="Phone Calls">
+    <Card title="📞 Phone Call Optimization" icon="phone">
+      Settings optimized for clear, professional phone conversations.
+    </Card>
+    
+    ### ElevenLabs Phone Setup
+    ```json
+    {
+      "model": "eleven_flash_v2_5",
+      "voice": "rachel",
+      "stability": 0.5,
+      "similarity_boost": 0.75,
+      "style": 0.0,
+      "use_speaker_boost": true,
+      "latency": 1
+    }
+    ```
+    
+    ### Deepgram Phone Setup
+    ```json
+    {
+      "model": "aura-2-asteria-en",
+      "encoding": "mulaw",
+      "sample_rate": 8000
+    }
+    ```
+    
+    ### Inworld Phone Setup
+    ```json
+    {
+      "model": "inworld-tts-1",
+      "voice": "Ashley",
+      "language": "en",
+      "text": "[professional] Thank you for calling. [helpful] How may I assist you?"
+    }
+    ```
+    
+    **Key Principles:**
+    - Prioritize clarity over expressiveness
+    - Use phone-compatible audio formats
+    - Keep emotional variation moderate
+    - Enable speaker boost when available
+  </Tab>
+  
+  <Tab title="Customer Service">
+    <Card title="🎧 Customer Service Excellence" icon="headset">
+      Warm, helpful, and professional voice settings.
+    </Card>
+    
+    ### ElevenLabs Customer Service
+    ```json
+    {
+      "voice": "bella",
+      "stability": 0.6,
+      "similarity_boost": 0.75,
+      "style": 0.1,
+      "use_speaker_boost": true
+    }
+    ```
+    
+    ### Inworld Customer Service
+    ```markdown
+    [friendly] Hello! [helpful] I'm here to assist you today. 
+    [understanding] I completely understand your concern. 
+    [confident] I can definitely help you resolve this.
+    ```
+    
+    **Voice Selection:**
+    - **ElevenLabs**: Bella (warm), Rachel (professional)
+    - **Deepgram**: Asteria (warm), Luna (gentle)
+    - **Inworld**: Ashley (friendly), Aria (professional)
+    - **Resemble**: Custom friendly customer service voice
+    
+    **Key Principles:**
+    - Warm and approachable tone
+    - Consistent but not monotone
+    - Slight emotional variation for empathy
+    - Clear pronunciation for understanding
+  </Tab>
+  
+  <Tab title="Content Creation">
+    <Card title="🎬 Content & Media" icon="video">
+      Engaging, expressive settings for videos, podcasts, and presentations.
+    </Card>
+    
+    ### ElevenLabs Content Creation
+    ```json
+    {
+      "model": "eleven_v3",
+      "voice": "antoni",
+      "stability": 0.4,
+      "similarity_boost": 0.7,
+      "style": 0.3,
+      "use_speaker_boost": true,
+      "latency": 2
+    }
+    ```
+    
+    ### Inworld Content Creation
+    ```markdown
+    [excited] Welcome to our latest episode! 
+    [curious] Have you ever wondered about this topic? 
+    [explaining] Let me break this down for you.
+    ```
+    
+    **Voice Selection:**
+    - **ElevenLabs**: Antoni (authoritative), Bella (engaging)
+    - **Inworld**: Hades (dramatic), Aria (professional)
+    - **Resemble**: Custom brand spokesperson voice
+    
+    **Key Principles:**
+    - Higher expressiveness acceptable
+    - Quality over speed
+    - Match voice to content personality
+    - Use emotional variation for engagement
+  </Tab>
+  
+  <Tab title="Multilingual Apps">
+    <Card title="🌍 Global Applications" icon="globe">
+      Settings optimized for multiple languages and international audiences.
+    </Card>
+    
+    ### ElevenLabs Multilingual
+    ```json
+    {
+      "model": "eleven_v3",
+      "language": "es",
+      "stability": 0.5,
+      "similarity_boost": 0.75,
+      "style": 0.0
+    }
+    ```
+    
+    ### Inworld Multilingual
+    ```json
+    {
+      "voice": "Diego",
+      "language": "es",
+      "text": "[amigable] ¡Hola! [servicial] ¿Cómo puedo ayudarte?"
+    }
+    ```
+    
+    **Language-Specific Recommendations:**
+    
+    | Language | Provider | Voice | Notes |
+    |----------|----------|-------|-------|
+    | **Spanish** | ElevenLabs/Inworld | Rachel/Diego | Native pronunciation |
+    | **French** | ElevenLabs/Inworld | Bella/Hélène | Natural accent |
+    | **German** | ElevenLabs/Inworld | Antoni/Johanna | Clear pronunciation |
+    | **Chinese** | Inworld | Yichen/Xiaoyin | Mandarin optimized |
+    | **English** | All providers | Various | Best quality available |
+    
+    **Key Principles:**
+    - Use native voices when available
+    - Test pronunciation with native speakers
+    - Consider cultural communication styles
+    - Adjust formality levels appropriately
+  </Tab>
+</Tabs>
+
+## Voice Testing & Optimization
+
+<Card title="🧪 Systematic Voice Testing" icon="flask">
+  Develop a systematic approach to test and optimize your voice settings.
+</Card>
+
+### Testing Framework
+
+<Steps>
+  <Step title="Baseline Testing">
+    Test with provider default settings using your actual content
+  </Step>
+  <Step title="Parameter Sweeping">
+    Systematically adjust one parameter at a time
+  </Step>
+  <Step title="A/B Testing">
+    Compare different settings with real users or stakeholders
+  </Step>
+  <Step title="Production Monitoring">
+    Monitor voice quality and user feedback in live applications
+  </Step>
+  <Step title="Iterative Improvement">
+    Continuously refine based on real-world usage data
+  </Step>
+</Steps>
+
+### Testing Script Examples
+
+<CodeGroup>
+
+```python ElevenLabs Testing
+def test_elevenlabs_settings():
+    test_cases = [
+        {
+            "name": "Conservative Business",
+            "settings": {
+                "stability": 0.6,
+                "similarity_boost": 0.75,
+                "style": 0.0,
+                "use_speaker_boost": True
+            }
+        },
+        {
+            "name": "Balanced Professional", 
+            "settings": {
+                "stability": 0.5,
+                "similarity_boost": 0.75,
+                "style": 0.1,
+                "use_speaker_boost": True
+            }
+        },
+        {
+            "name": "Expressive Friendly",
+            "settings": {
+                "stability": 0.4,
+                "similarity_boost": 0.7,
+                "style": 0.2,
+                "use_speaker_boost": True
+            }
+        }
+    ]
+    
+    test_text = "Hello! Thank you for calling our customer service line. How may I assist you today?"
+    
+    for test_case in test_cases:
+        print(f"Testing: {test_case['name']}")
+        # Generate audio with settings
+        # Collect feedback or metrics
+```
+
+```python Inworld Testing  
+def test_inworld_emotions():
+    emotion_tests = [
+        "[professional] Thank you for calling our support line.",
+        "[friendly] Hi there! How can I help you today?",
+        "[helpful] I'd be happy to assist you with that.",
+        "[understanding] I completely understand your concern.",
+        "[confident] I can definitely resolve this for you."
+    ]
+    
+    voices = ["Ashley", "Alex", "Aria"]
+    
+    for voice in voices:
+        for emotion_text in emotion_tests:
+            print(f"Testing {voice}: {emotion_text}")
+            # Generate and evaluate audio
+```
+
+```python Multi-Provider Testing
+def compare_providers():
+    test_text = "Welcome to our service. How may I help you today?"
+    
+    provider_configs = {
+        "elevenlabs": {
+            "voice": "rachel",
+            "stability": 0.5,
+            "similarity_boost": 0.75
+        },
+        "deepgram": {
+            "voice": "aura-asteria-en"
+        },
+        "inworld": {
+            "voice": "Ashley",
+            "text": "[professional] " + test_text
+        }
+    }
+    
+    # Test each provider and collect metrics
+    for provider, config in provider_configs.items():
+        print(f"Testing {provider}")
+        # Generate audio and measure:
+        # - Latency
+        # - Audio quality
+        # - User preference
+```
+
+</CodeGroup>
+
+## Common Tuning Mistakes
+
+<Card title="⚠️ Avoid These Pitfalls" icon="triangle-exclamation">
+  Learn from common voice tuning mistakes to save time and improve results.
+</Card>
+
+<Accordion title="Over-Optimization">
+**Problem**: Adjusting too many parameters at once
+
+**Solution**:
+- Change one parameter at a time
+- Test each change thoroughly
+- Keep notes on what works
+- Use A/B testing for comparisons
+
+**Example**: Don't change stability, similarity, and style simultaneously
+</Accordion>
+
+<Accordion title="Extreme Settings">
+**Problem**: Using values at the far ends of ranges (0.0 or 1.0)
+
+**Solution**:
+- Start with recommended ranges
+- Use extreme values only for specific effects
+- Test thoroughly before production use
+- Consider user experience impact
+
+**Example**: `style: 1.0` often sounds unnatural for business use
+</Accordion>
+
+<Accordion title="Ignoring Use Case">
+**Problem**: Using the same settings for different applications
+
+**Solution**:
+- Create setting profiles for different use cases
+- Consider your audience and context
+- Test with actual content types
+- Adjust based on user feedback
+
+**Example**: Phone call settings ≠ podcast settings
+</Accordion>
+
+<Accordion title="Neglecting Voice Selection">
+**Problem**: Focusing only on parameters, ignoring voice choice
+
+**Solution**:
+- Voice selection is often more important than fine-tuning
+- Test multiple voices with your content
+- Consider voice personality match
+- Use provider recommendations
+
+**Example**: Wrong voice + perfect settings < Right voice + default settings
+</Accordion>
+
+## Advanced Optimization Techniques
+
+<Tabs>
+  <Tab title="Dynamic Settings">
+    **Adjust settings based on context or content type**
+    
+    ```python
+    class DynamicVoiceSettings:
+        def __init__(self):
+            self.settings_profiles = {
+                "greeting": {
+                    "stability": 0.6,
+                    "style": 0.1,
+                    "emotion": "[friendly]"
+                },
+                "problem_solving": {
+                    "stability": 0.5,
+                    "style": 0.0,
+                    "emotion": "[helpful]"
+                },
+                "closing": {
+                    "stability": 0.5,
+                    "style": 0.1,
+                    "emotion": "[grateful]"
+                }
+            }
+            
+        def get_settings(self, context):
+            return self.settings_profiles.get(context, self.settings_profiles["greeting"])
+    ```
+  </Tab>
+  
+  <Tab title="Content-Aware Tuning">
+    **Adjust based on content analysis**
+    
+    ```python
+    def analyze_and_tune(text):
+        # Analyze content characteristics
+        word_count = len(text.split())
+        has_questions = '?' in text
+        has_exclamations = '!' in text
+        formality_score = calculate_formality(text)
+        
+        # Adjust settings based on analysis
+        if formality_score > 0.8:
+            return {"stability": 0.6, "style": 0.0}
+        elif has_exclamations:
+            return {"stability": 0.4, "style": 0.2}
+        elif has_questions:
+            return {"stability": 0.5, "style": 0.1}
+        else:
+            return {"stability": 0.5, "style": 0.0}
+    ```
+  </Tab>
+  
+  <Tab title="User Preference Learning">
+    **Learn from user feedback and behavior**
+    
+    ```python
+    class VoicePreferenceLearner:
+        def __init__(self):
+            self.feedback_data = []
+            self.current_settings = default_settings()
+            
+        def record_feedback(self, settings, rating, context):
+            self.feedback_data.append({
+                "settings": settings,
+                "rating": rating,
+                "context": context,
+                "timestamp": time.now()
+            })
+            
+        def optimize_settings(self):
+            # Analyze feedback patterns
+            # Adjust settings based on highest-rated combinations
+            # Return optimized settings
+            pass
+    ```
+  </Tab>
+</Tabs>
+
+## Related Guides
+
+<CardGroup cols={2}>
+  <Card title="📚 Provider Guides" icon="book">
+    **Detailed Provider Information:**
+    - [ElevenLabs Setup](/tts-providers/elevenlabs) - Premium quality controls
+    - [Deepgram Configuration](/tts-providers/deepgram) - Speed optimization
+    - [Inworld Emotions](/tts-providers/inworld) - Emotional markup
+    - [Resemble Custom Voices](/tts-providers/resemble) - Brand voice creation
+  </Card>
+  
+  <Card title="🛠️ Advanced Topics" icon="tools">
+    **Next Steps:**
+    - [Troubleshooting Guide](/tts-providers/troubleshooting) - Fix common issues
+    - [Best Practices](/tts-providers/best-practices) - Production optimization
+    - [AI Configuration](/ai-configuration) - System-wide settings
+  </Card>
+</CardGroup>
+
+---
+
+<Card title="🎯 Perfect Your Voice Settings" icon="bullseye">
+  Use this guide to systematically optimize your TTS voice settings. Start with recommended defaults, test systematically, and refine based on your specific use case and user feedback.
+</Card> 

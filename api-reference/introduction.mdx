@@ -1,33 +1,72 @@
 ---
 title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+description: 'Welcome to the Burki Voice AI API Reference.'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+The Burki Voice AI API allows you to programmatically manage assistants, calls, and other resources in your organization. You can use it to build powerful integrations and automate your voice AI workflows.
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+This API is built on REST principles and uses standard HTTP response codes and authentication. All API responses are returned in JSON format.
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="View the OpenAPI Specification"
+  icon="file-code"
+  href="/api-reference/openapi.json"
 >
-  View the OpenAPI specification file
+  Our API is documented using the OpenAPI 3.1 standard. You can view the raw specification file to see all available endpoints, models, and security schemes.
 </Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+All Burki API endpoints are protected and require a valid API key to be included in all requests. Authentication is performed by passing a **Bearer Token** in the `Authorization` header of your HTTP requests.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+You can generate and manage your API keys from the **API Keys** section in your organization's dashboard.
+
+### How to Use Your API Key
+
+To authenticate an API request, you must include an `Authorization` header with the value `Bearer YOUR_API_KEY`, where `YOUR_API_KEY` is the key you generated in the dashboard.
+
+<CodeGroup>
+```bash cURL
+curl "https://api.yourdomain.com/api/v1/assistants" \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
+
+```python Python
+import requests
+
+api_key = "YOUR_API_KEY"
+headers = {
+    "Authorization": f"Bearer {api_key}"
+}
+
+response = requests.get(
+    "https://api.yourdomain.com/api/v1/assistants", 
+    headers=headers
+)
+
+print(response.json())
+```
+
+```javascript Node.js
+const fetch = require('node-fetch');
+
+const apiKey = 'YOUR_API_KEY';
+
+fetch('https://api.yourdomain.com/api/v1/assistants', {
+  headers: {
+    'Authorization': `Bearer ${apiKey}`
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error));
+```
+</CodeGroup>
+
+<Warning>
+  Treat your API keys like passwords! Do not share them publicly or commit them to version control.
+</Warning>
+
+### Error Codes
+
+If your API key is missing, invalid, or expired, you will receive a `401 Unauthorized` HTTP response code.

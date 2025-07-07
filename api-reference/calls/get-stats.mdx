@@ -1,0 +1,22 @@
+---
+title: 'Get Call Stats'
+openapi: 'GET /api/v1/calls/stats'
+---
+
+This endpoint provides a high-level summary of call statistics for your entire organization. It's a quick way to get key metrics without any parameters.
+
+### Response
+
+The response is a JSON object containing the following key statistics:
+
+- `total_calls`: The total number of calls ever made.
+- `total_duration`: The sum of the duration of all calls, in seconds.
+- `average_duration`: The average duration of a call, in seconds.
+
+```json Response
+{
+  "total_calls": 500,
+  "total_duration": 150000,
+  "average_duration": 300
+}
+``` 

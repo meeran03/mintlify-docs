@@ -1,0 +1,28 @@
+---
+title: 'Get Document Status'
+openapi: 'GET /api/v1/assistants/{assistant_id}/documents/{document_id}/status'
+---
+
+After uploading a document, you can use this endpoint to check its processing status. This is useful for determining when the document is fully processed and ready for use in RAG.
+
+### Path Parameters
+
+- `assistant_id` (string, **required**): The identifier of the assistant that owns the document.
+- `document_id` (string, **required**): The identifier of the document whose status you want to check.
+
+### Response
+
+The response contains the document object, which includes the current `status`. The status will be one of `processing`, `completed`, or `failed`.
+
+```json Response
+{
+  "id": "doc_1234567890",
+  "user_id": "user_12345",
+  "organization_id": "org_67890",
+  "assistant_id": "asst_a1b2c3d4e5f67890",
+  "name": "product_faq.pdf",
+  "status": "completed",
+  "created_at": "2023-10-28T16:00:00Z",
+  "updated_at": "2023-10-28T16:05:00Z"
+}
+``` 

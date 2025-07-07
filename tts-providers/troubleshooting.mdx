@@ -1,0 +1,614 @@
+---
+title: "TTS Troubleshooting"
+description: "Common issues and solutions for all TTS providers in Burki Voice AI"
+---
+
+<Card title="🔧 TTS Troubleshooting Guide" icon="wrench">
+  Solve common TTS issues quickly with provider-specific solutions and general troubleshooting strategies.
+</Card>
+
+## Quick Diagnosis
+
+<Card title="🩺 Identify Your Issue" icon="stethoscope">
+  Start here to quickly identify the type of problem you're experiencing.
+</Card>
+
+<Tabs>
+  <Tab title="No Audio">
+    **Symptoms**: TTS request completes but no audio is produced
+    
+    **Quick Checks**:
+    - ✅ API key is valid and has TTS permissions
+    - ✅ Voice ID exists and is spelled correctly
+    - ✅ Audio format is supported by your system
+    - ✅ Network connectivity is stable
+    
+    **Jump to**: [No Audio Output](#no-audio-output)
+  </Tab>
+  
+  <Tab title="Poor Quality">
+    **Symptoms**: Audio is distorted, robotic, or unclear
+    
+    **Quick Checks**:
+    - ✅ Voice settings are appropriate for use case
+    - ✅ Audio encoding matches your system requirements
+    - ✅ Input text is clean and well-formatted
+    - ✅ Provider model supports your language/voice
+    
+    **Jump to**: [Audio Quality Issues](#audio-quality-issues)
+  </Tab>
+  
+  <Tab title="High Latency">
+    **Symptoms**: TTS takes too long to respond
+    
+    **Quick Checks**:
+    - ✅ Using fastest available model for your provider
+    - ✅ Text chunks are optimally sized
+    - ✅ Network latency is acceptable
+    - ✅ Provider service status is operational
+    
+    **Jump to**: [Latency Problems](#latency-problems)
+  </Tab>
+  
+  <Tab title="API Errors">
+    **Symptoms**: Getting error codes or failed requests
+    
+    **Quick Checks**:
+    - ✅ API key format and permissions
+    - ✅ Request format matches provider requirements
+    - ✅ Rate limits not exceeded
+    - ✅ Account has sufficient credits/usage
+    
+    **Jump to**: [API and Authentication](#api-and-authentication-errors)
+  </Tab>
+</Tabs>
+
+## No Audio Output
+
+<Accordion title="ElevenLabs - No Audio">
+**Common Causes & Solutions:**
+
+**Voice ID Issues:**
+```bash
+# Check if voice exists
+curl -X GET "https://api.elevenlabs.io/v1/voices" \
+  -H "xi-api-key: YOUR_API_KEY"
+```
+- Verify voice ID is correct (case-sensitive)
+- Ensure voice is available on your plan
+- Try with default voice: `21m00Tcm4TlvDq8ikWAM` (Rachel)
+
+**Model Compatibility:**
+- Some voices don't work with all models
+- Try with `eleven_turbo_v2_5` for broad compatibility
+- Check [ElevenLabs compatibility matrix](/tts-providers/elevenlabs#available-models)
+
+**API Key Issues:**
+- Verify API key has TTS permissions
+- Check key isn't expired or revoked
+- Test with a simple curl request first
+</Accordion>
+
+<Accordion title="Deepgram - No Audio">
+**Common Causes & Solutions:**
+
+**WebSocket Connection:**
+```javascript
+// Test WebSocket connection
+const ws = new WebSocket(
+  'wss://api.deepgram.com/v1/speak?model=aura-asteria-en',
+  { headers: { 'Authorization': 'Token YOUR_API_KEY' }}
+);
+
+ws.on('error', (error) => {
+  console.log('Connection failed:', error);
+});
+```
+
+**Audio Format Issues:**
+- Ensure your system supports the requested format
+- Try µ-law for phone systems: `encoding=mulaw&sample_rate=8000`
+- Use linear16 for web: `encoding=linear16&sample_rate=24000`
+
+**Voice Model Issues:**
+- Use correct voice format: `aura-asteria-en` not `asteria`
+- Verify model exists: `aura-2` vs `aura`
+- Check [Deepgram voice list](/tts-providers/deepgram#available-voices)
+</Accordion>
+
+<Accordion title="Inworld - No Audio">
+**Common Causes & Solutions:**
+
+**Bearer Token:**
+```bash
+# Test authentication
+curl -X GET "https://api.inworld.ai/v1/voices" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Language/Voice Compatibility:**
+- Verify voice supports selected language
+- Check language code format: `en` not `english`
+- Use [language matrix](/tts-providers/inworld#language-support--quality)
+
+**Model Selection:**
+- Try `inworld-tts-1` before `inworld-tts-1-max`
+- Ensure model supports your voice
+- Check [model compatibility](/tts-providers/inworld#available-models)
+</Accordion>
+
+<Accordion title="Resemble - No Audio">
+**Common Causes & Solutions:**
+
+**WebSocket Requirements:**
+- Business plan required for WebSocket streaming
+- Check plan status in Resemble dashboard
+- Fallback to REST API if needed
+
+**UUID Format:**
+```json
+{
+  "project_uuid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "voice_uuid": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+}
+```
+
+**Voice Training Status:**
+- Ensure custom voice training is complete
+- Check voice status in Resemble dashboard
+- Wait for training completion before using
+</Accordion>
+
+## Audio Quality Issues
+
+<Accordion title="Robotic or Distorted Voice">
+**ElevenLabs Solutions:**
+```json
+{
+  "stability": 0.5,           // Try 0.4-0.6 range
+  "similarity_boost": 0.75,   // Optimal setting
+  "style": 0.0,              // Keep low for natural sound
+  "use_speaker_boost": true   // Always enable
+}
+```
+
+**Inworld Solutions:**
+- Reduce emotional markup intensity
+- Try different voice with your content
+- Switch from TTS-1-Max to TTS-1 for stability
+
+**Deepgram Solutions:**
+- Use Aura-2 instead of original Aura
+- Ensure proper audio encoding for your system
+- Check sample rate matches playback system
+
+**General Solutions:**
+- Test with shorter text samples
+- Remove special characters from input text
+- Verify network stability during generation
+</Accordion>
+
+<Accordion title="Pronunciation Issues">
+**Text Preprocessing:**
+```python
+def fix_pronunciations(text):
+    fixes = {
+        "API": "A P I",
+        "HTTP": "H T T P", 
+        "OAuth": "O Auth",
+        "UUID": "U U I D",
+        "AWS": "A W S",
+        "URL": "U R L"
+    }
+    
+    for term, pronunciation in fixes.items():
+        text = text.replace(term, pronunciation)
+    return text
+```
+
+**Provider-Specific:**
+- **ElevenLabs**: Use SSML for pronunciation control
+- **Inworld**: Leverage phonetic variations in training
+- **Deepgram**: English-optimized, fewer pronunciation issues
+- **Resemble**: Train custom voice with problematic words
+</Accordion>
+
+<Accordion title="Inconsistent Quality">
+**Stability Optimization:**
+- **ElevenLabs**: Increase stability to 0.6-0.7
+- **Inworld**: Use TTS-1 instead of TTS-1-Max
+- **Resemble**: Retrain voice with more consistent samples
+
+**Network Optimization:**
+- Use WebSocket connections for streaming providers
+- Implement connection keepalive
+- Add retry logic for failed chunks
+- Monitor network latency and jitter
+</Accordion>
+
+## Latency Problems
+
+<Card title="⚡ Speed Optimization" icon="bolt">
+  Optimize TTS response times across all providers.
+</Card>
+
+<Accordion title="ElevenLabs Latency Optimization">
+**Model Selection:**
+```json
+{
+  "model": "eleven_flash_v2_5",  // Fastest model
+  "latency": 1,                  // Optimize setting 
+  "stability": 0.5,              // Don't go too low
+  "use_speaker_boost": true      // Maintain quality
+}
+```
+
+**Best Practices:**
+- Use Flash v2.5 for phone calls (~75ms)
+- Keep text chunks under 100 characters
+- Avoid complex punctuation and formatting
+- Use WebSocket streaming for real-time apps
+</Accordion>
+
+<Accordion title="Deepgram Speed Maximization">
+**Optimal Configuration:**
+```json
+{
+  "model": "aura-2-asteria-en",
+  "encoding": "mulaw",
+  "sample_rate": 8000
+}
+```
+
+**Speed Tips:**
+- Already fastest provider (~75ms)
+- Use µ-law encoding for phone systems
+- Keep WebSocket connections alive
+- Send text in 20-50 word chunks
+</Accordion>
+
+<Accordion title="General Latency Solutions">
+**Text Optimization:**
+```python
+def optimize_text_for_speed(text):
+    # Remove unnecessary punctuation
+    text = re.sub(r'[\.]{2,}', '.', text)
+    
+    # Break into optimal chunks
+    chunks = split_into_chunks(text, max_words=30)
+    
+    # Remove extra whitespace
+    chunks = [chunk.strip() for chunk in chunks]
+    
+    return chunks
+```
+
+**Connection Optimization:**
+- Reuse connections where possible
+- Implement connection pooling
+- Use regional endpoints when available
+- Monitor and retry failed requests quickly
+</Accordion>
+
+## API and Authentication Errors
+
+<Accordion title="401 Unauthorized">
+**Common Causes:**
+- Expired or invalid API key
+- Incorrect authentication header format
+- Key doesn't have required permissions
+
+**Solutions by Provider:**
+
+**ElevenLabs:**
+```bash
+# Correct header format
+curl -H "xi-api-key: YOUR_API_KEY"
+```
+
+**Deepgram:**
+```bash
+# Correct header format  
+curl -H "Authorization: Token YOUR_API_KEY"
+```
+
+**Inworld:**
+```bash
+# Correct header format
+curl -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Resemble:**
+```bash
+# Correct header format
+curl -H "Authorization: Bearer YOUR_API_KEY"
+```
+</Accordion>
+
+<Accordion title="403 Forbidden">
+**Common Causes:**
+- Plan limitations (voice access, features)
+- Usage quota exceeded
+- Geographic restrictions
+
+**Solutions:**
+- Check plan features and upgrade if needed
+- Verify voice is available on your plan
+- Review usage dashboard for quota limits
+- Contact provider support for restrictions
+</Accordion>
+
+<Accordion title="429 Rate Limited">
+**Rate Limit Solutions:**
+```python
+import time
+import random
+
+def retry_with_backoff(func, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except RateLimitError:
+            if attempt == max_retries - 1:
+                raise
+            
+            # Exponential backoff with jitter
+            delay = (2 ** attempt) + random.uniform(0, 1)
+            time.sleep(delay)
+```
+
+**Prevention:**
+- Implement proper rate limiting in your code
+- Use connection pooling and queuing
+- Distribute requests across time
+- Consider upgrading to higher tier plans
+</Accordion>
+
+## Provider-Specific Issues
+
+<Tabs>
+  <Tab title="ElevenLabs">
+    <Accordion title="Voice Cloning Problems">
+    **Training Issues:**
+    - Upload 1-25 minutes of clear audio
+    - Use consistent speaker and environment
+    - Include diverse sentence types
+    - Wait for full training completion
+    
+    **Usage Issues:**
+    - Use correct voice ID from dashboard
+    - Ensure plan supports voice cloning
+    - Try different similarity_boost values
+    - Check voice model compatibility
+    </Accordion>
+    
+    <Accordion title="Multilingual Issues">
+    **Language Detection:**
+    - Explicitly set language parameter
+    - Use models that support target language
+    - Test with native speakers
+    - Avoid mixing languages in single request
+    
+    **Model Compatibility:**
+    ```json
+    {
+      "model": "eleven_v3",        // Best multilingual
+      "language": "es",            // Explicit language
+      "text": "Hola mundo"
+    }
+    ```
+    </Accordion>
+  </Tab>
+  
+  <Tab title="Deepgram">
+    <Accordion title="Phone Integration">
+    **Twilio Compatibility:**
+    ```json
+    {
+      "encoding": "mulaw",
+      "sample_rate": 8000,
+      "model": "aura-2-asteria-en"
+    }
+    ```
+    
+    **Common Issues:**
+    - Use µ-law encoding for Twilio
+    - Ensure 8kHz sample rate
+    - Test with Twilio Media Streams
+    - Monitor connection stability
+    </Accordion>
+    
+    <Accordion title="WebSocket Issues">
+    **Connection Problems:**
+    - Verify API key has streaming permissions
+    - Check firewall allows WebSocket traffic
+    - Implement proper error handling
+    - Use connection heartbeat/keepalive
+    
+    **Audio Streaming:**
+    - Handle audio chunks properly
+    - Implement proper buffering
+    - Monitor for connection drops
+    - Have reconnection logic ready
+    </Accordion>
+  </Tab>
+  
+  <Tab title="Inworld">
+    <Accordion title="Emotional Markup">
+    **Common Issues:**
+    ```markdown
+    ❌ Wrong: [HAPPY] Hello there!
+    ✅ Right: [happy] Hello there!
+    
+    ❌ Wrong: [happy excited] Great news!
+    ✅ Right: [excited] Great news!
+    ```
+    
+    **Best Practices:**
+    - Emotions are case-sensitive (lowercase)
+    - Use one emotion per tag
+    - Don't overuse markup (max 2-3 per sentence)
+    - Test with different voices
+    </Accordion>
+    
+    <Accordion title="Language Issues">
+    **Beta Language Limitations:**
+    - Some languages are in beta (lower quality)
+    - Test thoroughly before production use
+    - Have fallback to English if needed
+    - Monitor for quality improvements
+    
+    **Voice Selection:**
+    - Use native voices for best quality
+    - Check language-voice compatibility
+    - Test pronunciation with native speakers
+    </Accordion>
+  </Tab>
+  
+  <Tab title="Resemble">
+    <Accordion title="Custom Voice Training">
+    **Training Failures:**
+    - Ensure 3-10 minutes of clear audio
+    - Use same speaker throughout
+    - Record in consistent environment
+    - Avoid background noise or echo
+    
+    **Quality Issues:**
+    - Include diverse sentence types in training
+    - Use professional recording equipment
+    - Test with actual use case content
+    - Consider retraining with better samples
+    </Accordion>
+    
+    <Accordion title="Business Plan Requirements">
+    **WebSocket Limitations:**
+    - Real-time streaming requires Business plan
+    - REST API available on all plans
+    - Check plan status in dashboard
+    - Contact sales for plan upgrades
+    
+    **Feature Access:**
+    - Voice creation limits by plan
+    - Concurrent connection limits
+    - Usage quota differences
+    - Priority support access
+    </Accordion>
+  </Tab>
+</Tabs>
+
+## Emergency Troubleshooting
+
+<Card title="🚨 When Everything Breaks" icon="triangle-exclamation">
+  Quick recovery strategies for critical TTS failures.
+</Card>
+
+### Fallback Strategy Implementation
+
+<CodeGroup>
+
+```python Python Fallback
+class TTSWithFallback:
+    def __init__(self):
+        self.providers = [
+            {"name": "elevenlabs", "priority": 1},
+            {"name": "deepgram", "priority": 2},
+            {"name": "inworld", "priority": 3}
+        ]
+    
+    async def synthesize_with_fallback(self, text):
+        for provider in sorted(self.providers, key=lambda x: x["priority"]):
+            try:
+                return await self.try_provider(provider["name"], text)
+            except Exception as e:
+                logger.warning(f"{provider['name']} failed: {e}")
+                continue
+        
+        # All providers failed - use local fallback
+        return await self.local_tts_fallback(text)
+```
+
+```javascript JavaScript Fallback
+class TTSFallbackManager {
+  constructor() {
+    this.providers = [
+      { name: 'elevenlabs', priority: 1 },
+      { name: 'deepgram', priority: 2 },
+      { name: 'inworld', priority: 3 }
+    ];
+  }
+
+  async synthesizeWithFallback(text) {
+    for (const provider of this.providers.sort((a, b) => a.priority - b.priority)) {
+      try {
+        return await this.tryProvider(provider.name, text);
+      } catch (error) {
+        console.warn(`${provider.name} failed:`, error.message);
+        continue;
+      }
+    }
+    
+    // All providers failed
+    throw new Error('All TTS providers failed');
+  }
+}
+```
+
+</CodeGroup>
+
+### Health Check Implementation
+
+```python
+async def check_provider_health():
+    """Monitor TTS provider health and switch if needed"""
+    health_status = {}
+    
+    for provider in ["elevenlabs", "deepgram", "inworld", "resemble"]:
+        try:
+            start_time = time.time()
+            await test_provider_connection(provider)
+            latency = time.time() - start_time
+            
+            health_status[provider] = {
+                "status": "healthy",
+                "latency": latency,
+                "last_check": time.time()
+            }
+        except Exception as e:
+            health_status[provider] = {
+                "status": "unhealthy", 
+                "error": str(e),
+                "last_check": time.time()
+            }
+    
+    return health_status
+```
+
+## Getting Help
+
+<Card title="📞 Support Resources" icon="life-ring">
+  When you need additional help beyond this troubleshooting guide.
+</Card>
+
+<CardGroup cols={2}>
+  <Card title="Provider Support" icon="headset">
+    **Direct Provider Support:**
+    - [ElevenLabs Support](https://help.elevenlabs.io/)
+    - [Deepgram Support](https://developers.deepgram.com/support)
+    - [Inworld Support](https://docs.inworld.ai/support)
+    - [Resemble Support](https://help.resemble.ai/)
+  </Card>
+  
+  <Card title="Community Resources" icon="users">
+    **Community Help:**
+    - [GitHub Issues](https://github.com/meeran03/burki/issues)
+    - [Discord Community](https://discord.gg/burki)
+    - [Stack Overflow](https://stackoverflow.com/questions/tagged/burki-voice-ai)
+    - Email: support@burki.ai
+  </Card>
+</CardGroup>
+
+---
+
+<Card title="💡 Still Having Issues?" icon="lightbulb">
+  If this guide didn't solve your problem, check our [Best Practices](/tts-providers/best-practices) guide or reach out to our community for help!
+</Card> 

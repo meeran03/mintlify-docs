@@ -1,0 +1,628 @@
+---
+title: "Inworld.ai TTS"
+description: "AI-powered TTS with emotional expression, multilingual support, and zero-shot voice cloning"
+---
+
+<Card title="🎭 Inworld.ai: AI-Powered Expression" icon="masks-theater">
+  Advanced AI-driven TTS with emotional markup, context awareness, and support for 11 languages. Perfect for gaming, entertainment, and expressive customer interactions.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Get API Key">
+    1. Visit [Inworld Studio](https://studio.inworld.ai) and create an account
+    2. Navigate to **Integrations** → **API Keys**
+    3. Generate a new API key for TTS
+    4. Copy your Bearer token
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **Inworld.ai** as provider
+    3. Paste your Bearer token in the **TTS API Key** field
+  </Step>
+  <Step title="Choose Model & Voice">
+    Select TTS-1 or TTS-1-Max model and your preferred voice
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Free Tier**: Inworld offers free credits for testing. Includes access to all voices and emotional markup features.
+</Callout>
+
+## Available Models
+
+<CardGroup cols={2}>
+  <Card title="🎪 TTS-1" icon="star">
+    **~200ms latency**
+    
+    Flagship model with realistic, context-aware synthesis
+    
+    **Languages**: 11 supported languages
+    **Best for**: Production applications, customer service
+  </Card>
+  
+  <Card title="🔬 TTS-1-Max" icon="flask">
+    **~250ms latency**
+    
+    Larger, more expressive model (experimental)
+    
+    **Languages**: 11 supported languages
+    **Best for**: Creative content, gaming, entertainment
+  </Card>
+</CardGroup>
+
+<Callout type="tip">
+**Recommendation**: Use **TTS-1** for most applications. Try **TTS-1-Max** for more expressive, creative content.
+</Callout>
+
+## Multilingual Voice Library
+
+<Tabs>
+  <Tab title="English">
+    <CardGroup cols={2}>
+      <Card title="Hades" icon="user">
+        **Deep and commanding**
+        
+        Perfect for authoritative characters
+        
+        `Voice ID: Hades`
+      </Card>
+      
+      <Card title="Alex" icon="user">
+        **Clear and natural**
+        
+        Great for professional applications
+        
+        `Voice ID: Alex`
+      </Card>
+      
+      <Card title="Ashley" icon="user">
+        **Warm and friendly**
+        
+        Ideal for customer service
+        
+        `Voice ID: Ashley`
+      </Card>
+      
+      <Card title="Aria" icon="user">
+        **Professional and articulate**
+        
+        Perfect for business communications
+        
+        `Voice ID: Aria`
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="Spanish">
+    <CardGroup cols={2}>
+      <Card title="Diego" icon="user">
+        **Warm and expressive**
+        
+        Native Spanish male voice
+        
+        `Voice ID: Diego`
+      </Card>
+      
+      <Card title="Lupita" icon="user">
+        **Elegant and clear**
+        
+        Professional Spanish female voice
+        
+        `Voice ID: Lupita`
+      </Card>
+      
+      <Card title="Miguel" icon="user">
+        **Strong and confident**
+        
+        Authoritative Spanish male voice
+        
+        `Voice ID: Miguel`
+      </Card>
+      
+      <Card title="Rafael" icon="user">
+        **Smooth and professional**
+        
+        Business-ready Spanish voice
+        
+        `Voice ID: Rafael`
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="French">
+    <CardGroup cols={2}>
+      <Card title="Alain" icon="user">
+        **Sophisticated male voice**
+        
+        Native French pronunciation
+        
+        `Voice ID: Alain`
+      </Card>
+      
+      <Card title="Hélène" icon="user">
+        **Graceful and articulate**
+        
+        Professional French female voice
+        
+        `Voice ID: Hélène`
+      </Card>
+      
+      <Card title="Mathieu" icon="user">
+        **Clear and natural**
+        
+        Conversational French voice
+        
+        `Voice ID: Mathieu`
+      </Card>
+      
+      <Card title="Étienne" icon="user">
+        **Expressive and warm**
+        
+        Engaging French male voice
+        
+        `Voice ID: Étienne`
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="Other Languages">
+    <Accordion title="German">
+    - **Johanna** (Female) - `Voice ID: Johanna` - Precise and professional
+    - **Josef** (Male) - `Voice ID: Josef` - Strong and clear
+    </Accordion>
+    
+    <Accordion title="Chinese (Mandarin)">
+    - **Yichen** (Male) - `Voice ID: Yichen` - Natural and expressive
+    - **Xiaoyin** (Female) - `Voice ID: Xiaoyin` - Melodic and clear
+    - **Xinyi** (Female) - `Voice ID: Xinyi` - Gentle and articulate
+    - **Jing** (Female) - `Voice ID: Jing` - Smooth and professional
+    </Accordion>
+    
+    <Accordion title="Japanese">
+    - **Hiroshi** (Male) - `Voice ID: Hiroshi` - Polite and clear
+    - **Sakura** (Female) - `Voice ID: Sakura` - Gentle and melodic
+    </Accordion>
+    
+    <Accordion title="Other Supported Languages">
+    - **Italian**: Marco (Male), Giulia (Female)
+    - **Portuguese**: Joao (Male), Ana (Female)
+    - **Dutch**: Jan (Male), Emma (Female)
+    - **Korean**: Min (Male), Soo (Female)
+    - **Polish**: Piotr (Male), Anna (Female)
+    </Accordion>
+  </Tab>
+</Tabs>
+
+## Emotional Markup System
+
+<Card title="🎭 Express Emotions in Speech" icon="heart">
+  Inworld's unique emotional markup allows you to add feelings and speaking styles directly in your text.
+</Card>
+
+### Emotional Tags
+
+<Tabs>
+  <Tab title="Basic Emotions">
+    ```markdown
+    [happy] I'm excited to help you today!
+    [sad] I'm sorry to hear about that issue.
+    [angry] This is completely unacceptable!
+    [surprised] Wow, I didn't expect that!
+    [fearful] Please be careful with that.
+    [disgusted] That's not what I ordered.
+    ```
+    
+    **Available emotions**: happy, sad, angry, surprised, fearful, disgusted, neutral
+  </Tab>
+  
+  <Tab title="Speaking Styles">
+    ```markdown
+    [whispering] This is confidential information.
+    [shouting] ATTENTION EVERYONE!
+    [laughing] That's hilarious!
+    [crying] I can't believe this happened.
+    [sighing] I suppose we have no choice.
+    [breathing] Take a deep breath and relax.
+    ```
+    
+    **Available styles**: whispering, shouting, laughing, crying, sighing, breathing
+  </Tab>
+  
+  <Tab title="Advanced Examples">
+    ```markdown
+    # Mixed emotions in conversation
+    [happy] Welcome to our store! [surprised] Oh, you're looking for that specific item? [sad] Unfortunately, we're out of stock right now, [happy] but I can order it for you!
+    
+    # Style changes for emphasis
+    [normal] The meeting will start at [emphasizing] three o'clock sharp. [whispering] Don't be late again.
+    
+    # Character voices for gaming
+    [angry] You dare challenge me? [laughing] This will be easy! [confident] Prepare for battle!
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="tip">
+**Pro Tip**: Emotional markup works best with natural sentence structure. Don't overuse tags - less is often more effective.
+</Callout>
+
+## Zero-Shot Voice Cloning
+
+<Card title="🎯 Custom Voice Creation" icon="wand-magic-sparkles">
+  Create custom voices without training data. Just provide a voice ID and Inworld handles the rest.
+</Card>
+
+<Steps>
+  <Step title="Enable Custom Voice">
+    In your assistant configuration, select "Custom" voice option
+  </Step>
+  <Step title="Enter Voice ID">
+    Provide your custom voice identifier in the Custom Voice ID field
+  </Step>
+  <Step title="Test & Refine">
+    Test with sample text and adjust based on results
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Voice Cloning**: Contact Inworld support to set up custom voice cloning for your specific use case. Usually requires voice samples and setup time.
+</Callout>
+
+## Language Support & Quality
+
+<Card title="🌍 Production-Ready Languages" icon="globe">
+  Inworld provides native-quality voices for multiple languages with varying production readiness.
+</Card>
+
+| Language | Status | Voices Available | Quality Rating |
+|----------|--------|------------------|----------------|
+| **English** | 🟢 Production | 4+ voices | ⭐⭐⭐⭐⭐ |
+| **Spanish** | 🟢 Production | 4+ voices | ⭐⭐⭐⭐⭐ |
+| **French** | 🟢 Production | 4+ voices | ⭐⭐⭐⭐ |
+| **German** | 🟡 Beta | 2+ voices | ⭐⭐⭐⭐ |
+| **Chinese** | 🟡 Beta | 4+ voices | ⭐⭐⭐⭐ |
+| **Japanese** | 🟡 Beta | 2+ voices | ⭐⭐⭐ |
+| **Italian** | 🟡 Beta | 2+ voices | ⭐⭐⭐ |
+| **Portuguese** | 🟡 Beta | 2+ voices | ⭐⭐⭐ |
+| **Dutch** | 🟡 Beta | 2+ voices | ⭐⭐⭐ |
+| **Korean** | 🟡 Beta | 2+ voices | ⭐⭐⭐ |
+| **Polish** | 🟡 Beta | 2+ voices | ⭐⭐⭐ |
+
+<Callout type="warning">
+**Beta Languages**: While functional, beta languages may have occasional quality variations. Test thoroughly before production use.
+</Callout>
+
+## API Integration
+
+<CodeGroup>
+
+```python Python
+import requests
+import json
+
+def synthesize_with_emotions(text, voice_id="Ashley", language="en"):
+    url = "https://api.inworld.ai/v1/text-to-speech/stream"
+    
+    headers = {
+        "Authorization": "Bearer YOUR_INWORLD_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "text": text,
+        "voice_id": voice_id,
+        "model": "inworld-tts-1",
+        "language": language,
+        "output_format": "wav",
+        "sample_rate": 8000
+    }
+    
+    response = requests.post(url, json=data, headers=headers, stream=True)
+    return response
+
+# Example with emotional markup
+text_with_emotion = "[happy] Welcome to our service! [excited] How can I help you today?"
+response = synthesize_with_emotions(text_with_emotion, "Ashley", "en")
+```
+
+```javascript JavaScript
+const synthesizeWithEmotions = async (text, voiceId = "Ashley", language = "en") => {
+  const response = await fetch("https://api.inworld.ai/v1/text-to-speech/stream", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer YOUR_INWORLD_API_KEY",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      text: text,
+      voice_id: voiceId,
+      model: "inworld-tts-1",
+      language: language,
+      output_format: "wav",
+      sample_rate: 8000,
+    }),
+  });
+  
+  return response;
+};
+
+// Example with emotional markup
+const textWithEmotion = "[happy] Welcome to our service! [excited] How can I help you today?";
+const audioStream = await synthesizeWithEmotions(textWithEmotion, "Ashley", "en");
+```
+
+```curl cURL
+curl -X POST "https://api.inworld.ai/v1/text-to-speech/stream" \
+  -H "Authorization: Bearer YOUR_INWORLD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "[happy] Welcome to our service! [excited] How can I help you today?",
+    "voice_id": "Ashley",
+    "model": "inworld-tts-1",
+    "language": "en",
+    "output_format": "wav",
+    "sample_rate": 8000
+  }'
+```
+
+</CodeGroup>
+
+## Use Case Examples
+
+<Tabs>
+  <Tab title="Customer Support">
+    ```markdown
+    # Empathetic customer service
+    [understanding] I completely understand your frustration. [reassuring] Let me help you resolve this issue right away. [confident] I'll have this sorted out for you in just a moment.
+    ```
+    
+    **Best voices**: Ashley (EN), Lupita (ES), Hélène (FR)
+    **Model**: TTS-1 for consistency
+  </Tab>
+  
+  <Tab title="Gaming/Entertainment">
+    ```markdown
+    # Character dialogue with personality
+    [excited] A new challenger approaches! [confident] You think you can defeat me? [laughing] This should be entertaining! [determined] Let the battle begin!
+    ```
+    
+    **Best voices**: Hades (commanding), Aria (heroic)
+    **Model**: TTS-1-Max for maximum expression
+  </Tab>
+  
+  <Tab title="Educational Content">
+    ```markdown
+    # Engaging learning material
+    [friendly] Today we're going to learn about photosynthesis. [curious] Have you ever wondered how plants make their own food? [explaining] It's actually a fascinating process!
+    ```
+    
+    **Best voices**: Alex (EN), Mathieu (FR), Yichen (ZH)
+    **Model**: TTS-1 for clarity
+  </Tab>
+  
+  <Tab title="Multilingual Business">
+    ```markdown
+    # Professional multilingual support
+    English: [professional] Thank you for calling our support line.
+    Spanish: [profesional] Gracias por llamar a nuestra línea de soporte.
+    French: [professionnel] Merci d'avoir appelé notre ligne d'assistance.
+    ```
+    
+    **Strategy**: Use native voices for each language
+    **Model**: TTS-1 for business consistency
+  </Tab>
+</Tabs>
+
+## Configuration Examples
+
+<Card title="🎛️ Optimal Settings" icon="sliders">
+  Recommended configurations for different use cases.
+</Card>
+
+<Accordion title="Phone Call Setup">
+```json
+{
+  "model": "inworld-tts-1",
+  "voice_id": "Ashley",
+  "language": "en",
+  "output_format": "wav",
+  "sample_rate": 8000,
+  "text": "[friendly] Thank you for calling! [helpful] How may I assist you today?"
+}
+```
+
+**Features**:
+- Phone-compatible audio format
+- Friendly, professional tone
+- Emotional warmth in greeting
+</Accordion>
+
+<Accordion title="Multilingual Application">
+```json
+{
+  "model": "inworld-tts-1",
+  "voice_id": "Diego",
+  "language": "es",
+  "output_format": "wav",
+  "sample_rate": 16000,
+  "text": "[amigable] ¡Bienvenido! [servicial] ¿En qué puedo ayudarte hoy?"
+}
+```
+
+**Features**:
+- Native Spanish voice
+- Cultural appropriate emotions
+- Higher quality audio format
+</Accordion>
+
+<Accordion title="Gaming/Interactive">
+```json
+{
+  "model": "inworld-tts-1-max",
+  "voice_id": "Hades",
+  "language": "en",
+  "output_format": "wav",
+  "sample_rate": 24000,
+  "text": "[menacing] You dare enter my domain? [angry] Prepare to face my wrath!"
+}
+```
+
+**Features**:
+- Maximum expression model
+- Character-appropriate voice
+- High-quality audio for immersion
+</Accordion>
+
+## Best Practices
+
+<Card title="🎯 Maximize Inworld's Emotional AI" icon="target">
+  Get the most out of Inworld's unique features with these proven strategies.
+</Card>
+
+<Accordion title="Emotional Markup Guidelines">
+**Do's**:
+- Use emotions that match the content context
+- Place tags at natural speech boundaries
+- Mix emotions sparingly for realistic conversations
+- Test different voices with the same emotions
+
+**Don'ts**:
+- Overuse emotional tags (max 2-3 per sentence)
+- Use conflicting emotions close together
+- Rely only on markup - the text itself should convey meaning
+- Mix languages and emotions in complex ways
+</Accordion>
+
+<Accordion title="Voice Selection Strategy">
+**For Business Applications**:
+- English: Ashley, Alex, Aria
+- Spanish: Lupita, Rafael
+- French: Hélène, Mathieu
+
+**For Creative Content**:
+- Dramatic: Hades, Aria
+- Friendly: Ashley, Diego
+- Professional: Alex, Johanna
+
+**For Gaming**:
+- Heroes: Aria, Alex
+- Villains: Hades
+- NPCs: Ashley, Diego
+</Accordion>
+
+<Accordion title="Performance Optimization">
+```python
+# Efficient text processing
+def optimize_for_inworld(text):
+    # Keep sentences under 50 words for best latency
+    sentences = split_into_sentences(text)
+    optimized = []
+    
+    for sentence in sentences:
+        if len(sentence.split()) > 50:
+            # Break long sentences at natural points
+            optimized.extend(break_long_sentence(sentence))
+        else:
+            optimized.append(sentence)
+    
+    return optimized
+
+# Cache voice models for repeated use
+voice_cache = {}
+
+def get_cached_voice(voice_id, language):
+    cache_key = f"{voice_id}_{language}"
+    if cache_key not in voice_cache:
+        voice_cache[cache_key] = load_voice_model(voice_id, language)
+    return voice_cache[cache_key]
+```
+</Accordion>
+
+## Pricing
+
+<Card title="💰 Flexible Pricing Model" icon="dollar-sign">
+  Pay-per-character with volume discounts and free tier for testing.
+</Card>
+
+| Plan | Characters/Month | Price | Features |
+|------|------------------|-------|----------|
+| **Free** | 25,000 | $0 | All voices, emotional markup |
+| **Starter** | 100,000 | $9 | Priority processing |
+| **Professional** | 500,000 | $29 | Custom voice support |
+| **Enterprise** | Custom | Custom | Dedicated support, SLA |
+
+<Callout type="info">
+**Cost Estimation**: Average phone call with emotions uses ~2,500 characters. A friendly greeting might be: "[happy] Welcome to our service! [helpful] How can I assist you today?" = ~85 characters
+</Callout>
+
+## Troubleshooting
+
+<Accordion title="Emotional Markup Not Working">
+**Problem**: Emotions don't seem to affect the voice
+
+**Solutions**:
+- Verify emotion tag spelling (case-sensitive)
+- Check if the voice supports the specific emotion
+- Try with TTS-1-Max model for stronger expression
+- Ensure tags are properly formatted: `[emotion]`
+</Accordion>
+
+<Accordion title="Language Detection Issues">
+**Problem**: Wrong language pronunciation
+
+**Solutions**:
+- Explicitly set language parameter in API call
+- Use native voices for each language
+- Avoid mixing languages in single requests
+- Verify voice ID supports the target language
+</Accordion>
+
+<Accordion title="Custom Voice Problems">
+**Problem**: Custom voice ID not working
+
+**Solutions**:
+- Verify custom voice ID with Inworld support
+- Check if voice is properly trained and available
+- Use fallback to standard voices during setup
+- Contact support for voice activation status
+</Accordion>
+
+## Migration Guide
+
+<Tabs>
+  <Tab title="From Other Providers">
+    **Key Advantages of Switching**:
+    - Emotional markup for better user engagement
+    - Native multilingual support (11 languages)
+    - Zero-shot voice cloning capabilities
+    - AI-powered context awareness
+    
+    **Migration Steps**:
+    1. Map existing voice preferences to Inworld voices
+    2. Add emotional markup to enhance user experience
+    3. Test multilingual capabilities if applicable
+    4. Optimize for Inworld's strengths (emotions, languages)
+  </Tab>
+  
+  <Tab title="Voice Mapping">
+    **From ElevenLabs**:
+    - Rachel → Ashley (professional female)
+    - Antoni → Hades (authoritative male)
+    - Bella → Ashley (friendly female)
+    
+    **From Deepgram**:
+    - Asteria → Ashley (warm female)
+    - Orion → Alex (professional male)
+    - Luna → Ashley (gentle female)
+    
+    **Enhancement Opportunity**: Add emotional context to improve engagement
+  </Tab>
+</Tabs>
+
+---
+
+<Card title="🎭 Ready to Add Emotion to Your AI?" icon="rocket">
+  Configure Inworld.ai in your [assistant settings](/ai-configuration) and start creating more engaging, expressive conversations!
+</Card> 

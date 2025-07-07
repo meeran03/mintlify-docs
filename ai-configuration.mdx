@@ -2,8 +2,6 @@
 title: AI Configuration (Deep Dive)
 ---
 
-# AI Configuration (Deep Dive)
-
 <Callout type="info">
 This is where you give your assistant its brain, voice, and ears! Configure how your AI thinks, speaks, and listens.
 </Callout>
@@ -41,27 +39,64 @@ When creating or editing an assistant, you'll see three main tabs:
   <Tab label="TTS (Text-to-Speech)">
 
   ### What is TTS?
-  TTS turns the AI's text responses into a natural-sounding voice.
+  TTS turns the AI's text responses into a natural-sounding voice. Choose from multiple providers to match your quality, speed, and language needs.
 
-  ### Key Settings
+  ### Quick Provider Guide
+  <CardGroup cols={2}>
+    <Card title="⚡ ElevenLabs" href="/tts-providers/elevenlabs">
+      **Premium Quality & Multilingual**
+      
+      70+ languages, voice cloning, advanced controls
+    </Card>
+    
+    <Card title="🚀 Deepgram Aura" href="/tts-providers/deepgram">
+      **Ultra-Low Latency**
+      
+      ~75ms response, phone-optimized
+    </Card>
+    
+    <Card title="🎭 Inworld.ai" href="/tts-providers/inworld">
+      **AI-Powered Emotions**
+      
+      Multilingual with emotional markup
+    </Card>
+    
+    <Card title="🎯 Resemble AI" href="/tts-providers/resemble">
+      **Custom Brand Voices**
+      
+      Unlimited voice creation
+    </Card>
+  </CardGroup>
+
+  ### Configuration Overview
   <Checklist>
-  - **Provider:** ElevenLabs, Deepgram, Inworld, or Resemble
-  - **Model:** Choose the voice quality/speed (e.g., Flash v2.5, Aura-2)
-  - **Voice:** Pick a character (Rachel, Luna, custom, etc.)
-  - **Language:** (For multilingual models) Select the spoken language
-  - **Latency/Speed:** How fast the voice responds (lower = faster, may reduce quality)
-  - **Stability/Similarity/Style:** Fine-tune voice consistency, accuracy, and expressiveness (provider-specific)
-  - **Speaker Boost:** Enhance clarity and reduce background noise
-  - **Custom Voice ID:** Use your own cloned or custom voice (where supported)
-  - **Encoding/Sample Rate:** (Advanced) Control audio format for phone quality
-  - **Project UUID:** (Resemble) Required for WebSocket streaming
+  - **Provider:** Choose based on your needs ([Full Comparison](/tts-providers))
+  - **Model:** Select quality/speed balance (varies by provider)
+  - **Voice:** Pick from available voices or use custom voices
+  - **Language:** Select for multilingual providers
+  - **Voice Controls:** Fine-tune stability, similarity, style ([Voice Tuning Guide](/tts-providers/voice-tuning))
+  - **Advanced Settings:** Encoding, sample rate, streaming options
   </Checklist>
 
-  <Accordion title="Tips for Best Voice Quality">
-  - For phone calls, use Flash v2.5 (ElevenLabs) or Aura-2 (Deepgram) for ultra-low latency
-  - Use Speaker Boost for noisy environments
-  - Test different voices to match your brand
+  <Accordion title="Quick Setup by Use Case">
+  **Phone Calls:** ElevenLabs Flash v2.5 or Deepgram Aura-2 for speed
+  
+  **Customer Service:** ElevenLabs Bella or Inworld Ashley for warmth
+  
+  **Multilingual:** ElevenLabs v3 or Inworld TTS-1 with native voices
+  
+  **Brand Voice:** Resemble AI with custom voice training
+  
+  → [See detailed recommendations](/tts-providers#quick-start-guide)
   </Accordion>
+
+  <Card title="📚 Complete TTS Documentation" icon="book">
+    **Dive Deeper:**
+    - [TTS Provider Comparison](/tts-providers) - Choose the right provider
+    - [Voice Tuning Guide](/tts-providers/voice-tuning) - Optimize voice settings
+    - [Best Practices](/tts-providers/best-practices) - Performance & cost optimization
+    - [Troubleshooting](/tts-providers/troubleshooting) - Fix common issues
+  </Card>
 
   </Tab>
   <Tab label="STT (Speech-to-Text)">
@@ -73,8 +108,7 @@ When creating or editing an assistant, you'll see three main tabs:
   <Checklist>
   - **Model:** Nova-3, Nova-2, Enhanced, etc. (Deepgram)
   - **Language:** Choose the spoken language (or enter a custom code)
-  - **Silence Threshold/Min Silence:** Fine-tune how the system detects when someone is done speaking
-  - **Utterance End/VAD Turnoff:** Controls for advanced timing
+  - **Advanced Timing Controls:** Fine-tune speech detection (see [STT Providers](/stt-providers) for details)
   - **Punctuation/Interim Results/Smart Format:** Make transcripts easier to read and use
   - **Audio Denoising:** Remove background noise for better accuracy (uses RNNoise)
   - **Keywords/Keyterms:** Boost recognition of important words (e.g., company names)
@@ -96,6 +130,28 @@ When creating or editing an assistant, you'll see three main tabs:
 - **Start simple:** Use recommended defaults, then experiment with advanced settings
 - **Test with real calls:** Try different voices, models, and fallback setups
 - **Document your changes:** Keep track of what works best for your use case
+
+---
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="📞 Call Management" href="/call-management" icon="phone">
+    Configure interruption handling, timeouts, and conversation flow control
+  </Card>
+  
+  <Card title="🎙️ STT Advanced Settings" href="/stt-providers" icon="microphone">
+    Fine-tune speech detection timing and audio processing
+  </Card>
+  
+  <Card title="🔊 TTS Provider Details" href="/tts-providers" icon="volume-high">
+    Deep dive into voice options and audio optimization
+  </Card>
+  
+  <Card title="🛠️ Tools & Actions" href="/tools" icon="wrench">
+    Enable call actions like transfers and automated responses
+  </Card>
+</CardGroup>
 
 <Callout type="tip">
 If you get stuck, check the tooltips in the UI or visit the [FAQ](./faq)!

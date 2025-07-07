@@ -1,0 +1,158 @@
+---
+title: 'Create Assistant'
+openapi: 'POST /api/v1/assistants'
+---
+
+This endpoint allows you to create a new, fully configured voice AI assistant. The parameters available via the API directly correspond to the settings you can configure in the assistant creation form in the web UI.
+
+A successful request will create the assistant within your organization and return the full assistant object, including its unique ID.
+
+### Request Body
+
+The request body is a JSON object containing the assistant's configuration. The parameters are organized into logical groups that mirror the sections in the UI. Many parameters are **conditional** based on the provider or options you select.
+
+<AccordionGroup>
+<Accordion title="Basic Information">
+- `name` (string, **required**): A unique name for your assistant.
+- `description` (string, optional): A brief description of the assistant's purpose.
+- `is_active` (boolean, optional): Set to `true` to allow the assistant to handle calls. Defaults to `true`.
+</Accordion>
+
+<Accordion title="AI Configuration">
+This section covers the core AI models for language, speech-to-text, and text-to-speech.
+
+**LLM (Language Model)**
+- `llm_provider` (string): The language model provider.
+  - **Enum**: `"openai"`, `"anthropic"`, `"gemini"`, `"groq"`, `"xai"`, `"custom"`. Defaults to `openai`.
+- `llm_provider_config` (object): Provider-specific configuration.
+  - `api_key` (string, **required**): The API key for the selected provider.
+  - `model` (string, optional): The specific model to use (e.g., `gpt-4o-mini`).
+  - `base_url` (string, optional): A custom API base URL. Required if `llm_provider` is `custom`.
+- `llm_settings` (object): General parameters for the language model.
+  - `temperature` (number): Controls creativity. Defaults to `0.7`.
+  - `max_tokens` (integer): Max length of the AI's response in tokens. Defaults to `1000`.
+  - `system_prompt` (string): The AI's personality and instructions.
+  - `welcome_message` (string): The first thing the assistant says to the caller.
+- `llm_fallback_providers` (object, optional): Configure backup LLM providers.
+  - `enabled` (boolean): Set to `true` to enable fallbacks.
+  - `fallbacks` (array of objects): An ordered list of fallback providers. Each object contains `provider`, `model`, `api_key`, and `base_url`.
+
+**TTS (Text-to-Speech)**
+- `tts_settings` (object):
+  - `provider` (string): The TTS provider. **Enum**: `"elevenlabs"`, `"deepgram"`, `"inworld"`, `"resemble"`.
+  - `voice_id` (string): The specific voice character to use (e.g., `rachel`).
+  - `model_id` (string, optional): The voice model (e.g., `eleven_flash_v2_5`).
+  - **Conditional Fields**:
+    - If `provider` is `elevenlabs`:
+      - `stability` (number): Voice consistency.
+      - `similarity_boost` (number): Voice accuracy.
+      - `style` (number): Speaking style variation.
+      - `use_speaker_boost` (boolean): Enhances audio quality.
+    - If `provider` is `resemble`:
+      - `provider_config.project_uuid` (string): Your Resemble AI project UUID.
+    - If `provider` is `inworld`:
+      - `provider_config.language` (string): Language code (e.g., `en`).
+  
+**STT (Speech-to-Text)**
+- `stt_settings` (object):
+  - `model` (string): The STT model (e.g., `nova-2`, `nova-3`).
+  - `language` (string): Language code (e.g., `en-US`).
+  - `keywords` (array of objects, optional): An array of keywords to boost. Each object should have a `keyword` (string) and an optional `intensifier` (float). For `nova-2` and older models.
+  - `keyterms` (array of strings, optional): An array of key terms to boost. For `nova-3` model only.
+</Accordion>
+
+<Accordion title="Call & Interruption Management">
+- `interruption_settings` (object):
+  - `interruption_threshold` (integer): Number of words a user must speak to interrupt.
+  - `min_speaking_time` (number): How long the assistant must speak before being interruptible (in seconds).
+  - `interruption_cooldown` (number): Cooldown period after an interruption (in seconds).
+- `idle_message` (string, optional): Message sent when the caller is silent.
+- `max_idle_messages` (integer, optional): How many idle messages to send before ending the call.
+- `idle_timeout` (integer, optional): Seconds of silence before sending an idle message.
+</Accordion>
+
+<Accordion title="Tools">
+- `tools_settings` (object): Configure built-in tools.
+  - `end_call` (object, optional):
+    - `enabled` (boolean): Enable/disable the tool.
+    - `scenarios` (array of strings): Phrases that will trigger ending the call.
+  - `transfer_call` (object, optional):
+    - `enabled` (boolean): Enable/disable the tool.
+    - `scenarios` (array of strings): Phrases that will trigger a transfer.
+    - `transfer_numbers` (array of strings): Phone numbers where calls can be transferred.
+</Accordion>
+
+<Accordion title="Advanced & Integration">
+- `custom_settings` (object, optional): For advanced data extraction.
+  - `structured_data_prompt` (string): Custom instructions for the AI on how to extract data.
+  - `structured_data_schema` (object): A JSON schema defining the data to be extracted.
+- `twilio_config` (object, optional): Bring your own Twilio credentials.
+  - `account_sid` (string): Your Twilio Account SID.
+  - `auth_token` (string): Your Twilio Auth Token.
+- `webhook_url` (string, optional): A URL to send call event webhooks to.
+</Accordion>
+</AccordionGroup>
+
+
+### Example Request
+
+Here is an example payload that mirrors the fields available in the UI to create a sophisticated customer service assistant. Note that fields like `scenarios` and `transfer_numbers` expect a JSON array of strings.
+
+```json
+{
+  "name": "ServiceBot 5000",
+  "description": "Handles initial customer service questions and escalations.",
+  "is_active": true,
+  "llm_provider": "openai",
+  "llm_provider_config": {
+    "model": "gpt-4o-mini",
+    "api_key": "sk-your-openai-api-key"
+  },
+  "llm_settings": {
+    "temperature": 0.7,
+    "max_tokens": 1000,
+    "system_prompt": "You are a friendly and efficient customer support agent. Your goal is to help with common questions and transfer to a human when requested.",
+    "welcome_message": "Hello! Thanks for calling support. How can I assist you today?"
+  },
+  "tts_settings": {
+    "provider": "elevenlabs",
+    "voice_id": "rachel",
+    "model_id": "eleven_flash_v2_5",
+    "stability": 0.5,
+    "similarity_boost": 0.75,
+    "style": 0.0,
+    "use_speaker_boost": true
+  },
+  "stt_settings": {
+    "model": "nova-2",
+    "language": "en-US",
+    "keywords": [
+        {"keyword": "agent", "intensifier": 1.5},
+        {"keyword": "human"},
+        {"keyword": "representative"}
+    ]
+  },
+  "interruption_settings": {
+    "interruption_threshold": 3,
+    "min_speaking_time": 0.5,
+    "interruption_cooldown": 2.0
+  },
+  "idle_message": "Are you still there? I'm here to help if you need anything.",
+  "max_idle_messages": 2,
+  "idle_timeout": 20,
+  "tools_settings": {
+    "transfer_call": {
+      "enabled": true,
+      "scenarios": [
+        "speak to an agent",
+        "talk to a human",
+        "transfer me to a representative"
+      ],
+      "transfer_numbers": [
+        "+18005551212"
+      ]
+    }
+  },
+  "webhook_url": "https://yourapi.com/webhooks/call-events"
+}
+``` 

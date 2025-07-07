@@ -1,0 +1,49 @@
+---
+title: 'Export Calls'
+openapi: 'GET /api/v1/calls/export'
+---
+
+This endpoint allows you to export a list of calls to either a CSV or JSON file. It supports a subset of the filtering options available on the [List Calls](/api-reference/calls/list) endpoint.
+
+The response from this endpoint will be a file download.
+
+### Query Parameters
+
+- `format` (string, optional, default: `csv`): The desired file format. Can be `csv` or `json`.
+- `status` (string, optional): Filter calls by their status.
+- `assistant_id` (integer, optional): Filter calls by a specific assistant.
+- `date_from` (string, optional): Filter calls from this date (ISO 8601 format).
+- `date_to` (string, optional): Filter calls to this date (ISO 8601 format).
+
+### Response
+
+The response is not a JSON object in the traditional sense, but a file that your browser will prompt you to download.
+
+**If `format=csv`:**
+
+You will receive a `text/csv` file named `calls_export.csv`.
+
+```csv CSV Content
+"Call ID","Call SID","Assistant Name","Customer Phone","Status","Duration (seconds)","Started At","Ended At"
+101,"CA...","Support Bot","+1555...","completed",300,"2023-10-30T10:00:00","2023-10-30T10:05:00"
+102,"CA...","Sales Rep","+1555...","completed",450,"2023-10-30T11:00:00","2023-10-30T11:07:30"
+```
+
+**If `format=json`:**
+
+You will receive an `application/json` file named `calls_export.json` containing an array of call objects.
+
+```json JSON Content
+[
+  {
+    "id": 101,
+    "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "assistant_name": "Support Bot",
+    "customer_phone_number": "+15559876543",
+    "status": "completed",
+    "duration": 300,
+    "started_at": "2023-10-30T10:00:00",
+    "ended_at": "2023-10-30T10:05:00"
+  }
+]
+``` 

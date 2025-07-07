@@ -1,0 +1,27 @@
+---
+title: 'Get Call Count'
+openapi: 'GET /api/v1/calls/count'
+---
+
+This endpoint returns the total number of calls that match a given set of filters. It is useful for quickly getting a count without retrieving the full list of call objects.
+
+### Query Parameters
+
+This endpoint supports the same filtering parameters as the [List Calls](/api-reference/calls/list) endpoint:
+
+- `status` (string, optional)
+- `assistant_id` (integer, optional)
+- `date_from` (string, optional)
+- `date_to` (string, optional)
+
+### Response
+
+The response is a JSON object containing the total count of matching calls.
+
+```json Response
+{
+  "count": 42
+}
+```
+
+</rewritten_file>

@@ -1,0 +1,42 @@
+---
+title: 'Twilio TwiML Webhook'
+openapi: 'POST /twiml'
+---
+
+This webhook is the primary entry point for all voice calls handled by the platform. It is designed to be called exclusively by Twilio when one of your configured phone numbers receives an incoming call or when you initiate an outbound call via the API.
+
+Its core function is to generate a TwiML (Twilio Markup Language) response that instructs Twilio to open a bi-directional media stream over a WebSocket connection to your server. This stream is what enables real-time voice interaction with your AI assistants.
+
+### How It Works
+
+1.  **Twilio Call**: A call is made to one of your Twilio phone numbers.
+2.  **Webhook Request**: Twilio sends a `POST` request to this `/twiml` endpoint.
+3.  **Assistant Lookup**: The system identifies the appropriate assistant based on the phone number called (for inbound) or metadata (for outbound).
+4.  **Database Record**: A new call record is created in the database.
+5.  **TwiML Response**: The server responds with TwiML containing a `<Connect>` verb, instructing Twilio to connect to the `/streams` WebSocket endpoint.
+
+### Request from Twilio
+
+This endpoint consumes `application/x-www-form-urlencoded` data sent by Twilio. The following are the key parameters your system uses:
+
+- `CallSid` (string): A unique identifier for the call, provided by Twilio.
+- `To` (string): The Twilio phone number that was called.
+- `From` (string): The phone number of the person initiating the call.
+
+For outbound calls, additional query parameters are used internally to pass metadata, such as `assistant_id` and a `welcome_message`.
+
+### Response to Twilio
+
+The response is not JSON, but rather an XML document in TwiML format. It instructs Twilio to connect to your WebSocket server to begin streaming audio.
+
+```xml Response
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://your-server.com/streams">
+      <Parameter name="To" value="+15551234567"/>
+      <Parameter name="From" value="+15559876543"/>
+    </Stream>
+  </Connect>
+</Response>
+``` 

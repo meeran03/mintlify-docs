@@ -1,0 +1,28 @@
+---
+title: 'Recording Status Webhook'
+openapi: 'POST /recording-status'
+---
+
+This webhook is designed to receive status updates from Twilio about call recordings. When you enable call recording on your Twilio account or for a specific call, Twilio will automatically make a `POST` request to this endpoint once the recording is processed and available.
+
+Its primary function is to receive the recording metadata from Twilio and update the corresponding call record in your database with the recording URL, duration, and other details.
+
+### Request from Twilio
+
+This endpoint consumes `application/x-www-form-urlencoded` data sent by Twilio. The following are the key parameters:
+
+- `CallSid` (string): The unique identifier of the call that was recorded. This is used to look up the call in your database.
+- `RecordingSid` (string): A unique identifier for the recording itself.
+- `RecordingUrl` (string): The URL where the recording's audio file can be accessed. This URL will be stored in your database.
+- `RecordingDuration` (string): The duration of the recording in seconds.
+- `RecordingStatus` (string): The status of the recording, typically `completed`.
+
+### Response to Twilio
+
+The endpoint responds with a `200 OK` status and a simple confirmation message to acknowledge receipt of the data. The response body is not typically used by Twilio.
+
+```json Response
+{
+  "message": "Recording status updated"
+}
+``` 

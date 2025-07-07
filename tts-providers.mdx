@@ -1,88 +1,190 @@
 ---
-title: TTS Providers
+title: "Text-to-Speech Providers"
+description: "Choose the perfect voice for your AI assistant from our comprehensive TTS provider ecosystem"
 ---
 
-# TTS Providers
+<Card title="🎙️ Give Your Assistant a Voice" icon="microphone">
+  Transform text into natural, human-like speech with our integrated TTS providers. Each provider offers unique advantages for different use cases.
+</Card>
+
+## Quick Provider Comparison
+
+<CardGroup cols={2}>
+  <Card title="⚡ ElevenLabs" icon="wand-magic-sparkles" href="/tts-providers/elevenlabs">
+    **Premium Quality & Customization**
+    
+    70+ languages, voice cloning, advanced controls
+    
+    *Best for: High-quality customer interactions*
+  </Card>
+  
+  <Card title="🚀 Deepgram Aura" icon="bolt" href="/tts-providers/deepgram">
+    **Ultra-Low Latency**
+    
+    3x faster than competitors, phone-optimized
+    
+    *Best for: Real-time conversations*
+  </Card>
+  
+  <Card title="🎭 Inworld.ai" icon="masks-theater" href="/tts-providers/inworld">
+    **AI-Powered Emotions**
+    
+    Multilingual, emotional markup, voice cloning
+    
+    *Best for: Expressive, contextual responses*
+  </Card>
+  
+  <Card title="🎯 Resemble AI" icon="bullseye" href="/tts-providers/resemble">
+    **Custom Voice Creation**
+    
+    WebSocket streaming, personalized voices
+    
+    *Best for: Brand-specific voice identity*
+  </Card>
+</CardGroup>
+
+## Feature Matrix
+
+| Provider | Latency | Languages | Voice Cloning | Streaming | Best For |
+|----------|---------|-----------|---------------|-----------|----------|
+| **ElevenLabs** | ~250ms | 70+ | ✅ Advanced | WebSocket | Premium quality |
+| **Deepgram** | ~75ms | English | ❌ | WebSocket | Speed & phone calls |
+| **Inworld** | ~200ms | 11 | ✅ Zero-shot | HTTP/WS | Emotional expression |
+| **Resemble** | ~300ms | English | ✅ Custom | WebSocket | Brand voices |
 
 <Callout type="info">
-Text-to-Speech (TTS) gives your assistant a natural, human-like voice. Burki Voice AI supports multiple providers—choose the one that fits your needs!
+**New to TTS?** Start with **ElevenLabs** for the best balance of quality and features, or **Deepgram** if speed is your priority.
+</Callout>
+
+## Setup Overview
+
+All providers follow the same basic setup pattern:
+
+<Steps>
+  <Step title="Get API Credentials">
+    Sign up with your chosen provider and obtain API keys
+  </Step>
+  <Step title="Configure in Burki">
+    Add your credentials in the assistant's AI Configuration → TTS tab
+  </Step>
+  <Step title="Select Voice & Model">
+    Choose from available voices and models for your use case
+  </Step>
+  <Step title="Fine-tune Settings">
+    Adjust speed, stability, and other provider-specific options
+  </Step>
+</Steps>
+
+## Provider Deep Dives
+
+<CardGroup cols={1}>
+  <Card title="🎭 ElevenLabs - Premium Voice Quality" href="/tts-providers/elevenlabs">
+    **Latest Models**: Flash v2.5 (75ms), v3 (70+ languages), Turbo v2.5
+    
+    **Key Features**: Advanced voice controls, multilingual support, custom voice creation
+    
+    **Perfect For**: Customer service, content creation, multilingual applications
+    
+    → [Complete ElevenLabs Guide](/tts-providers/elevenlabs)
+  </Card>
+  
+  <Card title="⚡ Deepgram Aura - Ultra-Fast TTS" href="/tts-providers/deepgram">
+    **Latest Models**: Aura-2 (next-gen), Aura (proven)
+    
+    **Key Features**: Industry-leading speed, phone optimization, µ-law encoding
+    
+    **Perfect For**: Real-time phone calls, live chat, interactive applications
+    
+    → [Complete Deepgram Guide](/tts-providers/deepgram)
+  </Card>
+  
+  <Card title="🎪 Inworld.ai - AI-Powered Expression" href="/tts-providers/inworld">
+    **Latest Models**: TTS-1 (flagship), TTS-1-Max (experimental)
+    
+    **Key Features**: Emotional markup, context awareness, 11 languages
+    
+    **Perfect For**: Gaming, entertainment, emotional customer support
+    
+    → [Complete Inworld Guide](/tts-providers/inworld)
+  </Card>
+  
+  <Card title="🎯 Resemble AI - Custom Brand Voices" href="/tts-providers/resemble">
+    **Key Features**: WebSocket streaming, unlimited voice creation, business plans
+    
+    **Perfect For**: Brand consistency, personalized experiences, enterprise
+    
+    → [Complete Resemble Guide](/tts-providers/resemble)
+  </Card>
+</CardGroup>
+
+## Advanced Topics
+
+<CardGroup cols={3}>
+  <Card title="🎛️ Voice Tuning" icon="sliders" href="/tts-providers/voice-tuning">
+    Master stability, similarity, and style controls across all providers
+  </Card>
+  
+  <Card title="🔧 Troubleshooting" icon="wrench" href="/tts-providers/troubleshooting">
+    Common issues and solutions with step-by-step fixes
+  </Card>
+  
+  <Card title="📈 Best Practices" icon="chart-line" href="/tts-providers/best-practices">
+    Performance optimization, cost reduction, and production tips
+  </Card>
+</CardGroup>
+
+## Related Documentation
+
+<Card title="🔗 See Also" icon="link">
+  **Configuration**: Learn how to configure TTS in your [AI Configuration](/ai-configuration) settings.
+  
+  **Integration**: Understand how TTS fits into the overall [Architecture](/architecture) of Burki Voice AI.
+  
+  **Call Management**: Discover how TTS works with [Call Management](/call-management) features.
+</Card>
+
+## Quick Start Guide
+
+<Tabs>
+  <Tab title="Business Calls">
+    **Recommended Setup:**
+    - **Provider**: ElevenLabs or Deepgram
+    - **Model**: Flash v2.5 or Aura-2
+    - **Voice**: Professional (Rachel, Asteria)
+    - **Settings**: Stability 0.5, Speaker Boost ON
+  </Tab>
+  
+  <Tab title="Customer Support">
+    **Recommended Setup:**
+    - **Provider**: ElevenLabs
+    - **Model**: Turbo v2.5
+    - **Voice**: Warm & friendly (Bella, Luna)
+    - **Settings**: Stability 0.6, Similarity 0.75
+  </Tab>
+  
+  <Tab title="Multilingual">
+    **Recommended Setup:**
+    - **Provider**: ElevenLabs or Inworld
+    - **Model**: v3 or TTS-1
+    - **Voice**: Language-specific
+    - **Settings**: Enable language detection
+  </Tab>
+  
+  <Tab title="Real-time Apps">
+    **Recommended Setup:**
+    - **Provider**: Deepgram
+    - **Model**: Aura-2
+    - **Voice**: Fast response (Asteria, Thalia)
+    - **Settings**: Latency 1, µ-law encoding
+  </Tab>
+</Tabs>
+
+<Callout type="warning">
+**API Rate Limits**: Each provider has different rate limits and pricing models. Check the individual provider pages for detailed pricing information.
 </Callout>
 
 ---
 
-## Provider & Model Comparison
-
-| Provider    | Example Models         | Voices         | Speed      | Special Features                |
-|-------------|-----------------------|----------------|------------|---------------------------------|
-| ElevenLabs  | Flash v2.5, v3, Turbo | Rachel, Domi…  | Fast       | Multilingual, voice cloning     |
-| Deepgram    | Aura-2, Aura          | Luna, Stella…  | Ultra Fast | Phone-optimized, low latency    |
-| Inworld     | TTS-1, TTS-1-Max      | Hades, Ashley… | Fast       | Voice cloning, emotional markup |
-| Resemble    | Default               | Custom UUID    | Fast       | WebSocket streaming             |
-
----
-
-## How to Set Up Each Provider
-
-<Accordion title="ElevenLabs">
-1. [Sign up for ElevenLabs](https://elevenlabs.io/)
-2. Get your API key from the dashboard
-3. Paste your key in the TTS API Key field
-4. Choose a model (Flash v2.5, v3, Turbo, etc.)
-5. Pick a voice (Rachel, Domi, or your own custom voice)
-6. (Optional) Adjust stability, similarity, style, and language
-
-<Callout type="tip">Use Flash v2.5 for phone calls (ultra-low latency). Try v3 for maximum expressiveness.</Callout>
-</Accordion>
-
-<Accordion title="Deepgram">
-1. [Sign up for Deepgram](https://console.deepgram.com/)
-2. Get your API key
-3. Paste your key in the TTS API Key field
-4. Choose a model (Aura-2, Aura)
-5. Pick a voice (Luna, Stella, etc.)
-6. (Optional) Set encoding/sample rate for phone quality
-
-<Callout type="tip">Aura-2 is the latest and best for real-time calls. Use µ-law encoding for Twilio/phone integration.</Callout>
-</Accordion>
-
-<Accordion title="Inworld.ai">
-1. [Sign up for Inworld](https://studio.inworld.ai/)
-2. Get your API key
-3. Paste your key in the TTS API Key field
-4. Choose a model (TTS-1, TTS-1-Max)
-5. Pick a voice (Hades, Ashley, or custom voice ID)
-6. (Optional) Set language and use voice cloning
-
-<Callout type="tip">Inworld supports free zero-shot voice cloning and emotional markup (e.g., [happy], [whispering]).</Callout>
-</Accordion>
-
-<Accordion title="Resemble AI">
-1. [Sign up for Resemble](https://app.resemble.ai/)
-2. Get your API key and project UUID
-3. Paste your key and UUID in the TTS settings
-4. Enter your custom voice UUID
-5. (Optional) Enable WebSocket streaming for real-time responses
-
-<Callout type="tip">WebSocket streaming requires a Business plan. Each voice is unique to your account.</Callout>
-</Accordion>
-
----
-
-## Advanced Controls & Features
-
-- **Stability/Similarity/Style:** Fine-tune how consistent, accurate, or expressive the voice is (mainly ElevenLabs)
-- **Speaker Boost:** Enhance clarity and reduce background noise
-- **Voice Cloning:** Use your own custom voice (ElevenLabs, Inworld, Resemble)
-- **Multilingual:** Many models support multiple languages—select in the UI
-- **Encoding/Sample Rate:** For phone quality, use µ-law or 8000Hz
-
----
-
-## Troubleshooting
-
-<Accordion title="Common Issues">
-- **Voice not available:** Make sure your account has access to the selected voice/model
-- **Audio quality issues:** Try adjusting encoding/sample rate or enable Speaker Boost
-- **Latency too high:** Use Flash v2.5 (ElevenLabs) or Aura-2 (Deepgram) for fastest response
-- **Custom voice not working:** Double-check your voice ID and provider requirements
-</Accordion> 
+<Card title="🚀 Ready to Get Started?" icon="rocket">
+  Choose your provider and dive into the detailed setup guides, or check out our [Best Practices](/tts-providers/best-practices) for optimization tips.
+</Card> 

@@ -1,0 +1,44 @@
+---
+title: 'List Calls'
+openapi: 'GET /api/v1/calls'
+---
+
+This endpoint retrieves a paginated list of all calls for your organization. It offers a comprehensive set of filters to help you find specific calls.
+
+### Query Parameters
+
+- `skip` (integer, optional, default: 0): The number of call records to skip before starting to collect the result set.
+- `limit` (integer, optional, default: 100): The maximum number of call records to return in a single request.
+- `status` (string, optional): Filter calls by their status (e.g., `completed`, `failed`, `in-progress`).
+- `assistant_id` (integer, optional): Filter calls handled by a specific assistant.
+- `customer_phone` (string, optional): Find calls involving a specific customer phone number (supports partial matches).
+- `date_from` (string, optional): Filter for calls that started on or after this date (ISO 8601 format: `YYYY-MM-DDTHH:MM:SS`).
+- `date_to` (string, optional): Filter for calls that started on or before this date (ISO 8601 format).
+- `min_duration` (integer, optional): Filter for calls with a duration greater than or equal to this value (in seconds).
+- `max_duration` (integer, optional): Filter for calls with a duration less than or equal to this value (in seconds).
+
+### Response
+
+The response is a JSON array of call objects, each containing detailed information about a call.
+
+```json Response
+[
+  {
+    "id": 101,
+    "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "assistant_id": 123,
+    "to_phone_number": "+15551234567",
+    "customer_phone_number": "+15559876543",
+    "status": "completed",
+    "started_at": "2023-10-30T10:00:00Z",
+    "ended_at": "2023-10-30T10:05:00Z",
+    "duration": 300,
+    "cost": 0.05,
+    "metadata": {
+      "customer_id": "cust_abc123"
+    },
+    "created_at": "2023-10-30T10:00:00Z",
+    "updated_at": "2023-10-30T10:05:00Z"
+  }
+]
+``` 

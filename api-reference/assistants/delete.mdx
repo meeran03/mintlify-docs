@@ -1,0 +1,20 @@
+---
+title: 'Delete Assistant'
+openapi: 'DELETE /api/v1/assistants/{assistant_id}'
+---
+
+This endpoint permanently deletes an assistant from your organization. This action cannot be undone. Once an assistant is deleted, all associated configurations are removed.
+
+### Path Parameters
+
+- `assistant_id` (string, **required**): The unique identifier for the assistant you want to delete.
+
+### Response
+
+A successful deletion will return a `200 OK` status code with a confirmation message.
+
+```json Response
+{
+  "message": "Assistant deleted successfully"
+}
+``` 

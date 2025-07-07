@@ -1,0 +1,21 @@
+---
+title: 'Delete Document'
+openapi: 'DELETE /api/v1/assistants/{assistant_id}/documents/{document_id}'
+---
+
+This endpoint permanently deletes a document from an assistant's knowledge base. This action also removes all associated vector embeddings from the database and cannot be undone.
+
+### Path Parameters
+
+- `assistant_id` (string, **required**): The identifier of the assistant that owns the document.
+- `document_id` (string, **required**): The identifier of the document to delete.
+
+### Response
+
+A successful deletion will return a `200 OK` status code with a confirmation message.
+
+```json Response
+{
+  "message": "Document deleted successfully"
+}
+``` 

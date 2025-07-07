@@ -1,0 +1,35 @@
+---
+title: 'Unassign Phone Number by String'
+openapi: 'POST /api/v1/assistants/{assistant_id}/phone-numbers/unassign-by-number'
+---
+
+This endpoint unassigns a phone number from an assistant, making it available again within your organization's pool. The phone number is not deleted from your account, but it will no longer route calls to this assistant.
+
+### Path Parameters
+
+- `assistant_id` (string, **required**): The unique identifier of the assistant from whom the phone number will be unassigned.
+
+### Request Body
+
+- `phone_number` (string, **required**): The phone number to unassign, specified in E.164 format (e.g., `+15551234567`).
+
+```json Request
+{
+  "phone_number": "+15551234567"
+}
+```
+
+### Response
+
+A successful request will return the updated phone number object, where the `assistant_id` is now `null`.
+
+```json Response
+{
+  "id": "pn_1a2b3c4d5e6f7g8h",
+  "phone_number": "+15551234567",
+  "assistant_id": null,
+  "organization_id": "org_67890",
+  "created_at": "2023-10-26T11:00:00Z",
+  "updated_at": "2023-10-28T15:00:00Z"
+}
+``` 

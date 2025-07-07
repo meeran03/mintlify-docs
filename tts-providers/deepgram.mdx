@@ -1,0 +1,517 @@
+---
+title: "Deepgram Aura TTS"
+description: "Ultra-low latency TTS optimized for real-time phone calls and live applications"
+---
+
+<Card title="⚡ Deepgram Aura: Ultra-Fast TTS" icon="bolt">
+  Industry-leading speed with ~75ms latency. Purpose-built for real-time phone calls, live chat, and interactive applications where every millisecond matters.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Get API Key">
+    1. Visit [Deepgram Console](https://console.deepgram.com) and create an account
+    2. Navigate to **API Keys** in the dashboard
+    3. Create a new API key with TTS permissions
+    4. Copy your API key
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **Deepgram** as provider
+    3. Paste your API key in the **TTS API Key** field
+  </Step>
+  <Step title="Select Aura Model">
+    Choose **Aura-2** for best quality or **Aura** for proven stability
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Free Credits**: Deepgram provides $200 in free credits to get started. Perfect for testing and small-scale deployments.
+</Callout>
+
+## Available Models
+
+<CardGroup cols={2}>
+  <Card title="🚀 Aura-2" icon="rocket">
+    **~75ms latency**
+    
+    Next-generation model with improved quality
+    
+    **Best for**: Production phone calls, live applications
+    **Status**: Latest and recommended
+  </Card>
+  
+  <Card title="⚖️ Aura" icon="balance-scale">
+    **~85ms latency**
+    
+    Proven stable model with consistent quality
+    
+    **Best for**: Stable production environments
+    **Status**: Battle-tested, reliable
+  </Card>
+</CardGroup>
+
+<Callout type="tip">
+**Recommendation**: Use **Aura-2** for the latest quality improvements and fastest response times.
+</Callout>
+
+## Available Voices
+
+### Deepgram Aura Voices
+
+<Accordion title="Female Voices">
+<CardGroup cols={2}>
+  <Card title="Asteria" icon="user">
+    **Warm and expressive**
+    
+    Perfect for customer service and support
+    
+    `Voice ID: aura-asteria-en`
+  </Card>
+  
+  <Card title="Luna" icon="user">
+    **Soft and melodic**
+    
+    Great for gentle, calming interactions
+    
+    `Voice ID: aura-luna-en`
+  </Card>
+  
+  <Card title="Stella" icon="user">
+    **Bright and clear**
+    
+    Excellent for announcements and alerts
+    
+    `Voice ID: aura-stella-en`
+  </Card>
+  
+  <Card title="Athena" icon="user">
+    **Intelligent and clear**
+    
+    Professional and articulate
+    
+    `Voice ID: aura-athena-en`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="Male Voices">
+<CardGroup cols={2}>
+  <Card title="Orion" icon="user">
+    **Deep and authoritative**
+    
+    Perfect for business and professional use
+    
+    `Voice ID: aura-orion-en`
+  </Card>
+  
+  <Card title="Helios" icon="user">
+    **Bright and energetic**
+    
+    Great for upbeat, engaging content
+    
+    `Voice ID: aura-helios-en`
+  </Card>
+  
+  <Card title="Perseus" icon="user">
+    **Strong and heroic** (Aura-2 only)
+    
+    Commanding presence for leadership content
+    
+    `Voice ID: aura-2-perseus-en`
+  </Card>
+  
+  <Card title="Apollo" icon="user">
+    **Musical and expressive** (Aura-2 only)
+    
+    Rich, versatile voice for varied content
+    
+    `Voice ID: aura-2-apollo-en`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="Complete Voice List">
+| Voice | Gender | Model | Voice ID | Best For |
+|-------|--------|-------|----------|----------|
+| **Asteria** | Female | Aura/Aura-2 | `aura-asteria-en` | Customer service |
+| **Thalia** | Female | Aura-2 | `aura-2-thalia-en` | Professional calls |
+| **Luna** | Female | Aura/Aura-2 | `aura-luna-en` | Gentle interactions |
+| **Stella** | Female | Aura/Aura-2 | `aura-stella-en` | Clear announcements |
+| **Athena** | Female | Aura/Aura-2 | `aura-athena-en` | Business calls |
+| **Hera** | Female | Aura/Aura-2 | `aura-hera-en` | Authoritative voice |
+| **Orion** | Male | Aura/Aura-2 | `aura-orion-en` | Professional use |
+| **Helios** | Male | Aura/Aura-2 | `aura-helios-en` | Energetic content |
+| **Perseus** | Male | Aura-2 | `aura-2-perseus-en` | Leadership content |
+| **Apollo** | Male | Aura-2 | `aura-2-apollo-en` | Versatile applications |
+</Accordion>
+
+## Phone Call Optimization
+
+<Card title="📞 Twilio Integration" icon="phone">
+  Deepgram Aura is specifically optimized for phone systems with built-in Twilio compatibility.
+</Card>
+
+### Audio Format Settings
+
+<Tabs>
+  <Tab title="µ-law Encoding">
+    **Recommended for Twilio**
+    
+    ```json
+    {
+      "encoding": "mulaw",
+      "sample_rate": 8000
+    }
+    ```
+    
+    - **Format**: G.711 µ-law
+    - **Sample Rate**: 8kHz
+    - **Best for**: Phone calls, VoIP systems
+    - **Quality**: Optimized for voice clarity over networks
+  </Tab>
+  
+  <Tab title="Linear PCM">
+    **High Quality Option**
+    
+    ```json
+    {
+      "encoding": "linear16",
+      "sample_rate": 24000
+    }
+    ```
+    
+    - **Format**: Linear PCM
+    - **Sample Rate**: 24kHz
+    - **Best for**: High-quality applications
+    - **Quality**: Maximum audio fidelity
+  </Tab>
+</Tabs>
+
+<Callout type="tip">
+**For Phone Calls**: Always use µ-law encoding at 8kHz sample rate for optimal compatibility with Twilio and other phone systems.
+</Callout>
+
+## Performance Metrics
+
+<CardGroup cols={3}>
+  <Card title="⚡ Latency" icon="timer">
+    **~75ms end-to-end**
+    
+    From text input to first audio chunk
+    
+    *3x faster than most competitors*
+  </Card>
+  
+  <Card title="🎯 Accuracy" icon="target">
+    **99.9% uptime**
+    
+    Enterprise-grade reliability
+    
+    *Production-ready stability*
+  </Card>
+  
+  <Card title="📊 Throughput" icon="chart-bar">
+    **High concurrency**
+    
+    Scales automatically with demand
+    
+    *No rate limit bottlenecks*
+  </Card>
+</CardGroup>
+
+## API Integration
+
+<CodeGroup>
+
+```python Python
+import asyncio
+import websockets
+import json
+import base64
+
+async def stream_tts():
+    uri = "wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mulaw&sample_rate=8000"
+    
+    headers = {
+        "Authorization": "Token YOUR_DEEPGRAM_API_KEY"
+    }
+    
+    async with websockets.connect(uri, extra_headers=headers) as websocket:
+        # Send text
+        await websocket.send(json.dumps({
+            "type": "speak",
+            "text": "Hello from Deepgram Aura!"
+        }))
+        
+        # Receive audio chunks
+        async for message in websocket:
+            data = json.loads(message)
+            if data.get("type") == "audio":
+                audio_data = base64.b64decode(data["data"])
+                # Process audio data
+                yield audio_data
+```
+
+```javascript JavaScript
+const WebSocket = require('ws');
+
+const streamTTS = () => {
+  const ws = new WebSocket(
+    'wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mulaw&sample_rate=8000',
+    {
+      headers: {
+        'Authorization': 'Token YOUR_DEEPGRAM_API_KEY'
+      }
+    }
+  );
+
+  ws.on('open', () => {
+    // Send text to synthesize
+    ws.send(JSON.stringify({
+      type: 'speak',
+      text: 'Hello from Deepgram Aura!'
+    }));
+  });
+
+  ws.on('message', (data) => {
+    const response = JSON.parse(data);
+    if (response.type === 'audio') {
+      const audioData = Buffer.from(response.data, 'base64');
+      // Process audio data
+      console.log('Received audio chunk:', audioData.length, 'bytes');
+    }
+  });
+};
+```
+
+```curl cURL
+# WebSocket connection (conceptual - use a WebSocket client)
+wscat -c "wss://api.deepgram.com/v1/speak?model=aura-asteria-en&encoding=mulaw&sample_rate=8000" \
+  -H "Authorization: Token YOUR_DEEPGRAM_API_KEY"
+
+# Send JSON message:
+{
+  "type": "speak",
+  "text": "Hello from Deepgram Aura!"
+}
+```
+
+</CodeGroup>
+
+## Configuration Examples
+
+<Tabs>
+  <Tab title="Phone Calls">
+    **Optimal Settings for Phone Systems**
+    
+    ```json
+    {
+      "model": "aura-2-asteria-en",
+      "encoding": "mulaw",
+      "sample_rate": 8000,
+      "text": "Thank you for calling. How can I help you today?"
+    }
+    ```
+    
+    - Ultra-low latency for real-time conversation
+    - Phone-compatible audio format
+    - Clear, professional voice
+  </Tab>
+  
+  <Tab title="Live Chat">
+    **Real-time Web Applications**
+    
+    ```json
+    {
+      "model": "aura-2-luna-en",
+      "encoding": "linear16",
+      "sample_rate": 24000,
+      "text": "I'm here to help! What can I assist you with?"
+    }
+    ```
+    
+    - High-quality audio for web playback
+    - Friendly, approachable voice
+    - Fast response times
+  </Tab>
+  
+  <Tab title="Announcements">
+    **System Alerts & Notifications**
+    
+    ```json
+    {
+      "model": "aura-stella-en",
+      "encoding": "linear16",
+      "sample_rate": 16000,
+      "text": "Attention: Your appointment reminder is ready."
+    }
+    ```
+    
+    - Clear, attention-getting voice
+    - Balanced quality and file size
+    - Professional tone
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+<Card title="🚀 Optimization Tips" icon="lightbulb">
+  **Maximize Deepgram's Speed Advantage**
+</Card>
+
+<Accordion title="Text Chunking">
+**Send text in optimal chunks for best latency**
+
+- **Ideal chunk size**: 20-50 words
+- **Avoid**: Sending entire paragraphs at once
+- **Benefit**: Faster time to first audio
+
+```python
+def chunk_text(text, max_words=30):
+    words = text.split()
+    chunks = []
+    current_chunk = []
+    
+    for word in words:
+        current_chunk.append(word)
+        if len(current_chunk) >= max_words:
+            chunks.append(' '.join(current_chunk))
+            current_chunk = []
+    
+    if current_chunk:
+        chunks.append(' '.join(current_chunk))
+    
+    return chunks
+```
+</Accordion>
+
+<Accordion title="Connection Reuse">
+**Keep WebSocket connections alive for multiple requests**
+
+- **Pattern**: One connection per conversation
+- **Benefit**: Eliminates connection overhead
+- **Implementation**: Reuse WebSocket for entire call session
+</Accordion>
+
+<Accordion title="Error Handling">
+**Implement robust error handling for production**
+
+```python
+async def robust_tts_stream():
+    max_retries = 3
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            # Your TTS streaming code here
+            break
+        except websockets.exceptions.ConnectionClosed:
+            retry_count += 1
+            await asyncio.sleep(1)  # Brief pause before retry
+        except Exception as e:
+            logger.error(f"TTS error: {e}")
+            break
+```
+</Accordion>
+
+## Pricing
+
+<Card title="💰 Simple, Predictable Pricing" icon="dollar-sign">
+  Pay-per-character with volume discounts. No hidden fees or subscription tiers.
+</Card>
+
+| Usage Tier | Price per Character | Best For |
+|------------|-------------------|----------|
+| **First 10M chars/month** | $0.0135 | Small to medium businesses |
+| **Next 90M chars/month** | $0.0108 | Growing applications |
+| **Next 400M chars/month** | $0.0081 | Enterprise usage |
+| **500M+ chars/month** | Custom pricing | Large-scale deployments |
+
+<Callout type="info">
+**Free Credits**: New accounts receive $200 in credits. Average phone call costs ~$0.03 in TTS usage.
+</Callout>
+
+## Language Support
+
+<Callout type="warning">
+**Current Limitation**: Deepgram Aura currently supports **English only**. Multi-language support is planned for future releases.
+</Callout>
+
+<Card title="🇺🇸 English Optimizations" icon="flag-usa">
+  **Specialized for English-language applications**
+  
+  - Native English training data
+  - Optimized for American English pronunciation
+  - Best-in-class quality for English content
+  - Perfect for US-based business applications
+</Card>
+
+## Troubleshooting
+
+<Accordion title="High Latency Issues">
+**Problem**: Response time slower than expected
+
+**Solutions**:
+- Verify you're using Aura-2 model
+- Check network connection quality
+- Ensure µ-law encoding for phone calls
+- Monitor concurrent connection limits
+</Accordion>
+
+<Accordion title="Audio Quality Problems">
+**Problem**: Distorted or unclear audio
+
+**Solutions**:
+- Use correct encoding (µ-law for phones, linear16 for high quality)
+- Verify sample rate matches your playback system
+- Check API key permissions include TTS
+- Test with shorter text chunks
+</Accordion>
+
+<Accordion title="Connection Drops">
+**Problem**: WebSocket connection terminates unexpectedly
+
+**Solutions**:
+- Implement connection keepalive pings
+- Add automatic reconnection logic
+- Monitor connection health
+- Use exponential backoff for retries
+</Accordion>
+
+## Migration from Other Providers
+
+<Tabs>
+  <Tab title="From ElevenLabs">
+    **Key Differences**:
+    - 3x faster latency (75ms vs 250ms)
+    - English-only vs multilingual
+    - WebSocket-only vs REST+WebSocket
+    - Different voice ID format
+    
+    **Migration Tips**:
+    - Map ElevenLabs voices to Deepgram equivalents
+    - Update API calls to WebSocket format
+    - Adjust audio encoding for your use case
+  </Tab>
+  
+  <Tab title="From Google/AWS">
+    **Key Advantages**:
+    - Significantly lower latency
+    - Real-time streaming vs batch processing
+    - Phone-optimized audio formats
+    - Simpler integration for voice apps
+    
+    **Migration Tips**:
+    - Switch from REST to WebSocket streaming
+    - Update audio format handling
+    - Leverage faster response times in UX
+  </Tab>
+</Tabs>
+
+---
+
+<Card title="⚡ Ready for Ultra-Fast TTS?" icon="rocket">
+  Configure Deepgram Aura in your [assistant settings](/ai-configuration) and experience the speed difference in your phone calls!
+</Card>

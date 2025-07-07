@@ -2,8 +2,6 @@
 title: STT Providers & Settings
 ---
 
-# STT Providers & Settings
-
 <Callout type="info">
 Speech-to-Text (STT) converts what callers say into text for your AI to understand. Burki Voice AI uses Deepgram for high-quality, real-time transcription.
 </Callout>
@@ -34,14 +32,101 @@ Speech-to-Text (STT) converts what callers say into text for your AI to understa
 - **Custom Language:** Enter any Deepgram-supported language code (e.g., `fr-FR`, `es-ES`)
 </Accordion>
 
-<Accordion title="Timing Controls">
-- **Silence Threshold:** How long to wait before considering speech ended (default: 500ms)
-- **Min Silence Duration:** Minimum silence before processing (default: 500ms)
-- **Utterance End:** Time to wait before finalizing transcript (default: 1000ms)
-- **VAD Turnoff:** Voice activity detection timeout (default: 500ms)
+<Accordion title="Advanced Timing Controls">
+These settings control how Deepgram detects when someone has finished speaking. Getting these right is crucial for natural conversation flow.
+
+### Endpointing (Silence Threshold)
+**What it does**: How long Deepgram waits after detecting silence before considering speech has ended.
+
+**Technical Details**:
+- **Measured in**: Milliseconds
+- **Default**: 10ms (Deepgram's minimal endpointing for real-time applications)
+- **Range**: 10ms - 2000ms (recommended)
+- **Config Path**: `stt_settings.endpointing.silence_threshold`
+
+**Real Example**:
+- 10ms: Very responsive (default) - might cut off slow speakers
+- 500ms: "I need help with..." → 0.5s silence → Deepgram says "speech ended"
+- 1000ms: More patient (good for people who pause while thinking)
+
+**When to Adjust**:
+- **Lower (10-100ms)**: For fast talkers or quick interactions (default)
+- **Higher (500-1000ms)**: For elderly callers or complex topics
+- **Much higher (1500ms+)**: For people with speech difficulties
+
+### Min Silence Duration  
+**What it does**: Internal timeout for utterance processing when Deepgram doesn't send `speech_final` (not sent to Deepgram API).
+
+**Technical Details**:
+- **Measured in**: Milliseconds
+- **Default**: 1500ms
+- **Range**: 500ms - 5000ms (recommended)
+- **Config Path**: `stt_settings.endpointing.min_silence_duration`
+- **Used for**: Call handler utterance timeout logic when `speech_final` is missing
+
+**Real Example**:
+- 1500ms: Wait 1.5s for `speech_final`, then process accumulated utterance (default)
+- 1000ms: Quicker timeout for responsive conversation
+- 2500ms: More patience for complex responses or noisy environments
+
+**When to Adjust**:
+- **Lower (500-1000ms)**: For quick, responsive interactions
+- **Higher (2000-3000ms)**: For environments with background noise where `speech_final` may be unreliable
+- **Match with conversation style**: Shorter for rapid-fire Q&A, longer for detailed discussions
+
+### Utterance End Timeout
+**What it does**: Maximum time Deepgram waits for a complete utterance before sending UtteranceEnd event.
+
+**Technical Details**:
+- **Measured in**: Milliseconds  
+- **Default**: 1000ms
+- **Range**: 500ms - 5000ms (recommended)
+- **Config Path**: `stt_settings.utterance_end_ms`
+- **API Parameter**: `utterance_end_ms`
+
+**Real Example**:
+- 1000ms: If someone starts talking but doesn't finish within 1 second, Deepgram sends UtteranceEnd (default)
+- 500ms: Quick timeout (might cut off long sentences)
+- 2000ms: Patient timeout (good for complex responses)
+
+**When to Adjust**:
+- **Lower (500-800ms)**: For short, quick interactions
+- **Higher (1500-3000ms)**: For detailed conversations or forms
+- **Consider your use case**: Customer service vs. quick orders
+
+### VAD Events
+**What it does**: Enables Voice Activity Detection events for enhanced speech detection and UtteranceEnd events.
+
+**Technical Details**:
+- **Type**: Boolean (true/false)
+- **Default**: true (enabled)
+- **Config Path**: `stt_settings.vad_events`
+- **API Parameter**: `vad_events`
+
+**Real Example**:
+- true: Enhanced speech detection with UtteranceEnd events when `speech_final` doesn't work (recommended)
+- false: Basic speech detection only (legacy mode)
+
+**When to Enable**:
+- **Always recommended**: Provides better speech detection in noisy environments
+- **Essential for**: Background noise, poor connections, multiple speakers
+- **Backup mechanism**: When `speech_final` doesn't trigger due to audio issues
+
+**Why It Matters**: VAD events provide UtteranceEnd signals as a fallback when normal speech detection fails due to background noise or audio quality issues.
+
+<Card title="🎯 Timing Settings Quick Guide" icon="target">
+  **Real-Time/Fast Conversations (Default)**: 
+  - Endpointing: 10ms, Min Silence: 1500ms, Utterance End: 1000ms, VAD Events: true
+  
+  **Balanced Professional**: 
+  - Endpointing: 300ms, Min Silence: 1500ms, Utterance End: 1500ms, VAD Events: true
+  
+  **Patient/Elderly Callers**: 
+  - Endpointing: 800ms, Min Silence: 2500ms, Utterance End: 2000ms, VAD Events: true
+</Card>
 
 <Callout type="warning">
-Adjust these carefully—too short and the AI cuts callers off, too long and there are awkward pauses.
+**Critical**: These settings work together with [Call Management interruption settings](/call-management). **Endpointing** controls Deepgram's responsiveness, **Min Silence Duration** controls internal timeout handling, and both affect conversation flow timing.
 </Callout>
 </Accordion>
 
@@ -91,12 +176,27 @@ Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes
 
 ## Troubleshooting
 
-<Accordion title="Common STT Issues">
+<Accordion title="Common STT Issues & Solutions">
+**Speech Detection Problems:**
 - **AI misses words:** Enable denoising or add keywords for important terms
-- **Cuts off callers:** Increase silence threshold and utterance end timing
-- **Long pauses:** Decrease timing settings, but test carefully
-- **Wrong language:** Set correct language code or use "custom" option
-- **Technical terms not recognized:** Add them as keywords/keyterms
+- **Cuts off callers mid-sentence:** Increase endpointing (10ms → 500ms) and utterance end timeout
+- **Long awkward pauses:** Decrease min silence duration for faster internal processing
+- **Interrupts slow speakers:** Increase endpointing and min silence duration  
+- **Misses trailing words:** Enable VAD events and increase utterance end timeout
+
+**Language & Recognition:**
+- **Wrong language detected:** Set correct language code or use "custom" option
+- **Technical terms not recognized:** Add them as keywords/keyterms with boost factors
+- **Company names garbled:** Add company/product names to keywords list
+
+**Audio Quality:**
+- **Noisy background:** Enable audio denoising and increase VAD turnoff
+- **Poor phone connection:** Enable denoising and use more conservative timing settings
+- **Multiple speakers:** Use higher silence thresholds to avoid cross-talk issues
+
+<Callout type="tip">
+**Testing Strategy**: Record test calls with different timing settings and listen to the conversation flow. What feels natural to you will feel natural to callers.
+</Callout>
 </Accordion>
 
 ---
@@ -107,4 +207,30 @@ Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes
 - **Test with real calls** in your target environment
 - **Use keywords** for your business-specific terminology
 - **Enable denoising** if you expect background noise
-- **Monitor call quality** and adjust timing as needed 
+- **Monitor call quality** and adjust timing as needed
+
+---
+
+## How STT Works with Call Management
+
+<Card title="🔗 STT + Call Management = Natural Conversations" icon="link">
+  **STT Settings** control when Deepgram detects speech has ended.
+  
+  **Call Management Settings** control how your AI responds to that detected speech.
+  
+  Both must work together for natural conversation flow!
+</Card>
+
+**The Flow**:
+1. **STT detects speech** using your timing settings (silence threshold, VAD, etc.)
+2. **Call Management decides response** using interruption and timeout settings  
+3. **Result**: Natural conversation or awkward pauses
+
+**Key Relationships**:
+- STT `min_silence_duration` (internal timeout) should be longer than Call Management `interruption_cooldown`
+- Lower STT `endpointing` (more responsive) works well with lower Call Management `interruption_threshold`
+- Higher STT timing settings pair well with patient Call Management `idle_timeout`
+
+<Callout type="info">
+**Next Step**: Configure [Call Management settings](/call-management) to control conversation flow after STT detects speech.
+</Callout> 

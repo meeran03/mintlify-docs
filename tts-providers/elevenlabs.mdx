@@ -1,0 +1,473 @@
+---
+title: "ElevenLabs TTS"
+description: "Premium voice quality with advanced customization and multilingual support"
+---
+
+<Card title="🎭 ElevenLabs: Premium Voice Quality" icon="wand-magic-sparkles">
+  Industry-leading TTS with 70+ languages, voice cloning, and granular voice controls. Perfect for high-quality customer interactions and content creation.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Get API Key">
+    1. Visit [ElevenLabs.io](https://elevenlabs.io) and create an account
+    2. Navigate to your [API Settings](https://elevenlabs.io/app/settings/api)
+    3. Copy your API key
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **ElevenLabs** as provider
+    3. Paste your API key in the **TTS API Key** field
+  </Step>
+  <Step title="Choose Voice & Model">
+    Select your preferred model and voice from the dropdowns
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Free Tier**: ElevenLabs offers 10,000 characters per month on the free plan. Upgrade for higher limits and advanced features.
+</Callout>
+
+## Available Models
+
+<Tabs>
+  <Tab title="Speed Optimized">
+    <CardGroup cols={2}>
+      <Card title="⚡ Flash v2.5" icon="bolt">
+        **~75ms latency**
+        
+        Ultra-fast model optimized for real-time use
+        
+        **Languages**: 70+ languages
+        **Best for**: Phone calls, live chat
+      </Card>
+      
+      <Card title="🚀 Flash v2" icon="rocket">
+        **~75ms latency**
+        
+        Fast model (English only, legacy)
+        
+        **Languages**: English only
+        **Best for**: English-only speed applications
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="Quality Optimized">
+    <CardGroup cols={2}>
+      <Card title="🌟 Eleven v3" icon="star">
+        **~300ms latency**
+        
+        Human-like and expressive speech
+        
+        **Languages**: 70+ languages
+        **Best for**: Content creation, high-quality needs
+      </Card>
+      
+      <Card title="🔥 Multilingual v2" icon="globe">
+        **~400ms latency**
+        
+        Most lifelike model with rich emotional expression
+        
+        **Languages**: 29 languages
+        **Best for**: Premium applications
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="Balanced">
+    <CardGroup cols={2}>
+      <Card title="⚖️ Turbo v2.5" icon="gauge">
+        **~250ms latency**
+        
+        High quality with good speed balance
+        
+        **Languages**: 70+ languages
+        **Best for**: Most business applications
+      </Card>
+      
+      <Card title="🎙️ TTV v3" icon="microphone">
+        **~300ms latency**
+        
+        Voice design model for custom voices
+        
+        **Languages**: 70+ languages
+        **Best for**: Voice cloning and design
+      </Card>
+    </CardGroup>
+  </Tab>
+</Tabs>
+
+<Callout type="tip">
+**Recommendation**: Use **Flash v2.5** for phone calls and **Turbo v2.5** for most other applications.
+</Callout>
+
+## Available Voices
+
+### Preset Voices
+
+<Accordion title="Female Voices">
+<CardGroup cols={3}>
+  <Card title="Rachel" icon="user">
+    **Clear and professional**
+    
+    Perfect for business applications
+    
+    `Voice ID: 21m00Tcm4TlvDq8ikWAM`
+  </Card>
+  
+  <Card title="Domi" icon="user">
+    **Young and energetic**
+    
+    Great for casual conversations
+    
+    `Voice ID: AZnzlk1XvdvUeBnXmlld`
+  </Card>
+  
+  <Card title="Bella" icon="user">
+    **Warm and friendly**
+    
+    Ideal for customer service
+    
+    `Voice ID: EXAVITQu4vr4xnSDxMaL`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="Male Voices">
+<CardGroup cols={3}>
+  <Card title="Antoni" icon="user">
+    **Deep and authoritative**
+    
+    Professional and commanding
+    
+    `Voice ID: ErXwobaYiN019PkySvjV`
+  </Card>
+  
+  <Card title="Josh" icon="user">
+    **Natural and conversational**
+    
+    Perfect for casual interactions
+    
+    `Voice ID: TxGEqnHWrfWFTfGW9XjX`
+  </Card>
+  
+  <Card title="Adam" icon="user">
+    **Deep and smooth**
+    
+    Rich, mature voice
+    
+    `Voice ID: pNInz6obpgDQGcFmaJgB`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="All Available Voices">
+| Voice | Gender | Style | Voice ID | Best For |
+|-------|--------|-------|----------|----------|
+| **Rachel** | Female | Professional | `21m00Tcm4TlvDq8ikWAM` | Business calls |
+| **Domi** | Female | Energetic | `AZnzlk1XvdvUeBnXmlld` | Marketing content |
+| **Bella** | Female | Friendly | `EXAVITQu4vr4xnSDxMaL` | Customer service |
+| **Antoni** | Male | Authoritative | `ErXwobaYiN019PkySvjV` | Leadership content |
+| **Eli** | Male | Youthful | `MF3mGyEYCl7XYWbV9V6O` | Educational content |
+| **Josh** | Male | Conversational | `TxGEqnHWrfWFTfGW9XjX` | General purpose |
+| **Arnold** | Male | Commanding | `VR6AewLTigWG4xSOukaG` | Announcements |
+| **Adam** | Male | Smooth | `pNInz6obpgDQGcFmaJgB` | Storytelling |
+| **Sam** | Male | Approachable | `yoZ06aMxZJJ28mfd3POQ` | Support calls |
+</Accordion>
+
+## Voice Controls
+
+ElevenLabs offers advanced voice customization options:
+
+<Tabs>
+  <Tab title="Stability">
+    **Controls voice consistency** (Range: 0.0 - 1.0)
+    
+    - **0.0-0.3**: More variation, expressive but inconsistent
+    - **0.4-0.6**: ✅ **Balanced consistency (Recommended)**
+    - **0.7-1.0**: Very consistent, may sound monotone
+    
+    ```python
+    # Example API call
+    {
+      "stability": 0.5,  # Recommended value
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Similarity Boost">
+    **Controls voice accuracy** (Range: 0.0 - 1.0)
+    
+    - **0.0-0.5**: More creative interpretation
+    - **0.6-0.8**: ✅ **Balanced accuracy (Recommended)**
+    - **0.9-1.0**: Very close to original voice
+    
+    ```python
+    # Example API call
+    {
+      "similarity_boost": 0.75,  # Recommended value
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Style">
+    **Controls speaking style variation** (Range: 0.0 - 1.0)
+    
+    - **0.0**: ✅ **Natural baseline voice (Recommended for business)**
+    - **0.1-0.5**: Slight style variation
+    - **0.6-1.0**: More expressive, dramatic style
+    
+    ```python
+    # Example API call
+    {
+      "style": 0.0,  # Keep natural for business
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Speaker Boost">
+    **Enhanced audio quality** (Boolean)
+    
+    - ✅ **Enabled (Recommended)**: Boosts voice clarity and reduces background noise
+    - Disabled: Standard quality
+    
+    Perfect for phone calls and noisy environments.
+    
+    ```python
+    # Example API call
+    {
+      "use_speaker_boost": true  # Recommended
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Multilingual Support
+
+<Callout type="info">
+**Supported Languages**: ElevenLabs supports 70+ languages with models v3, Flash v2.5, and Turbo v2.5.
+</Callout>
+
+<Accordion title="Supported Languages">
+<CardGroup cols={4}>
+  <Card title="🇺🇸 English" icon="flag">
+    Native support, best quality
+  </Card>
+  <Card title="🇪🇸 Spanish" icon="flag">
+    Excellent quality
+  </Card>
+  <Card title="🇫🇷 French" icon="flag">
+    High quality
+  </Card>
+  <Card title="🇩🇪 German" icon="flag">
+    High quality
+  </Card>
+  <Card title="🇮🇹 Italian" icon="flag">
+    High quality
+  </Card>
+  <Card title="🇵🇹 Portuguese" icon="flag">
+    Good quality
+  </Card>
+  <Card title="🇵🇱 Polish" icon="flag">
+    Good quality
+  </Card>
+  <Card title="🇨🇳 Chinese" icon="flag">
+    Good quality
+  </Card>
+</CardGroup>
+
+**And 62+ more languages including**: Japanese, Korean, Russian, Arabic, Dutch, Turkish, Czech, Hungarian, and many others.
+</Accordion>
+
+## Performance Optimization
+
+<Cards>
+  <Card title="🚀 Speed Settings" icon="gauge">
+    **Latency Optimization (Range: 0-3)**
+    
+    - **0**: Ultra Low (Experimental) - ~50ms
+    - **1**: ✅ **Low (Recommended)** - ~75ms
+    - **2**: Medium - ~150ms
+    - **3**: High (Most Stable) - ~250ms
+  </Card>
+  
+  <Card title="📞 Phone Call Setup" icon="phone">
+    **Optimal Settings for Calls**
+    
+    - **Model**: Flash v2.5
+    - **Latency**: 1 (Low)
+    - **Stability**: 0.5
+    - **Similarity**: 0.75
+    - **Speaker Boost**: ✅ Enabled
+  </Card>
+</Cards>
+
+## API Integration
+
+<CodeGroup>
+
+```python Python
+import requests
+
+def synthesize_speech(text, voice_id="21m00Tcm4TlvDq8ikWAM"):
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream-input"
+    
+    headers = {
+        "xi-api-key": "your-api-key",
+        "Content-Type": "application/json"
+    }
+    
+    data = {
+        "text": text,
+        "model_id": "eleven_flash_v2_5",
+        "voice_settings": {
+            "stability": 0.5,
+            "similarity_boost": 0.75,
+            "style": 0.0,
+            "use_speaker_boost": True
+        }
+    }
+    
+    response = requests.post(url, json=data, headers=headers, stream=True)
+    return response
+```
+
+```javascript JavaScript
+const synthesizeSpeech = async (text, voiceId = "21m00Tcm4TlvDq8ikWAM") => {
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream-input`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": "your-api-key",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: "eleven_flash_v2_5",
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.0,
+          use_speaker_boost: true,
+        },
+      }),
+    }
+  );
+  
+  return response;
+};
+```
+
+```curl cURL
+curl -X POST \
+  "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream-input" \
+  -H "xi-api-key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hello, this is a test of ElevenLabs TTS.",
+    "model_id": "eleven_flash_v2_5",
+    "voice_settings": {
+      "stability": 0.5,
+      "similarity_boost": 0.75,
+      "style": 0.0,
+      "use_speaker_boost": true
+    }
+  }'
+```
+
+</CodeGroup>
+
+## Voice Cloning
+
+<Callout type="info">
+**Professional Voice Cloning**: ElevenLabs offers voice cloning capabilities. Upload voice samples to create custom voices.
+</Callout>
+
+<Steps>
+  <Step title="Upload Voice Samples">
+    Upload 1-25 minutes of clear audio samples of the target voice
+  </Step>
+  <Step title="Train Custom Voice">
+    ElevenLabs processes and creates your custom voice (usually takes a few minutes)
+  </Step>
+  <Step title="Use Custom Voice ID">
+    Use the generated voice ID in your Burki configuration
+  </Step>
+</Steps>
+
+## Pricing Overview
+
+| Plan | Characters/Month | Price | Best For |
+|------|------------------|-------|----------|
+| **Free** | 10,000 | $0 | Testing & small projects |
+| **Starter** | 30,000 | $5 | Small businesses |
+| **Creator** | 100,000 | $22 | Content creators |
+| **Pro** | 500,000 | $99 | Professional use |
+| **Scale** | 2,000,000 | $330 | Enterprise |
+
+<Callout type="tip">
+**Cost Optimization**: Use shorter, more focused responses to reduce character usage. Average phone call uses ~2,000 characters.
+</Callout>
+
+## Common Issues & Solutions
+
+<Accordion title="Voice Not Available">
+**Problem**: Selected voice doesn't work
+
+**Solutions**:
+- Verify your plan includes the voice
+- Check voice ID spelling
+- Ensure voice supports your selected model
+</Accordion>
+
+<Accordion title="High Latency">
+**Problem**: TTS response is too slow
+
+**Solutions**:
+- Switch to Flash v2.5 model
+- Set latency to 1 (Low)
+- Reduce stability to 0.4-0.5
+- Enable Speaker Boost for clarity without quality loss
+</Accordion>
+
+<Accordion title="Poor Audio Quality">
+**Problem**: Voice sounds robotic or unclear
+
+**Solutions**:
+- Enable Speaker Boost
+- Adjust similarity_boost to 0.6-0.8
+- Try stability around 0.5
+- Consider upgrading to Turbo v2.5 or v3 model
+</Accordion>
+
+## See Also
+
+<CardGroup cols={3}>
+  <Card title="⚡ Need Speed?" href="/tts-providers/deepgram">
+    **Deepgram Aura** - 3x faster with ~75ms latency for real-time calls
+  </Card>
+  
+  <Card title="🌍 Multilingual?" href="/tts-providers/inworld">
+    **Inworld.ai** - Native voices in 11 languages with emotional markup
+  </Card>
+  
+  <Card title="🎯 Custom Voices?" href="/tts-providers/resemble">
+    **Resemble AI** - Create unlimited custom voices for your brand
+  </Card>
+</CardGroup>
+
+<Card title="🎛️ Optimization Resources" icon="tools">
+  **Fine-tune your ElevenLabs setup:**
+  - [Voice Tuning Guide](/tts-providers/voice-tuning) - Master all voice controls
+  - [Best Practices](/tts-providers/best-practices) - Performance optimization
+  - [Troubleshooting](/tts-providers/troubleshooting) - Fix common issues
+</Card>
+
+---
+
+<Card title="🚀 Ready to Use ElevenLabs?" icon="rocket">
+  Head back to your [assistant configuration](/ai-configuration) and set up ElevenLabs with these optimized settings!
+</Card> 

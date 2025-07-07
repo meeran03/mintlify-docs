@@ -1,180 +1,359 @@
 ---
-title: Call Management
+title: "Call Management"
+description: "Configure interruption handling, timeouts, and call flow control for natural conversations"
 ---
-
-# Call Management
 
 <Callout type="info">
-Burki Voice AI provides comprehensive call management features—from routing and recording to background sounds and call controls. Manage every aspect of your voice assistant's phone interactions.
+**Think of this as traffic control for your phone calls!** These settings determine how smoothly conversations flow between your AI and callers.
 </Callout>
 
 ---
 
-## Call Routing & Setup
+## What is Call Management?
 
-<Accordion title="Twilio Integration">
-**Prerequisites:**
-- Twilio account with purchased phone number
-- Media Streams enabled
-- Webhook configured to point to your Burki backend
+Call Management controls the **conversation flow** during phone calls. It's separate from AI Configuration (which handles what the AI says) - this section controls **when** and **how** the AI responds to callers.
 
-**Setup Steps:**
-1. Configure your Twilio webhook URL
-2. Enable Media Streams in your Twilio console
-3. Test incoming calls to ensure proper routing
-4. Monitor call quality and connection stability
+<Card title="🚦 Call Management = Conversation Traffic Control" icon="traffic-light">
+  Just like traffic lights control car flow, these settings control conversation flow between your AI assistant and callers.
+</Card>
 
-<Callout type="tip">
-Use Twilio's debugger to troubleshoot webhook and media stream issues.
+---
+
+## Interruption Settings
+
+<Callout type="warning">
+**Most Important Section**: These settings directly affect how natural your conversations feel!
 </Callout>
+
+### Interruption Threshold
+<Accordion title="What does 'Interruption Threshold' mean?">
+**Simple Explanation**: How many words a caller needs to say before the AI stops talking and listens.
+
+**Technical Details**:
+- **Measured in**: Number of words
+- **Default**: 3 words
+- **Range**: 1-10 words (recommended)
+
+**Real Example**:
+- Threshold = 3: Caller says "Wait, I have a..." → AI stops talking
+- Threshold = 1: Caller says "Um..." → AI stops talking (very sensitive)
+- Threshold = 5: Caller says "Actually, I need to tell you..." → AI stops talking
+
+**When to Adjust**:
+- **Lower (1-2 words)**: For very responsive, human-like conversations
+- **Higher (4-5 words)**: For formal business calls where AI should finish sentences
+- **Much higher (6+ words)**: For presentations or when AI shouldn't be interrupted
+
+**Technical Note**: The system counts words by splitting text on spaces. Both word count AND min speaking time must be met for a valid interruption.
+
 </Accordion>
 
-<Accordion title="Phone Number Management">
-- **Multiple Numbers:** Route different numbers to different assistants
-- **Number Formatting:** Ensure proper E.164 format (+1234567890)
-- **Geographic Routing:** Use local numbers for better caller experience
-- **Fallback Numbers:** Configure backup routing for high availability
+### Min Speaking Time
+<Accordion title="What is 'Min Speaking Time'?">
+**Simple Explanation**: How long the AI must talk before it can be interrupted.
+
+**Technical Details**:
+- **Measured in**: Seconds (decimals allowed like 0.5)
+- **Default**: 0.5 seconds
+- **Range**: 0.1-3.0 seconds (recommended)
+
+**Real Example**:
+- Min Speaking Time = 0.5s: AI says "Hello, how can I—" → Caller can interrupt
+- Min Speaking Time = 2.0s: AI says "Hello, how can I help you today? I'm here to assist with—" → Now caller can interrupt
+
+**When to Adjust**:
+- **Lower (0.1-0.3s)**: For very natural, back-and-forth conversations
+- **Higher (1-2s)**: For business calls where AI should complete thoughts
+- **Much higher (2-3s)**: For announcements or important information delivery
+
+**Technical Note**: The AI must be speaking for at least this duration before any interruption is considered valid, regardless of word count.
+
+</Accordion>
+
+### Interruption Cooldown
+<Accordion title="What is 'Interruption Cooldown'?">
+**Simple Explanation**: How long to pause after a caller interrupts before the AI starts talking again.
+
+**Technical Details**:
+- **Measured in**: Seconds (decimals allowed)
+- **Default**: 2.0 seconds
+- **Range**: 0.5-5.0 seconds (recommended)
+
+**Real Example**:
+- Cooldown = 2.0s: Caller interrupts → AI pauses for 2 seconds → AI responds with buffered speech
+- Cooldown = 0.5s: Very quick responses (might feel rushed)
+- Cooldown = 4.0s: Longer pauses (might feel awkward)
+
+**Technical Note**: During cooldown, any additional speech from the caller is buffered and processed together when the cooldown period ends.
+
+**When to Adjust**:
+- **Lower (0.5-1s)**: For fast-paced conversations or tech support
+- **Higher (3-4s)**: For emotional or sensitive conversations
+- **Much higher (5s+)**: For elderly callers or those needing processing time
+
+</Accordion>
+
+<Card title="💡 Interruption Settings Quick Guide" icon="lightbulb">
+  **Natural Conversations**: Threshold=2, Speaking=0.3s, Cooldown=1.5s
+  
+  **Business Formal**: Threshold=4, Speaking=1.0s, Cooldown=2.5s
+  
+  **Customer Support**: Threshold=3, Speaking=0.5s, Cooldown=2.0s (default)
+</Card>
+
+---
+
+## Timeout Settings
+
+### Idle Timeout
+<Accordion title="How does 'Idle Timeout' work?">
+**Simple Explanation**: How long to wait for the caller to respond before asking "Are you still there?"
+
+**Technical Details**:
+- **Measured in**: Seconds
+- **Default**: 30 seconds
+- **Range**: 10-120 seconds (recommended)
+
+**Real Example**:
+- Timeout = 30s: AI asks question → 30 seconds of silence → AI says idle message
+- Timeout = 10s: Very short patience (good for quick interactions)
+- Timeout = 60s: Very patient (good for complex questions)
+
+**When to Adjust**:
+- **Lower (10-20s)**: For simple, quick interactions
+- **Higher (45-60s)**: For complex questions or elderly callers
+- **Much higher (90s+)**: For forms or detailed information gathering
+
+**Technical Note**: The timer resets when the caller completes an utterance (speech_final) or when the AI responds with meaningful content.
+
+</Accordion>
+
+### Max Idle Messages
+<Accordion title="What are 'Max Idle Messages'?">
+**Simple Explanation**: How many "Are you still there?" messages to send before ending the call.
+
+**Technical Details**:
+- **Measured in**: Number of messages
+- **Default**: 3 messages
+- **Range**: 1-5 messages (recommended)
+
+**Real Example**:
+- Max = 3: AI asks "Are you there?" → Silence → AI asks again → Silence → AI asks again → Silence → Call ends
+- Max = 1: AI asks once, then ends call (not very patient)
+- Max = 5: AI is very patient (might annoy callers)
+
+**When to Adjust**:
+- **Lower (1-2)**: For business efficiency or when call time is expensive
+- **Higher (4-5)**: For customer service or when you don't want to lose calls
+
+</Accordion>
+
+<Card title="⏰ Timeout Settings Quick Guide" icon="clock">
+  **Quick Service**: Idle=15s, Max Messages=2
+  
+  **Standard Support**: Idle=30s, Max Messages=3 (default)
+  
+  **Patient Service**: Idle=45s, Max Messages=4
+</Card>
+
+---
+
+## Call Control Messages
+
+### End Call Message
+<Accordion title="What is the 'End Call Message'?">
+**Simple Explanation**: The last thing callers hear when the call ends (either by AI decision or timeout).
+
+**Default**: "Thank you for calling. Goodbye!"
+
+**Examples**:
+- Business: "Thank you for calling [Company]. Have a great day!"
+- Support: "Your issue has been resolved. Thank you for calling!"
+- Appointment: "Your appointment is confirmed. We'll see you soon!"
+
+**Best Practices**:
+- Keep it under 10 words for clarity
+- Include your company name if branding is important
+- Match the tone of your assistant's personality
+
+</Accordion>
+
+### Transfer Call Message
+<Accordion title="What is the 'Transfer Call Message'?">
+**Simple Explanation**: What the AI says when transferring a caller to a human agent.
+
+**Default**: "Please hold while I transfer your call."
+
+**Examples**:
+- Professional: "Let me connect you with a specialist who can help."
+- Urgent: "I'm transferring you to our emergency support team now."
+- Specific: "Connecting you to our billing department. Please hold."
+
+**Best Practices**:
+- Explain WHO they're being transferred to
+- Keep them calm with reassuring language
+- Include estimated wait time if known
+
+</Accordion>
+
+### Idle Message
+<Accordion title="What is the 'Idle Message'?">
+**Simple Explanation**: What the AI says when there's been silence for too long.
+
+**Default**: "Are you still there? I'm here to help if you need anything."
+
+**Examples**:
+- Friendly: "Hello? I'm still here if you have more questions!"
+- Professional: "Are you still on the line? I'm ready to assist."
+- Helpful: "Take your time. Let me know when you're ready to continue."
+
+**Best Practices**:
+- Sound patient, not annoyed
+- Offer help or reassurance
+- Keep it conversational and warm
+
 </Accordion>
 
 ---
 
 ## Recording Settings
 
-<Accordion title="Recording Configuration">
-**Available Options:**
-- **User Audio:** Record what callers say
-- **Assistant Audio:** Record AI responses
-- **Mixed Audio:** Combined recording of both parties
-
-**Formats:**
-- **MP3:** Recommended for quality and compression
-- **WAV:** Uncompressed, larger file size
-
-**Sample Rates:**
-- **8000 Hz:** Phone quality (default)
-- **22050 Hz:** Higher quality (upsampled for MP3)
-
-<Callout type="warning">
-Recording settings affect storage costs and processing time. Choose based on your compliance and quality needs.
-</Callout>
-</Accordion>
-
-<Accordion title="Recording Storage">
-- **Local Storage:** Save recordings to your server
-- **S3 Integration:** Store recordings in AWS S3
-- **Auto-Save:** Automatically save when calls end
-- **Database Records:** Create database entries for recordings
-- **Directory Structure:** Organize recordings by date/assistant/call
-</Accordion>
+<Card title="🎙️ Automatic Call Recording" icon="microphone">
+  **Always Enabled**: All calls are automatically recorded by Twilio and stored securely in S3 as high-quality MP3 files.
+  
+  This is built-in and cannot be disabled - it ensures you have records for quality, compliance, and training purposes.
+</Card>
 
 ---
 
-## Background Sound
+## Common Configuration Scenarios
 
-<Accordion title="Background Audio Options">
-**Use Cases:**
-- Restaurant ambiance for food ordering
-- Office sounds for business calls
-- Music for on-hold experiences
-- Custom brand audio
-
-**Configuration:**
-- **Audio File:** Upload your background sound file
-- **Volume Level:** Adjust background audio volume
-- **Loop Settings:** Continuous or one-time playback
-- **Fade In/Out:** Smooth audio transitions
-
-<Callout type="tip">
-Keep background sounds subtle—they should enhance, not distract from the conversation.
-</Callout>
-</Accordion>
+<Tabs>
+  <Tab title="Customer Service">
+    **Goal**: Helpful but efficient support
+    
+    ```yaml
+    Interruption Threshold: 3 words
+    Min Speaking Time: 0.5 seconds
+    Interruption Cooldown: 2.0 seconds
+    Idle Timeout: 30 seconds
+    Max Idle Messages: 3
+    ```
+    
+    **Why**: Balanced responsiveness with professional patience
+  </Tab>
+  
+  <Tab title="Sales Calls">
+    **Goal**: Let prospects talk, show you're listening
+    
+    ```yaml
+    Interruption Threshold: 2 words
+    Min Speaking Time: 0.3 seconds
+    Interruption Cooldown: 1.5 seconds
+    Idle Timeout: 45 seconds
+    Max Idle Messages: 4
+    ```
+    
+    **Why**: Very responsive to show engagement, patient to let them think
+  </Tab>
+  
+  <Tab title="Appointment Booking">
+    **Goal**: Clear information exchange
+    
+    ```yaml
+    Interruption Threshold: 4 words
+    Min Speaking Time: 1.0 seconds
+    Interruption Cooldown: 2.5 seconds
+    Idle Timeout: 20 seconds
+    Max Idle Messages: 2
+    ```
+    
+    **Why**: AI needs to finish instructions, but move efficiently through booking
+  </Tab>
+  
+  <Tab title="Tech Support">
+    **Goal**: Handle frustrated callers patiently
+    
+    ```yaml
+    Interruption Threshold: 2 words
+    Min Speaking Time: 0.4 seconds
+    Interruption Cooldown: 3.0 seconds
+    Idle Timeout: 40 seconds
+    Max Idle Messages: 4
+    ```
+    
+    **Why**: Very responsive to interruptions, longer cooldowns for emotional regulation
+  </Tab>
+</Tabs>
 
 ---
 
-## Call Controls
+## Troubleshooting Common Issues
 
-<Accordion title="Call Flow Management">
-**Start of Call:**
-- **Greeting Message:** What the AI says first
-- **Timeout Settings:** How long to wait for caller response
-- **Language Detection:** Automatically detect caller language
+<Accordion title="🚨 AI keeps getting cut off / sounds robotic">
+**Problem**: Interruption threshold too low or min speaking time too short
 
-**During Call:**
-- **Interruption Handling:** How to manage when callers speak over the AI
-- **Silence Detection:** When to prompt for more input
-- **Transfer Options:** Route to human agents when needed
+**Solutions**:
+- Increase interruption threshold to 4-5 words
+- Increase min speaking time to 1.0-1.5 seconds
+- Callers won't interrupt as quickly
 
-**End of Call:**
-- **Goodbye Message:** Final message before hanging up
-- **Call Summary:** Generate and store call summaries
-- **Follow-up Actions:** Trigger webhooks or notifications
+**Test**: Make a call and see if AI can complete full sentences
 </Accordion>
 
-<Accordion title="Advanced Call Features">
-- **Call Forwarding:** Transfer calls to human agents
-- **Conference Calling:** Multi-party call support
-- **Call Queuing:** Handle multiple simultaneous calls
-- **Priority Routing:** VIP caller handling
-- **Time-based Routing:** Different behavior by time of day
+<Accordion title="😴 AI takes forever to respond / feels unresponsive">
+**Problem**: Interruption cooldown too long or threshold too high
+
+**Solutions**:
+- Decrease interruption cooldown to 1.0-1.5 seconds
+- Decrease interruption threshold to 2-3 words
+- AI will feel more responsive and natural
+
+**Test**: Try interrupting mid-sentence - AI should stop and respond quickly
 </Accordion>
 
----
+<Accordion title="📞 Calls ending too quickly">
+**Problem**: Idle timeout too short or max idle messages too low
 
-## Monitoring & Analytics
+**Solutions**:
+- Increase idle timeout to 45-60 seconds
+- Increase max idle messages to 4-5
+- Give callers more time to think and respond
 
-<Accordion title="Real-time Monitoring">
-**Live Call Dashboard:**
-- Active calls in progress
-- Call duration and status
-- Transcription quality metrics
-- Error rates and connection issues
-
-**Alerts:**
-- Failed call attempts
-- High error rates
-- Unusual call patterns
-- System performance issues
+**Test**: Stay silent during a call - should get multiple "are you there?" messages
 </Accordion>
 
-<Accordion title="Call Analytics">
-**Metrics to Track:**
-- Call volume and duration
-- Successful completion rates
-- Common caller intents
-- Response accuracy
-- Customer satisfaction scores
+<Accordion title="⏰ Calls dragging on too long">
+**Problem**: Idle timeout too long or max idle messages too high
 
-**Reports:**
-- Daily/weekly/monthly summaries
-- Trend analysis
-- Performance comparisons
-- Cost analysis
+**Solutions**:
+- Decrease idle timeout to 15-20 seconds
+- Decrease max idle messages to 1-2
+- Calls will end more efficiently
+
+**Test**: Simulate an unresponsive caller - call should end reasonably quickly
 </Accordion>
 
 ---
 
 ## Best Practices
 
-- **Test thoroughly** with different phone types and carriers
-- **Monitor call quality** regularly and adjust settings as needed
-- **Keep recordings** for compliance and quality assurance
-- **Use background sounds sparingly** to avoid distraction
-- **Set appropriate timeouts** to balance responsiveness and patience
-- **Plan for peak traffic** and scale accordingly
-- **Regular maintenance** of phone numbers and routing rules
+<Card title="🎯 Golden Rules for Call Management" icon="target">
+  1. **Start with defaults** and adjust based on real call feedback
+  2. **Test with real users** - your perception differs from callers'
+  3. **Match your business style** - formal vs casual affects all settings
+  4. **Monitor call recordings** to see where conversations break down
+  5. **Adjust gradually** - small changes have big impacts on conversation feel
+</Card>
+
+<Callout type="tip">
+**Pro Tip**: Record yourself having a conversation with your assistant, then listen back. You'll immediately hear what needs adjusting!
+</Callout>
 
 ---
 
-## Troubleshooting
-
-<Accordion title="Common Call Issues">
-- **Calls not connecting:** Check Twilio webhook configuration
-- **Poor audio quality:** Verify media stream settings and network
-- **Recordings not saving:** Check storage permissions and disk space
-- **Background audio too loud:** Adjust volume levels in settings
-- **Calls dropping:** Monitor network stability and Twilio logs
-</Accordion>
-
-<Callout type="tip">
-Use Twilio's comprehensive logging and debugging tools to diagnose call issues quickly.
-</Callout> 
+<Card title="➡️ What's Next?" icon="arrow-right">
+  **Ready to fine-tune your AI's brain?** Check out [AI Configuration](/ai-configuration) to optimize your LLM, TTS, and STT settings.
+  
+  **Need more technical control?** See [Advanced Settings](/advanced-configuration) for speech processing and audio settings.
+</Card> 
