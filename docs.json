@@ -59,7 +59,8 @@
               "features",
               "rag",
               "call-management",
-              "tools"
+              "tools",
+              "live-transcript"
             ]
           },
           {
@@ -160,6 +161,12 @@
               "api-reference/webhooks/twilio-twiml",
               "api-reference/webhooks/recording-status",
               "api-reference/webhooks/initiate-call"
+            ]
+          },
+          {
+            "group": "WebSockets",
+            "pages": [
+              "api-reference/websockets/live-transcript"
             ]
           }
         ]

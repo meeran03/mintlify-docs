@@ -1,0 +1,749 @@
+---
+title: Live Transcript WebSocket
+description: "Stream real-time transcripts of ongoing calls via WebSocket for monitoring, analytics, and customer service quality assurance"
+---
+
+<Callout type="info">
+The Live Transcript WebSocket allows you to receive real-time transcripts as they are generated during calls. Perfect for call monitoring dashboards, live supervision, and real-time analytics.
+</Callout>
+
+## Overview
+
+The live transcript functionality provides a WebSocket endpoint that streams real-time transcriptions of ongoing calls. This enables powerful use cases like:
+
+- **Call Monitoring Dashboards**: Build real-time interfaces for supervisors
+- **Live Customer Service**: Monitor calls as they happen for quality assurance
+- **Real-time Analytics**: Process transcripts for sentiment analysis and insights
+- **Accessibility Features**: Provide live captions for hearing-impaired users
+- **Training & Coaching**: Help agents improve through real-time feedback
+
+## WebSocket Endpoint
+
+Connect to the live transcript stream using the following WebSocket URL:
+
+```
+ws://burki.dev/live-transcript/{call_sid}?token={api_key}
+```
+
+**Path Parameters:**
+- `call_sid` (string, **required**): The Twilio Call SID of the call you want to monitor
+
+**Authentication:**
+The WebSocket endpoint requires authentication using your API key. You can authenticate using any of these methods:
+
+1. **Query Parameter** (Recommended): `?token=your_api_key`
+2. **Authorization Header**: `Authorization: Bearer your_api_key`  
+3. **WebSocket Subprotocol**: `burki-token-your_api_key`
+
+<Warning>
+**Security Note**: Only users from the same organization as the call's assistant can access the transcript stream. API keys are validated and must have appropriate permissions.
+</Warning>
+
+## Message Types
+
+The WebSocket sends different types of messages to keep you informed about the call status and transcript updates.
+
+### Connection Established
+
+Sent immediately when the WebSocket connection is successfully established.
+
+```json
+{
+  "type": "connection_established",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "message": "Connected to live transcript stream"
+}
+```
+
+### Transcript Messages
+
+The main message type containing real-time transcript segments from both the user and assistant.
+
+```json
+{
+  "type": "transcript",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:05.123Z",
+  "data": {
+    "content": "Hello, how can I help you today?",
+    "speaker": "assistant",
+    "is_final": true,
+    "confidence": 0.95,
+    "segment_start": 5.2,
+    "segment_end": 7.1,
+    "created_at": "2024-01-01T12:00:05.123Z"
+  }
+}
+```
+
+**Transcript Data Fields:**
+- `content`: The transcribed text
+- `speaker`: Either `"user"` or `"assistant"`
+- `is_final`: Whether this is a final transcript (usually `true`)
+- `confidence`: Confidence score from 0.0 to 1.0 (may be `null`)
+- `segment_start`: Start time in seconds from call beginning
+- `segment_end`: End time in seconds from call beginning
+- `created_at`: When the transcript was created
+
+### Call Status Updates
+
+Sent when the call status changes (start, end, etc.).
+
+```json
+{
+  "type": "call_status",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "status": "in-progress",
+  "metadata": {
+    "assistant_id": 123,
+    "started_at": "2024-01-01T12:00:00.000Z",
+    "to_phone_number": "+1234567890",
+    "customer_phone_number": "+0987654321",
+    "call_type": "inbound"
+  }
+}
+```
+
+**Status Values:**
+- `in-progress`: Call is active and ongoing
+- `completed`: Call has ended successfully
+- `failed`: Call has failed or was terminated
+
+### Error Messages
+
+Sent when an error occurs (e.g., call not found).
+
+```json
+{
+  "type": "error",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "message": "Call CA123abc... not found"
+}
+```
+
+## Client-to-Server Messages
+
+You can send messages to the server for interaction and health checks.
+
+### Ping/Pong
+
+Keep the connection alive and test connectivity.
+
+<CodeGroup>
+```json Send Ping
+{
+  "type": "ping"
+}
+```
+
+```json Receive Pong
+{
+  "type": "pong",
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+</CodeGroup>
+
+### Request Status
+
+Request the current call status on demand.
+
+<CodeGroup>
+```json Send Request
+{
+  "type": "request_status"
+}
+```
+
+```json Receive Response
+{
+  "type": "call_status",
+  "call_sid": "CA123abc...",
+  "status": "in-progress",
+  "metadata": {
+    "assistant_id": 123,
+    "duration": 45
+  }
+}
+```
+</CodeGroup>
+
+## Implementation Examples
+
+### JavaScript/Browser
+
+<CodeGroup>
+```javascript Basic Connection
+const callSid = 'CA123abc...';
+const apiKey = 'burki_your_api_key_here';
+const wsUrl = `ws://localhost:8000/live-transcript/${callSid}?token=${apiKey}`;
+const websocket = new WebSocket(wsUrl);
+
+websocket.onopen = function(event) {
+    console.log('Connected to live transcript stream');
+};
+
+websocket.onmessage = function(event) {
+    const message = JSON.parse(event.data);
+    
+    switch (message.type) {
+        case 'transcript':
+            console.log(`${message.data.speaker}: ${message.data.content}`);
+            displayTranscript(message.data);
+            break;
+        case 'call_status':
+            console.log(`Call status: ${message.status}`);
+            updateCallStatus(message);
+            break;
+        case 'error':
+            console.error(`Error: ${message.message}`);
+            break;
+    }
+};
+
+websocket.onclose = function(event) {
+    console.log('Disconnected from live transcript stream');
+};
+```
+
+```javascript Advanced Handler
+class LiveTranscriptClient {
+    constructor(callSid, apiKey, onTranscript, onStatus, onError) {
+        this.callSid = callSid;
+        this.apiKey = apiKey;
+        this.onTranscript = onTranscript;
+        this.onStatus = onStatus;
+        this.onError = onError;
+        this.websocket = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+    }
+
+    connect() {
+        const wsUrl = `ws://localhost:8000/live-transcript/${this.callSid}?token=${this.apiKey}`;
+        this.websocket = new WebSocket(wsUrl);
+
+        this.websocket.onopen = () => {
+            console.log('Connected to live transcript stream');
+            this.reconnectAttempts = 0;
+        };
+
+        this.websocket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            this.handleMessage(message);
+        };
+
+        this.websocket.onclose = (event) => {
+            console.log('WebSocket closed:', event.code);
+            this.attemptReconnect();
+        };
+
+        this.websocket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+    }
+
+    handleMessage(message) {
+        switch (message.type) {
+            case 'transcript':
+                this.onTranscript(message.data);
+                break;
+            case 'call_status':
+                this.onStatus(message);
+                break;
+            case 'error':
+                this.onError(message.message);
+                break;
+        }
+    }
+
+    sendPing() {
+        if (this.websocket?.readyState === WebSocket.OPEN) {
+            this.websocket.send(JSON.stringify({ type: 'ping' }));
+        }
+    }
+
+    requestStatus() {
+        if (this.websocket?.readyState === WebSocket.OPEN) {
+            this.websocket.send(JSON.stringify({ type: 'request_status' }));
+        }
+    }
+
+    attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            const delay = Math.pow(2, this.reconnectAttempts) * 1000;
+            console.log(`Reconnecting in ${delay}ms...`);
+            setTimeout(() => this.connect(), delay);
+        }
+    }
+
+    disconnect() {
+        if (this.websocket) {
+            this.websocket.close();
+        }
+    }
+}
+```
+</CodeGroup>
+
+### Python
+
+<CodeGroup>
+```python Basic Client
+import asyncio
+import websockets
+import json
+
+async def listen_to_transcript(call_sid, api_key):
+    uri = f"ws://localhost:8000/live-transcript/{call_sid}?token={api_key}"
+    
+    async with websockets.connect(uri) as websocket:
+        print(f"Connected to live transcript for call {call_sid}")
+        
+        async for message in websocket:
+            data = json.loads(message)
+            
+            if data['type'] == 'transcript':
+                transcript = data['data']
+                print(f"{transcript['speaker']}: {transcript['content']}")
+            elif data['type'] == 'call_status':
+                print(f"Call status: {data['status']}")
+            elif data['type'] == 'error':
+                print(f"Error: {data['message']}")
+
+# Usage
+call_sid = "CA123abc..."
+api_key = "burki_your_api_key_here"
+asyncio.run(listen_to_transcript(call_sid, api_key))
+```
+
+```python Advanced Client
+import asyncio
+import websockets
+import json
+import logging
+from typing import Callable, Optional
+
+class LiveTranscriptClient:
+    def __init__(
+        self, 
+        call_sid: str,
+        api_key: str,
+        host: str = "localhost:8000",
+        on_transcript: Optional[Callable] = None,
+        on_status: Optional[Callable] = None,
+        on_error: Optional[Callable] = None
+    ):
+        self.call_sid = call_sid
+        self.api_key = api_key
+        self.uri = f"ws://{host}/live-transcript/{call_sid}?token={api_key}"
+        self.on_transcript = on_transcript
+        self.on_status = on_status
+        self.on_error = on_error
+        self.websocket = None
+        self.running = False
+
+    async def connect(self):
+        """Connect to the live transcript stream"""
+        try:
+            self.websocket = await websockets.connect(self.uri)
+            self.running = True
+            print(f"Connected to live transcript for call {self.call_sid}")
+            
+            await self.listen()
+            
+        except Exception as e:
+            print(f"Connection error: {e}")
+            if self.on_error:
+                self.on_error(str(e))
+
+    async def listen(self):
+        """Listen for incoming messages"""
+        try:
+            async for message in self.websocket:
+                if not self.running:
+                    break
+                    
+                data = json.loads(message)
+                await self.handle_message(data)
+                
+        except websockets.exceptions.ConnectionClosed:
+            print("Connection closed")
+        except Exception as e:
+            print(f"Listen error: {e}")
+
+    async def handle_message(self, data: dict):
+        """Handle incoming WebSocket messages"""
+        message_type = data.get('type')
+        
+        if message_type == 'transcript' and self.on_transcript:
+            await self.on_transcript(data['data'])
+        elif message_type == 'call_status' and self.on_status:
+            await self.on_status(data)
+        elif message_type == 'error' and self.on_error:
+            await self.on_error(data['message'])
+
+    async def send_ping(self):
+        """Send a ping message"""
+        if self.websocket and not self.websocket.closed:
+            await self.websocket.send(json.dumps({"type": "ping"}))
+
+    async def request_status(self):
+        """Request current call status"""
+        if self.websocket and not self.websocket.closed:
+            await self.websocket.send(json.dumps({"type": "request_status"}))
+
+    async def disconnect(self):
+        """Disconnect from the stream"""
+        self.running = False
+        if self.websocket:
+            await self.websocket.close()
+
+# Usage example
+async def on_transcript(transcript_data):
+    print(f"{transcript_data['speaker']}: {transcript_data['content']}")
+
+async def on_status(status_data):
+    print(f"Call status: {status_data['status']}")
+
+async def main():
+    client = LiveTranscriptClient(
+        call_sid="CA123abc...",
+        api_key="burki_your_api_key_here",
+        on_transcript=on_transcript,
+        on_status=on_status
+    )
+    
+    await client.connect()
+
+asyncio.run(main())
+```
+</CodeGroup>
+
+### Node.js
+
+<CodeGroup>
+```javascript Basic Client
+const WebSocket = require('ws');
+
+const callSid = 'CA123abc...';
+const apiKey = 'burki_your_api_key_here';
+const ws = new WebSocket(`ws://localhost:8000/live-transcript/${callSid}?token=${apiKey}`);
+
+ws.on('open', function open() {
+    console.log('Connected to live transcript stream');
+});
+
+ws.on('message', function message(data) {
+    const msg = JSON.parse(data);
+    
+    switch (msg.type) {
+        case 'transcript':
+            console.log(`${msg.data.speaker}: ${msg.data.content}`);
+            break;
+        case 'call_status':
+            console.log(`Call status: ${msg.status}`);
+            break;
+        case 'error':
+            console.error(`Error: ${msg.message}`);
+            break;
+    }
+});
+
+ws.on('close', function close() {
+    console.log('Disconnected from live transcript stream');
+});
+```
+
+```javascript EventEmitter Client
+const WebSocket = require('ws');
+const EventEmitter = require('events');
+
+class LiveTranscriptClient extends EventEmitter {
+    constructor(callSid, apiKey, host = 'localhost:8000') {
+        super();
+        this.callSid = callSid;
+        this.apiKey = apiKey;
+        this.wsUrl = `ws://${host}/live-transcript/${callSid}?token=${apiKey}`;
+        this.ws = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+    }
+
+    connect() {
+        this.ws = new WebSocket(this.wsUrl);
+
+        this.ws.on('open', () => {
+            console.log('Connected to live transcript stream');
+            this.reconnectAttempts = 0;
+            this.emit('connected');
+        });
+
+        this.ws.on('message', (data) => {
+            try {
+                const message = JSON.parse(data);
+                this.handleMessage(message);
+            } catch (error) {
+                this.emit('error', `Parse error: ${error.message}`);
+            }
+        });
+
+        this.ws.on('close', (code, reason) => {
+            console.log(`WebSocket closed: ${code} - ${reason}`);
+            this.emit('disconnected', { code, reason });
+            this.attemptReconnect();
+        });
+
+        this.ws.on('error', (error) => {
+            console.error('WebSocket error:', error);
+            this.emit('error', error.message);
+        });
+    }
+
+    handleMessage(message) {
+        switch (message.type) {
+            case 'transcript':
+                this.emit('transcript', message.data);
+                break;
+            case 'call_status':
+                this.emit('status', message);
+                break;
+            case 'error':
+                this.emit('error', message.message);
+                break;
+            case 'pong':
+                this.emit('pong', message);
+                break;
+        }
+    }
+
+    sendPing() {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify({ type: 'ping' }));
+        }
+    }
+
+    requestStatus() {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify({ type: 'request_status' }));
+        }
+    }
+
+    attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            const delay = Math.pow(2, this.reconnectAttempts) * 1000;
+            console.log(`Reconnecting in ${delay}ms...`);
+            setTimeout(() => this.connect(), delay);
+        } else {
+            this.emit('maxReconnectAttemptsReached');
+        }
+    }
+
+    disconnect() {
+        if (this.ws) {
+            this.ws.close();
+        }
+    }
+}
+
+// Usage
+const client = new LiveTranscriptClient('CA123abc...', 'burki_your_api_key_here');
+
+client.on('transcript', (data) => {
+    console.log(`${data.speaker}: ${data.content}`);
+});
+
+client.on('status', (data) => {
+    console.log(`Call status: ${data.status}`);
+});
+
+client.on('error', (error) => {
+    console.error('Error:', error);
+});
+
+client.connect();
+```
+</CodeGroup>
+
+## Key Features
+
+### Historical Transcripts
+When connecting to an ongoing call, you'll immediately receive all existing transcripts for that call before new live transcripts start flowing.
+
+### Multiple Clients
+Multiple clients can connect to the same call's transcript stream simultaneously without affecting performance.
+
+### Automatic Cleanup
+Connections are automatically cleaned up when clients disconnect or when calls end, preventing memory leaks.
+
+### Error Handling
+The server handles various error conditions gracefully:
+- Call not found
+- Connection errors  
+- Client disconnections
+- Invalid message formats
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Connection Management">
+- Implement automatic reconnection with exponential backoff
+- Handle WebSocket close events gracefully
+- Use ping/pong messages to maintain connection health
+- Set appropriate timeout values for your use case
+</Accordion>
+
+<Accordion title="Performance Optimization">
+- Process transcript messages asynchronously to avoid blocking
+- Implement client-side buffering for high-volume scenarios
+- Use efficient data structures for storing transcript history
+- Consider implementing client-side filtering to reduce processing load
+</Accordion>
+
+<Accordion title="Error Handling">
+- Always handle connection errors and implement retry logic
+- Validate incoming messages before processing
+- Log errors appropriately for debugging
+- Implement fallback mechanisms for critical applications
+</Accordion>
+
+<Accordion title="Security Considerations">
+- Validate Call SID format before connecting
+- Implement authentication if required for your use case
+- Use secure WebSocket connections (WSS) in production
+- Rate limit connections to prevent abuse
+</Accordion>
+</AccordionGroup>
+
+## Use Case Examples
+
+### Call Monitoring Dashboard
+
+Perfect for building real-time call monitoring interfaces where supervisors can watch multiple calls simultaneously.
+
+```javascript
+class CallMonitoringDashboard {
+    constructor() {
+        this.activeConnections = new Map();
+        this.callDisplays = new Map();
+    }
+
+    monitorCall(callSid) {
+        const client = new LiveTranscriptClient(
+            callSid,
+            (transcript) => this.updateTranscriptDisplay(callSid, transcript),
+            (status) => this.updateCallStatus(callSid, status),
+            (error) => this.handleError(callSid, error)
+        );
+        
+        this.activeConnections.set(callSid, client);
+        client.connect();
+    }
+
+    updateTranscriptDisplay(callSid, transcript) {
+        const display = this.getCallDisplay(callSid);
+        display.addTranscript(transcript);
+    }
+
+    stopMonitoring(callSid) {
+        const client = this.activeConnections.get(callSid);
+        if (client) {
+            client.disconnect();
+            this.activeConnections.delete(callSid);
+        }
+    }
+}
+```
+
+### Real-time Sentiment Analysis
+
+Analyze call sentiment in real-time using the transcript stream.
+
+```python
+import asyncio
+from textblob import TextBlob
+
+class SentimentAnalyzer:
+    def __init__(self, call_sid):
+        self.call_sid = call_sid
+        self.sentiment_history = []
+        
+    async def analyze_transcript(self, transcript_data):
+        text = transcript_data['content']
+        speaker = transcript_data['speaker']
+        
+        # Analyze sentiment
+        blob = TextBlob(text)
+        sentiment = blob.sentiment.polarity
+        
+        self.sentiment_history.append({
+            'timestamp': transcript_data['created_at'],
+            'speaker': speaker,
+            'text': text,
+            'sentiment': sentiment
+        })
+        
+        # Alert if sentiment becomes very negative
+        if sentiment < -0.5 and speaker == 'user':
+            await self.trigger_supervisor_alert()
+    
+    async def trigger_supervisor_alert(self):
+        print(f"ALERT: Negative sentiment detected in call {self.call_sid}")
+        # Implement your alerting logic here
+```
+
+### Live Subtitles/Captions
+
+Provide accessibility features with live captions.
+
+```javascript
+class LiveCaptionService {
+    constructor(callSid, captionElement) {
+        this.callSid = callSid;
+        this.captionElement = captionElement;
+        this.transcriptBuffer = [];
+        this.maxBufferSize = 10;
+    }
+
+    connect() {
+        const client = new LiveTranscriptClient(
+            this.callSid,
+            (transcript) => this.displayCaption(transcript)
+        );
+        client.connect();
+    }
+
+    displayCaption(transcript) {
+        // Add to buffer
+        this.transcriptBuffer.push(transcript);
+        
+        // Maintain buffer size
+        if (this.transcriptBuffer.length > this.maxBufferSize) {
+            this.transcriptBuffer.shift();
+        }
+        
+        // Update display
+        const captionText = this.transcriptBuffer
+            .map(t => `${t.speaker}: ${t.content}`)
+            .join('\n');
+            
+        this.captionElement.textContent = captionText;
+        
+        // Auto-scroll to bottom
+        this.captionElement.scrollTop = this.captionElement.scrollHeight;
+    }
+}
+```
+
+<Warning>
+**Production Considerations**: In production environments, consider implementing authentication, rate limiting, and monitoring for the WebSocket endpoint to ensure security and reliability.
+</Warning>
+
+<Card title="🔧 Complete Implementation" icon="code" href="https://github.com/meeran03/burki/blob/main/live_transcript_client.html">
+  View the complete HTML test client implementation on GitHub
+</Card> 

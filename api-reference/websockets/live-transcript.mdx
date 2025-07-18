@@ -1,0 +1,298 @@
+---
+title: 'Live Transcript WebSocket'
+description: 'Real-time transcript streaming via WebSocket connection'
+---
+
+## WebSocket Endpoint
+
+**Endpoint:** `ws://your-domain.com/live-transcript/{call_sid}?token={api_key}`
+
+This WebSocket endpoint provides real-time streaming of call transcripts as they are generated. It's designed for building live monitoring dashboards, call supervision tools, and accessibility features.
+
+### Path Parameters
+
+- `call_sid` (string, **required**): The Twilio Call SID of the call you want to monitor
+
+### Authentication
+
+**Required**: All connections must be authenticated using a valid API key.
+
+**Methods Supported:**
+
+1. **Query Parameter** (Recommended):
+   ```
+   ws://your-domain.com/live-transcript/{call_sid}?token=your_api_key
+   ```
+
+2. **Authorization Header**:
+   ```javascript
+   const websocket = new WebSocket(url, {
+     headers: {
+       'Authorization': 'Bearer your_api_key'
+     }
+   });
+   ```
+
+3. **WebSocket Subprotocol**:
+   ```javascript
+   const websocket = new WebSocket(url, ['burki-token-your_api_key']);
+   ```
+
+### Access Control
+
+- Only users from the same organization as the call's assistant can access the transcript stream
+- API keys must have valid permissions and belong to an active user
+- Invalid authentication results in immediate connection termination with code 1008
+
+### Connection Process
+
+1. **Establish Connection**: Connect to the WebSocket endpoint with a valid Call SID
+2. **Receive Confirmation**: Server sends a connection established message
+3. **Get Historical Data**: Receive any existing transcripts for the call
+4. **Stream Live Data**: Receive real-time transcripts as they're generated
+5. **Handle Status Updates**: Receive call status changes (start, end, etc.)
+
+## Server-to-Client Messages
+
+### Connection Established
+
+```json
+{
+  "type": "connection_established",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "message": "Connected to live transcript stream"
+}
+```
+
+### Transcript Data
+
+```json
+{
+  "type": "transcript",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:05.123Z",
+  "data": {
+    "content": "Hello, how can I help you today?",
+    "speaker": "assistant",
+    "is_final": true,
+    "confidence": 0.95,
+    "segment_start": 5.2,
+    "segment_end": 7.1,
+    "created_at": "2024-01-01T12:00:05.123Z"
+  }
+}
+```
+
+**Field Descriptions:**
+- `content`: The transcribed text
+- `speaker`: `"user"` or `"assistant"`
+- `is_final`: Whether this is a final transcript
+- `confidence`: Speech recognition confidence (0.0 - 1.0)
+- `segment_start`: Start time in seconds from call start
+- `segment_end`: End time in seconds from call start
+- `created_at`: ISO timestamp of transcript creation
+
+### Call Status Updates
+
+```json
+{
+  "type": "call_status",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "status": "in-progress",
+  "metadata": {
+    "assistant_id": 123,
+    "started_at": "2024-01-01T12:00:00.000Z",
+    "to_phone_number": "+1234567890",
+    "customer_phone_number": "+0987654321",
+    "call_type": "inbound",
+    "duration": 45
+  }
+}
+```
+
+**Status Values:**
+- `in-progress`: Call is active
+- `completed`: Call ended successfully
+- `failed`: Call failed or was terminated
+
+### Error Messages
+
+```json
+{
+  "type": "error",
+  "call_sid": "CA123abc...",
+  "timestamp": "2024-01-01T12:00:00.000Z",
+  "message": "Call CA123abc... not found"
+}
+```
+
+### Pong Response
+
+```json
+{
+  "type": "pong",
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+## Client-to-Server Messages
+
+### Ping (Health Check)
+
+Send a ping to test connection health:
+
+```json
+{
+  "type": "ping"
+}
+```
+
+**Response:** Server will reply with a `pong` message
+
+### Request Status
+
+Request the current call status:
+
+```json
+{
+  "type": "request_status"
+}
+```
+
+**Response:** Server will reply with a `call_status` message
+
+## Features
+
+### Historical Transcripts
+When connecting to an ongoing call, you'll immediately receive all existing transcripts before new live data starts streaming.
+
+### Multiple Connections
+Multiple clients can connect to the same call simultaneously without performance impact.
+
+### Automatic Cleanup
+Connections are automatically cleaned up when:
+- Clients disconnect
+- Calls end
+- Connection errors occur
+
+### Error Handling
+The server gracefully handles:
+- Invalid Call SIDs
+- Connection timeouts
+- Malformed messages
+- Concurrent connection limits
+
+## Example Usage
+
+### JavaScript
+
+```javascript
+const callSid = 'CA123abc...';
+const apiKey = 'burki_your_api_key_here';
+const websocket = new WebSocket(`ws://localhost:8000/live-transcript/${callSid}?token=${apiKey}`);
+
+websocket.onopen = function() {
+    console.log('Connected to live transcript stream');
+    
+    // Send a ping to test connection
+    websocket.send(JSON.stringify({ type: 'ping' }));
+};
+
+websocket.onmessage = function(event) {
+    const message = JSON.parse(event.data);
+    
+    switch (message.type) {
+        case 'transcript':
+            console.log(`${message.data.speaker}: ${message.data.content}`);
+            break;
+        case 'call_status':
+            console.log(`Call status: ${message.status}`);
+            break;
+        case 'pong':
+            console.log('Connection is healthy');
+            break;
+        case 'error':
+            console.error(`Error: ${message.message}`);
+            break;
+    }
+};
+
+websocket.onclose = function(event) {
+    console.log('Connection closed:', event.code);
+};
+```
+
+### Python
+
+```python
+import asyncio
+import websockets
+import json
+
+async def listen_to_call(call_sid, api_key):
+    uri = f"ws://localhost:8000/live-transcript/{call_sid}?token={api_key}"
+    
+    try:
+        async with websockets.connect(uri) as websocket:
+            print(f"Connected to call {call_sid}")
+            
+            # Send ping
+            await websocket.send(json.dumps({"type": "ping"}))
+            
+            async for message in websocket:
+                data = json.loads(message)
+                
+                if data['type'] == 'transcript':
+                    transcript = data['data']
+                    print(f"{transcript['speaker']}: {transcript['content']}")
+                elif data['type'] == 'call_status':
+                    print(f"Status: {data['status']}")
+                elif data['type'] == 'error':
+                    print(f"Error: {data['message']}")
+                    break
+                    
+    except websockets.exceptions.ConnectionClosed:
+        print("Connection closed")
+    except Exception as e:
+        print(f"Error: {e}")
+
+# Usage
+asyncio.run(listen_to_call("CA123abc...", "burki_your_api_key_here"))
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| 1000 | Normal closure |
+| 1001 | Going away |
+| 1002 | Protocol error |
+| 1003 | Unsupported data |
+| 1006 | Abnormal closure |
+| 1008 | Authentication failed or access denied |
+| 1011 | Server error |
+
+## Rate Limits
+
+- **Connections per Call**: 10 concurrent connections maximum
+- **Messages per Second**: 100 messages per connection
+- **Connection Duration**: No limit (connections persist until call ends)
+
+## Best Practices
+
+1. **Secure API Keys**: Store API keys securely and never expose them in client-side code
+2. **Implement Reconnection**: Use exponential backoff for reconnection attempts
+3. **Handle All Message Types**: Process all message types to avoid missing important updates
+4. **Validate Call SID**: Ensure Call SID format is valid before connecting
+5. **Use Ping/Pong**: Regularly send pings to maintain connection health
+6. **Error Handling**: Always handle connection errors and authentication failures gracefully
+7. **Use Query Parameters**: Prefer query parameter authentication for simplicity
+
+## Security Considerations
+
+- Validate Call SID ownership before connecting
+- Implement rate limiting in production
+- Use secure WebSocket connections (WSS) over HTTPS
+- Consider implementing authentication tokens for sensitive deployments 
