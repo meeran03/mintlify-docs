@@ -57,6 +57,9 @@
             "group": "Features",
             "pages": [
               "features",
+              "telephony-providers",
+              "messaging",
+              "phone-number-management",
               "rag",
               "call-management",
               "tools",
@@ -135,6 +138,21 @@
               "api-reference/calls/get-analytics",
               "api-reference/calls/get-stats",
               "api-reference/calls/export"
+            ]
+          },
+          {
+            "group": "Messaging",
+            "pages": [
+              "api-reference/messaging/send-sms"
+            ]
+          },
+          {
+            "group": "Phone Number Management",
+            "pages": [
+              "api-reference/phone-numbers/search",
+              "api-reference/phone-numbers/purchase",
+              "api-reference/phone-numbers/release",
+              "api-reference/phone-numbers/countries"
             ]
           },
           {

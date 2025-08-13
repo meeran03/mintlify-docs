@@ -1,0 +1,427 @@
+---
+title: 'List Country Codes'
+openapi: 'GET /phone-numbers/countries'
+---
+
+This endpoint returns a list of country codes where phone numbers are available for purchase from the specified telephony provider. Use this to populate country selection dropdowns or validate country availability before searching for numbers.
+
+## How It Works
+
+1. **Provider Query**: Queries the specified provider for available countries
+2. **Code Retrieval**: Returns standardized ISO country codes
+3. **Coverage Check**: Helps determine global coverage for each provider
+
+<Info>
+**Provider Coverage**: Different providers have varying global coverage. Twilio generally supports more countries than Telnyx, but Telnyx may offer better pricing in supported regions.
+</Info>
+
+## Query Parameters
+
+- `provider` (string, optional): Provider to get country codes from (`"twilio"` or `"telnyx"`). Defaults to `"telnyx"`
+
+```bash
+GET /phone-numbers/countries?provider=telnyx
+```
+
+## Response
+
+A successful request returns a `200 OK` status with available country codes.
+
+```json Response
+{
+  "success": true,
+  "country_codes": [
+    "US",
+    "CA",
+    "GB",
+    "AU",
+    "DE",
+    "FR",
+    "IT",
+    "ES",
+    "NL",
+    "BE"
+  ],
+  "provider": "telnyx"
+}
+```
+
+## Response Fields
+
+- `success` (boolean): Whether the request completed successfully
+- `country_codes` (array of strings): List of available ISO 3166-1 alpha-2 country codes
+- `provider` (string): Provider used for the query ("twilio" or "telnyx")
+
+## Country Code Reference
+
+### Common Country Codes
+
+| Code | Country | Twilio | Telnyx |
+|------|---------|--------|--------|
+| `US` | United States | ✅ | ✅ |
+| `CA` | Canada | ✅ | ✅ |
+| `GB` | United Kingdom | ✅ | ✅ |
+| `AU` | Australia | ✅ | ✅ |
+| `DE` | Germany | ✅ | ✅ |
+| `FR` | France | ✅ | ✅ |
+| `IT` | Italy | ✅ | ✅ |
+| `ES` | Spain | ✅ | ✅ |
+| `NL` | Netherlands | ✅ | ✅ |
+| `BE` | Belgium | ✅ | ✅ |
+| `SE` | Sweden | ✅ | ⚠️ |
+| `NO` | Norway | ✅ | ⚠️ |
+| `DK` | Denmark | ✅ | ⚠️ |
+
+<Info>
+**Coverage Notes**: 
+- ✅ = Generally available
+- ⚠️ = Limited availability or specific restrictions
+- Coverage may vary by region within countries
+</Info>
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when an invalid provider is specified.
+
+```json
+{
+  "detail": "Provider must be 'twilio' or 'telnyx'"
+}
+```
+
+### 500 Internal Server Error
+
+Returned when the provider API is unavailable.
+
+```json
+{
+  "detail": "Internal error: Provider API unavailable"
+}
+```
+
+## Usage Examples
+
+### Basic Request
+
+```bash
+curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=telnyx" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Compare Provider Coverage
+
+```bash
+# Get Telnyx coverage
+curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=telnyx" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Get Twilio coverage  
+curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=twilio" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Integration Examples
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function getCountryCodes(provider = 'telnyx') {
+  try {
+    const response = await axios.get(`https://api.burki.dev/phone-numbers/countries?provider=${provider}`, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    });
+    
+    return response.data.country_codes;
+  } catch (error) {
+    console.error('Failed to get country codes:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage
+const telnyxCountries = await getCountryCodes('telnyx');
+const twilioCountries = await getCountryCodes('twilio');
+
+// Find countries supported by both providers
+const commonCountries = telnyxCountries.filter(code => 
+  twilioCountries.includes(code)
+);
+```
+
+### Python
+
+```python
+import requests
+
+def get_country_codes(provider='telnyx'):
+    url = f"https://api.burki.dev/phone-numbers/countries?provider={provider}"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()['country_codes']
+    else:
+        raise Exception(f"Failed to get country codes: {response.json()['detail']}")
+
+# Usage
+telnyx_countries = get_country_codes('telnyx')
+twilio_countries = get_country_codes('twilio')
+
+# Compare coverage
+print(f"Telnyx supports {len(telnyx_countries)} countries")
+print(f"Twilio supports {len(twilio_countries)} countries")
+```
+
+### PHP
+
+```php
+<?php
+function getCountryCodes($provider = 'telnyx') {
+    $url = "https://api.burki.dev/phone-numbers/countries?provider=" . urlencode($provider);
+    $headers = ['Authorization: Bearer YOUR_API_KEY'];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true)['country_codes'];
+    } else {
+        throw new Exception("Failed to get country codes: " . $response);
+    }
+}
+
+// Usage
+$countries = getCountryCodes('telnyx');
+?>
+```
+
+## Use Cases
+
+### UI Population
+
+Build country selection dropdowns:
+
+```javascript
+async function buildCountryDropdown() {
+  const countries = await getCountryCodes('telnyx');
+  const countryNames = {
+    'US': 'United States',
+    'CA': 'Canada',
+    'GB': 'United Kingdom',
+    'AU': 'Australia',
+    'DE': 'Germany',
+    // ... more mappings
+  };
+  
+  return countries.map(code => ({
+    value: code,
+    label: countryNames[code] || code
+  }));
+}
+```
+
+### Provider Comparison
+
+Compare global coverage:
+
+```python
+def compare_provider_coverage():
+    telnyx_countries = get_country_codes('telnyx')
+    twilio_countries = get_country_codes('twilio')
+    
+    only_telnyx = set(telnyx_countries) - set(twilio_countries)
+    only_twilio = set(twilio_countries) - set(telnyx_countries)
+    both_providers = set(telnyx_countries) & set(twilio_countries)
+    
+    return {
+        'telnyx_only': list(only_telnyx),
+        'twilio_only': list(only_twilio),
+        'both_providers': list(both_providers)
+    }
+```
+
+### Validation
+
+Validate country availability before search:
+
+```javascript
+async function validateCountrySupport(countryCode, provider) {
+  const supportedCountries = await getCountryCodes(provider);
+  
+  if (!supportedCountries.includes(countryCode)) {
+    throw new Error(`${provider} does not support country code: ${countryCode}`);
+  }
+  
+  return true;
+}
+
+// Usage
+try {
+  await validateCountrySupport('FR', 'telnyx');
+  // Proceed with number search
+} catch (error) {
+  console.error('Country not supported:', error.message);
+}
+```
+
+## Provider-Specific Details
+
+### Telnyx Coverage
+
+**Strong Coverage**:
+- North America (US, CA)
+- Western Europe (GB, DE, FR, NL)
+- Major English-speaking markets
+
+**Features**:
+- Competitive pricing
+- Modern API
+- Good voice quality
+- SMS/MMS support
+
+### Twilio Coverage
+
+**Extensive Coverage**:
+- 100+ countries worldwide
+- Comprehensive global reach
+- Emerging markets support
+
+**Features**:
+- Mature platform
+- Extensive documentation
+- Wide feature set
+- Enterprise-grade reliability
+
+## Caching Strategy
+
+Country codes change infrequently, so implement caching:
+
+```javascript
+class CountryCodeCache {
+  constructor() {
+    this.cache = new Map();
+    this.TTL = 24 * 60 * 60 * 1000; // 24 hours
+  }
+  
+  async getCountryCodes(provider) {
+    const cacheKey = `countries_${provider}`;
+    const cached = this.cache.get(cacheKey);
+    
+    if (cached && Date.now() - cached.timestamp < this.TTL) {
+      return cached.data;
+    }
+    
+    const countries = await getCountryCodes(provider);
+    this.cache.set(cacheKey, {
+      data: countries,
+      timestamp: Date.now()
+    });
+    
+    return countries;
+  }
+}
+```
+
+## Best Practices
+
+### Performance Optimization
+
+1. **Cache Results**: Country codes rarely change, cache for 24+ hours
+2. **Parallel Requests**: Fetch both providers' codes simultaneously
+3. **Local Fallback**: Maintain a local fallback list for critical countries
+
+### User Experience
+
+1. **Sort by Popularity**: Put common countries first (US, GB, CA, AU)
+2. **Search Functionality**: Allow users to search/filter countries
+3. **Visual Indicators**: Show which providers support each country
+
+### Error Handling
+
+```python
+def get_country_codes_with_fallback(provider='telnyx'):
+    try:
+        return get_country_codes(provider)
+    except Exception as e:
+        # Log error but return common countries as fallback
+        logger.error(f"Failed to fetch country codes from {provider}: {e}")
+        return ['US', 'CA', 'GB', 'AU', 'DE', 'FR']  # Common fallback
+```
+
+## Regional Considerations
+
+### Regulatory Requirements
+
+Some countries have special requirements:
+
+- **Germany**: May require local business registration
+- **India**: Requires local entity for certain number types  
+- **China**: Limited availability through international providers
+- **UAE**: Specific documentation requirements
+
+### Number Types
+
+Different countries offer different number types:
+
+- **Toll-Free**: Available in most countries
+- **Local Numbers**: City/region specific
+- **National Numbers**: Country-wide accessibility
+- **Mobile Numbers**: Mobile-specific ranges
+
+<Warning>
+**Regulatory Compliance**: Always check local telecommunications regulations before purchasing numbers in new countries. Some regions have specific requirements for foreign entities.
+</Warning>
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Empty country list | Provider API down | Try alternative provider |
+| Unexpected countries | API change | Update your country mappings |
+| Missing countries | Provider limitations | Check provider documentation |
+
+### Monitoring
+
+Monitor country code availability:
+
+```javascript
+async function monitorCountryAvailability() {
+  const providers = ['twilio', 'telnyx'];
+  const results = {};
+  
+  for (const provider of providers) {
+    try {
+      const countries = await getCountryCodes(provider);
+      results[provider] = {
+        success: true,
+        count: countries.length,
+        countries: countries
+      };
+    } catch (error) {
+      results[provider] = {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  
+  return results;
+}
+```
+
+This endpoint is essential for building location-aware phone number search interfaces and ensuring your application can handle global phone number requirements across different telephony providers.

@@ -1,0 +1,448 @@
+---
+title: 'Release Phone Number'
+openapi: 'POST /phone-numbers/release'
+---
+
+This endpoint allows you to release (delete) a phone number from your Twilio or Telnyx account, making it available for others to purchase. The number is immediately removed from your account and all associated configurations are cleaned up.
+
+## How It Works
+
+1. **Provider Detection**: The system automatically detects which provider owns the number
+2. **Account Removal**: The number is released from your telephony provider account
+3. **Database Cleanup**: The number is removed from your organization's inventory
+4. **Immediate Effect**: The number stops receiving calls and messages instantly
+
+<Warning>
+**Permanent Action**: Once released, a phone number cannot be recovered. The number becomes available for others to purchase and you cannot guarantee getting it back.
+</Warning>
+
+## Request Body
+
+The request body is a JSON object containing release details.
+
+- `phone_number` (string, **required**): The phone number to release in E.164 format
+- `provider` (string, optional): Provider to use (`"twilio"` or `"telnyx"`). Auto-detected if not provided
+
+```json Request
+{
+  "phone_number": "+14155551234",
+  "provider": "telnyx"
+}
+```
+
+### Auto-Detection Example
+
+```json Request
+{
+  "phone_number": "+14155551234"
+}
+```
+
+<Info>
+**Provider Auto-Detection**: If you don't specify a provider, the system will automatically detect which provider owns the number based on your database records.
+</Info>
+
+## Response
+
+A successful request returns a `200 OK` status with release confirmation.
+
+```json Response
+{
+  "success": true,
+  "phone_number": "+14155551234",
+  "provider": "telnyx",
+  "message": "Successfully released phone number +14155551234 from telnyx"
+}
+```
+
+## Response Fields
+
+- `success` (boolean): Whether the release completed successfully
+- `phone_number` (string): The released phone number
+- `provider` (string): Provider from which the number was released
+- `message` (string): Human-readable confirmation message
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when the request contains invalid data.
+
+```json
+{
+  "detail": "Provider must be 'twilio' or 'telnyx'"
+}
+```
+
+Common causes:
+- Invalid `provider` value
+- Invalid phone number format
+- Number not in E.164 format
+
+### 404 Not Found
+
+Returned when the phone number is not found.
+
+```json
+{
+  "detail": "Phone number +14155551234 not found in database"
+}
+```
+
+This occurs when:
+- Number doesn't exist in your account
+- Number was never purchased through Burki
+- Number already released
+
+### 500 Internal Server Error
+
+Returned when the release fails at the provider level.
+
+```json
+{
+  "detail": "Failed to release phone number from telnyx"
+}
+```
+
+Common causes:
+- Provider API error
+- Network connectivity issues
+- Invalid provider credentials
+- Number has active calls/usage
+
+## Release Workflow
+
+### Standard Release Process
+
+```bash
+# 1. List your current numbers (optional)
+curl -X GET "https://api.burki.dev/organization/phonenumbers" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# 2. Release a specific number
+curl -X POST "https://api.burki.dev/phone-numbers/release" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phone_number": "+14155551234"
+  }'
+
+# 3. Number is immediately unavailable
+```
+
+### Bulk Release Process
+
+```bash
+# Release multiple numbers
+for number in "+14155551234" "+14155551235" "+14155551236"; do
+  curl -X POST "https://api.burki.dev/phone-numbers/release" \
+    -H "Authorization: Bearer YOUR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"phone_number\": \"$number\"}"
+done
+```
+
+## Use Cases
+
+### Cost Optimization
+
+Release unused numbers to reduce monthly costs:
+
+```json
+{
+  "phone_number": "+14155551234"
+}
+```
+
+### Account Cleanup
+
+Remove test or temporary numbers:
+
+```json
+{
+  "phone_number": "+18005551234",
+  "provider": "twilio"
+}
+```
+
+### Geographic Reorganization
+
+Release numbers when closing regional offices:
+
+```json
+{
+  "phone_number": "+12125551234"
+}
+```
+
+### Provider Migration
+
+Release numbers before switching providers:
+
+```json
+{
+  "phone_number": "+14155551234",
+  "provider": "twilio"
+}
+```
+
+## Provider Behavior
+
+### Twilio Release
+
+- **Immediate Deactivation**: Number stops working instantly
+- **Billing**: Pro-rated refund may apply (check Twilio terms)
+- **Reactivation**: Number returns to Twilio's available pool
+- **Dependencies**: All webhooks and configurations are removed
+
+### Telnyx Release
+
+- **Immediate Deactivation**: Number stops working instantly
+- **Billing**: Check Telnyx terms for refund policies
+- **Reactivation**: Number returns to available inventory
+- **Order Status**: Associated orders marked as released
+
+## Safety Considerations
+
+### Pre-Release Checklist
+
+Before releasing a number, ensure:
+
+1. **No Active Calls**: Number isn't currently handling calls
+2. **No Dependencies**: No critical integrations depend on this number
+3. **Customer Communication**: Customers are notified of number changes
+4. **Documentation Updated**: Internal docs reflect the change
+5. **Backup Plan**: Alternative contact methods are available
+
+### Impact Assessment
+
+Releasing a number affects:
+
+- **Incoming Calls**: All incoming calls will fail
+- **SMS Messages**: SMS/MMS will not be delivered
+- **Assistant Assignment**: Associated assistant becomes unreachable
+- **Customer Experience**: Customers lose ability to contact you
+
+## Integration Examples
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function releasePhoneNumber(phoneNumber, provider = null) {
+  try {
+    const requestData = { phone_number: phoneNumber };
+    if (provider) {
+      requestData.provider = provider;
+    }
+
+    const response = await axios.post('https://api.burki.dev/phone-numbers/release', requestData, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log(`Successfully released ${phoneNumber} from ${response.data.provider}`);
+    return response.data;
+  } catch (error) {
+    console.error('Release failed:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage with auto-detection
+await releasePhoneNumber('+14155551234');
+
+// Usage with explicit provider
+await releasePhoneNumber('+14155551234', 'telnyx');
+```
+
+### Python
+
+```python
+import requests
+
+def release_phone_number(phone_number, provider=None):
+    url = "https://api.burki.dev/phone-numbers/release"
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {"phone_number": phone_number}
+    if provider:
+        payload["provider"] = provider
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Release failed: {response.json()['detail']}")
+
+# Usage examples
+result = release_phone_number("+14155551234")  # Auto-detect provider
+result = release_phone_number("+14155551234", "telnyx")  # Explicit provider
+```
+
+### PHP
+
+```php
+<?php
+function releasePhoneNumber($phoneNumber, $provider = null) {
+    $url = 'https://api.burki.dev/phone-numbers/release';
+    $headers = [
+        'Authorization: Bearer YOUR_API_KEY',
+        'Content-Type: application/json'
+    ];
+    
+    $data = ['phone_number' => $phoneNumber];
+    if ($provider) {
+        $data['provider'] = $provider;
+    }
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("Release failed: " . $response);
+    }
+}
+
+// Usage
+$result = releasePhoneNumber('+14155551234');
+?>
+```
+
+## Batch Operations
+
+### Release Multiple Numbers
+
+```javascript
+async function releaseMultipleNumbers(phoneNumbers) {
+  const results = [];
+  
+  for (const phoneNumber of phoneNumbers) {
+    try {
+      const result = await releasePhoneNumber(phoneNumber);
+      results.push({ phoneNumber, success: true, result });
+    } catch (error) {
+      results.push({ phoneNumber, success: false, error: error.message });
+    }
+  }
+  
+  return results;
+}
+
+// Usage
+const numbersToRelease = ['+14155551234', '+14155551235', '+14155551236'];
+const results = await releaseMultipleNumbers(numbersToRelease);
+```
+
+### Conditional Release
+
+```python
+def release_unused_numbers(unused_threshold_days=30):
+    """Release numbers that haven't been used for calls in X days"""
+    
+    # Get list of numbers and their last usage
+    numbers = get_phone_number_usage()
+    
+    for number_info in numbers:
+        if number_info['days_since_last_call'] > unused_threshold_days:
+            try:
+                result = release_phone_number(number_info['phone_number'])
+                print(f"Released unused number: {number_info['phone_number']}")
+            except Exception as e:
+                print(f"Failed to release {number_info['phone_number']}: {e}")
+```
+
+## Best Practices
+
+### Planning and Preparation
+
+1. **Audit First**: Review which numbers are actually needed
+2. **Usage Analysis**: Check call/SMS volume before releasing
+3. **Customer Impact**: Assess impact on customer communications
+4. **Gradual Release**: Release numbers in phases, not all at once
+
+### Error Handling
+
+```javascript
+async function safeRelease(phoneNumber) {
+  try {
+    // Check if number has recent activity
+    const usage = await checkNumberUsage(phoneNumber);
+    if (usage.recentCalls > 0) {
+      throw new Error('Number has recent activity, release cancelled');
+    }
+    
+    return await releasePhoneNumber(phoneNumber);
+  } catch (error) {
+    console.error(`Failed to release ${phoneNumber}:`, error.message);
+    // Log to monitoring system
+    // Send alert to admin
+    throw error;
+  }
+}
+```
+
+### Cost Management
+
+1. **Regular Audits**: Monthly review of number usage
+2. **Automated Cleanup**: Script to release unused numbers
+3. **Approval Process**: Require approval for number releases
+4. **Recovery Planning**: Consider number porting instead of release
+
+### Documentation
+
+Always document releases:
+- Which numbers were released
+- Reason for release
+- Date and time
+- Impact assessment
+- Rollback plan (if applicable)
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| "Number not found" | Number not in account | Verify number ownership |
+| "Release failed" | Provider API error | Check provider status |
+| "Active usage" | Number currently in use | Wait for calls to complete |
+| "Permission denied" | Insufficient privileges | Check API key permissions |
+
+### Recovery Options
+
+If you accidentally release a critical number:
+
+1. **Immediate Search**: Search for the number in available pools
+2. **Quick Purchase**: Purchase it back if still available
+3. **Alternative Numbers**: Find similar numbers in the same area
+4. **Customer Communication**: Notify customers of temporary number changes
+
+### Monitoring
+
+Set up monitoring for:
+- Number release events
+- Failed release attempts
+- Usage patterns before release
+- Customer impact metrics
+
+<Info>
+**Best Practice**: Always test the release process with non-critical numbers first to understand the full impact and timing.
+</Info>

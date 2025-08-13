@@ -11,15 +11,40 @@ This endpoint allows you to modify the configuration of an existing assistant by
 
 ### Request Body
 
-The request body is a JSON object containing the fields to update. The structure and available parameters are identical to those used when creating an assistant. Refer to the [Create Assistant](/api-reference/assistants/create) documentation for a detailed breakdown of all possible fields within the `llm_settings`, `tts_settings`, `stt_settings`, `interruption_settings`, and `tools_settings` objects.
+The request body is a JSON object containing the fields to update. The structure and available parameters are identical to those used when creating an assistant. Refer to the [Create Assistant](/api-reference/assistants/create) documentation for a detailed breakdown of all possible fields within the `llm_settings`, `tts_settings`, `stt_settings`, `interruption_settings`, `tools_settings`, `twilio_config`, and `telnyx_config` objects.
 
-Below is an example of a request to change an assistant's name and its LLM temperature.
+### Examples
 
+**Update basic settings:**
 ```json Request
 {
   "name": "Senior Customer Support Specialist",
   "llm_settings": {
     "temperature": 0.5
+  }
+}
+```
+
+**Switch from Twilio to Telnyx:**
+```json Request
+{
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "connection_id": "1234567890"
+  },
+  "twilio_config": {
+    "account_sid": null,
+    "auth_token": null
+  }
+}
+```
+
+**Add Telnyx as backup to Twilio:**
+```json Request
+{
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", 
+    "connection_id": "1234567890"
   }
 }
 ```

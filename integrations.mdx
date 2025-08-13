@@ -35,16 +35,27 @@ You can mix and match providers for STT, LLM, and TTS. Configure per-assistant o
 </Callout>
 
 <AccordionGroup>
-  <Accordion icon="phone" title="Twilio (Telephony)">
-    **Purpose:** Handles phone calls, media streaming, and SMS.
+  <Accordion icon="phone" title="Telephony Providers">
+    **Twilio** (traditional, full-featured)
+    - **Purpose:** Handles phone calls, media streaming, and SMS.
+    - **Setup:**
+      - Sign up at [Twilio](https://www.twilio.com/).
+      - Buy a phone number and enable Media Streams.
+      - Set environment variables: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
+      - Configure Twilio webhook to point to your Burki backend.
     
-    **Setup:**
-    - Sign up at [Twilio](https://www.twilio.com/).
-    - Buy a phone number and enable Media Streams.
-    - Set environment variables:
-      - `TWILIO_ACCOUNT_SID`
-      - `TWILIO_AUTH_TOKEN`
-    - Configure Twilio webhook to point to your Burki backend.
+    **Telnyx** (modern, competitive pricing)
+    - **Purpose:** Next-generation telephony with Call Control API.
+    - **Setup:**
+      - Sign up at [Telnyx](https://telnyx.com/).
+      - Buy a phone number and create a Call Control Application.
+      - Set environment variables: `TELNYX_API_KEY`, `TELNYX_CONNECTION_ID`
+      - Configure Telnyx webhook to point to your Burki backend.
+    
+    **Per-Assistant Configuration:**
+    - Each assistant can use different telephony providers.
+    - Configure provider credentials in the assistant settings.
+    - System automatically detects and uses the appropriate provider.
   </Accordion>
 
   <Accordion icon="waveform" title="Speech-to-Text (STT) Providers">

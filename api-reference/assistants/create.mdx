@@ -89,7 +89,15 @@ This section covers the core AI models for language, speech-to-text, and text-to
 - `twilio_config` (object, optional): Bring your own Twilio credentials.
   - `account_sid` (string): Your Twilio Account SID.
   - `auth_token` (string): Your Twilio Auth Token.
+- `telnyx_config` (object, optional): Bring your own Telnyx credentials.
+  - `api_key` (string): Your Telnyx API Key.
+  - `connection_id` (string): Your Telnyx Connection ID for Call Control Application.
 - `webhook_url` (string, optional): A URL to send call event webhooks to.
+
+**Telephony Provider Selection:**
+- If both `twilio_config` and `telnyx_config` are provided, Telnyx takes priority.
+- If neither is provided, the system uses environment variables (`TWILIO_*` or `TELNYX_*`).
+- Each assistant can use a different telephony provider.
 </Accordion>
 </AccordionGroup>
 
@@ -98,6 +106,7 @@ This section covers the core AI models for language, speech-to-text, and text-to
 
 Here is an example payload that mirrors the fields available in the UI to create a sophisticated customer service assistant. Note that fields like `scenarios` and `transfer_numbers` expect a JSON array of strings.
 
+### Example: Twilio Assistant
 ```json
 {
   "name": "ServiceBot 5000",
@@ -153,6 +162,48 @@ Here is an example payload that mirrors the fields available in the UI to create
       ]
     }
   },
+  "twilio_config": {
+    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "auth_token": "your_twilio_auth_token"
+  },
   "webhook_url": "https://yourapi.com/webhooks/call-events"
+}
+```
+
+### Example: Telnyx Assistant
+```json
+{
+  "name": "SalesBot Pro",
+  "description": "Modern sales assistant using Telnyx for competitive call rates.",
+  "is_active": true,
+  "llm_provider": "openai",
+  "llm_provider_config": {
+    "model": "gpt-4o-mini",
+    "api_key": "sk-your-openai-api-key"
+  },
+  "llm_settings": {
+    "temperature": 0.8,
+    "max_tokens": 1000,
+    "system_prompt": "You are an enthusiastic sales representative. Help qualify leads and schedule demos.",
+    "welcome_message": "Hi there! Thanks for your interest in our product. How can I help you today?"
+  },
+  "tts_settings": {
+    "provider": "elevenlabs",
+    "voice_id": "charlie",
+    "model_id": "eleven_flash_v2_5",
+    "stability": 0.6,
+    "similarity_boost": 0.8,
+    "use_speaker_boost": true
+  },
+  "stt_settings": {
+    "model": "nova-3",
+    "language": "en-US",
+    "keyterms": ["demo", "pricing", "features", "schedule"]
+  },
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "connection_id": "1234567890"
+  },
+  "webhook_url": "https://yourapi.com/webhooks/telnyx-events"
 }
 ``` 

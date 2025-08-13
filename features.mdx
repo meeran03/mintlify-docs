@@ -12,13 +12,14 @@ description: "Everything vapi.ai promises, but delivered with superior performan
 </Warning>
 
 ## Core Voice AI Capabilities
-- **Twilio Integration**: Handle phone calls through Twilio's Media Streams API with WebSocket support.
+- **Multi-Provider Telephony**: Support for both Twilio and Telnyx with automatic provider selection per assistant.
 - **Speech-to-Text**: Real-time transcription using Deepgram Nova 3 with confidence scoring.
 - **Natural Language Processing**: Generate intelligent responses with OpenAI GPT models or custom LLM providers.
 - **Text-to-Speech**: Convert responses to natural speech with ElevenLabs, Deepgram, Inworld, or Resemble.
 - **Audio Denoising**: Built-in RNNoise integration for crystal-clear audio quality.
 - **Call Recording**: Automatic recording with transcription storage and metadata tracking.
 - **Live Transcript Streaming**: Real-time WebSocket streaming of call transcripts for monitoring and analytics.
+- **SMS & MMS Messaging**: Send text messages and multimedia content through your assistants with multi-provider support.
 
 <Callout type="success">
 Burki supports multiple TTS and LLM providers out of the box. You can easily switch or add new integrations.
@@ -29,6 +30,24 @@ Burki supports multiple TTS and LLM providers out of the box. You can easily swi
 - **Phone Number Assignment**: Assign specific assistants to different phone numbers.
 - **Database-Driven Configuration**: Store and manage assistant configurations dynamically.
 - **Real-time Assistant Loading**: Hot-reload assistant configurations without restart.
+
+## SMS & MMS Messaging
+- **Multi-Provider SMS**: Send messages through Twilio or Telnyx based on assistant configuration.
+- **Multimedia Support**: Send images, documents, and other media files via MMS.
+- **Assistant-Based Routing**: Messages automatically use the correct provider for each assistant.
+- **E.164 Validation**: Automatic phone number format validation for reliable delivery.
+- **Delivery Tracking**: Receive message IDs and delivery status from telephony providers.
+- **Integration Ready**: Easy-to-use REST API for sending messages from your applications.
+
+## Phone Number Management
+- **Search & Discovery**: Find available phone numbers from Twilio and Telnyx with advanced filtering by area code, locality, and patterns.
+- **Direct Purchase**: Buy phone numbers instantly through the API with automatic webhook configuration and assistant assignment.
+- **Multi-Provider Support**: Purchase and manage numbers from both Twilio and Telnyx in a unified interface.
+- **Cost Comparison**: Compare pricing between providers for the same region to optimize costs.
+- **Global Coverage**: Access phone numbers in 60+ countries worldwide with local presence capabilities.
+- **Inventory Management**: Centralized dashboard to track usage, costs, and assignment across all providers.
+- **Release Management**: Release unused numbers to reduce monthly costs with automatic cleanup.
+- **Bulk Operations**: Purchase or release multiple numbers simultaneously for scaling operations.
 
 ## Web Dashboard & Management
 - **Modern Web Interface**: Beautiful, responsive dashboard for managing your voice AI system.

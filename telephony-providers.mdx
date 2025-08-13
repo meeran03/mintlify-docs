@@ -1,0 +1,313 @@
+---
+title: Telephony Providers
+description: "Configure Twilio or Telnyx for your voice AI assistants"
+---
+
+<Callout type="info">
+Burki Voice AI supports both Twilio and Telnyx as telephony providers. You can use different providers for different assistants, enabling cost optimization and redundancy.
+</Callout>
+
+---
+
+## Provider Comparison
+
+<CardGroup cols={2}>
+  <Card title="🏢 Twilio" icon="phone">
+    **Traditional Leader**
+    
+    - Mature, feature-rich platform
+    - Global presence and reliability
+    - Extensive documentation and community
+    - Higher pricing on calls
+    - Media Streams for real-time audio
+    - SMS/MMS messaging support
+  </Card>
+  
+  <Card title="⚡ Telnyx" icon="lightning">
+    **Modern Alternative**
+    
+    - Competitive pricing (often 50%+ savings)
+    - Call Control API for advanced features
+    - Developer-friendly modern APIs
+    - SMS/MMS messaging support
+    - Global carrier-grade network
+    - WebRTC and SIP support
+  </Card>
+</CardGroup>
+
+---
+
+## Provider Selection Logic
+
+The system automatically determines which provider to use based on this priority:
+
+<Steps>
+  <Step title="Assistant-Level Credentials">
+    Check if the assistant has `telnyx_config` or `twilio_config` configured
+    
+    **Priority:** Telnyx > Twilio if both are present
+  </Step>
+  
+  <Step title="Organization-Level Credentials">
+    Fallback to organization-level telephony credentials
+    
+    **Priority:** Telnyx > Twilio if both are present
+  </Step>
+  
+  <Step title="Environment Variables">
+    Use system-wide environment variables as last resort
+    
+    **Priority:** Telnyx > Twilio if both are present
+  </Step>
+</Steps>
+
+---
+
+## Twilio Setup
+
+<Accordion title="Twilio Configuration">
+
+### 1. Account Setup
+- Sign up at [Twilio Console](https://console.twilio.com/)
+- Purchase a phone number
+- Enable Media Streams on your account
+
+### 2. Webhook Configuration
+Set your Twilio webhook URL to:
+```
+https://yourdomain.com/twiml
+```
+
+### 3. Credentials
+**Environment Variables (Global):**
+```env
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+```
+
+**Per-Assistant (API):**
+```json
+{
+  "twilio_config": {
+    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "auth_token": "your_twilio_auth_token"
+  }
+}
+```
+
+### 4. Features
+- ✅ Inbound/Outbound calls
+- ✅ Call recording
+- ✅ Call transfer
+- ✅ Real-time audio streaming
+- ✅ SMS capabilities
+- ✅ Global phone numbers
+
+</Accordion>
+
+---
+
+## Telnyx Setup
+
+<Accordion title="Telnyx Configuration">
+
+### 1. Account Setup
+- Sign up at [Telnyx Portal](https://portal.telnyx.com/)
+- Purchase a phone number
+- Create a Call Control Application
+
+### 2. Call Control Application
+1. Go to **Call Control > Applications**
+2. Create a new application
+3. Set webhook URL to:
+   ```
+   https://yourdomain.com/telnyx-webhook
+   ```
+4. Enable **Answering Machine Detection** (optional)
+5. Save and note the **Connection ID**
+
+### 3. Credentials
+**Environment Variables (Global):**
+```env
+TELNYX_API_KEY=KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TELNYX_CONNECTION_ID=1234567890
+```
+
+**Per-Assistant (API):**
+```json
+{
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "connection_id": "1234567890"
+  }
+}
+```
+
+### 4. Features
+- ✅ Inbound/Outbound calls
+- ✅ Call recording
+- ✅ Call transfer
+- ✅ WebRTC support
+- ✅ SMS capabilities
+- ✅ Competitive pricing
+- ⚠️ WebSocket audio streaming (planned)
+
+</Accordion>
+
+---
+
+## Mixed Environment Examples
+
+### Use Case 1: Cost Optimization
+```json
+// High-volume sales assistant - use Telnyx for cost savings
+{
+  "name": "Sales Dialer Bot",
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "connection_id": "1234567890"
+  }
+}
+
+// Premium support assistant - use Twilio for reliability
+{
+  "name": "VIP Support Bot", 
+  "twilio_config": {
+    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "auth_token": "your_twilio_auth_token"
+  }
+}
+```
+
+### Use Case 2: Geographic Optimization
+```json
+// US/Canada assistant - use Telnyx for better rates
+{
+  "name": "North America Bot",
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "connection_id": "1234567890"
+  }
+}
+
+// International assistant - use Twilio for global coverage
+{
+  "name": "Global Support Bot",
+  "twilio_config": {
+    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", 
+    "auth_token": "your_twilio_auth_token"
+  }
+}
+```
+
+---
+
+## Provider Migration
+
+### Gradual Migration
+You can migrate assistants from one provider to another without downtime:
+
+<CodeGroup>
+```json Before (Twilio Only)
+{
+  "name": "Customer Service Bot",
+  "twilio_config": {
+    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "auth_token": "your_twilio_auth_token"
+  }
+}
+```
+
+```json After (Switch to Telnyx)  
+{
+  "name": "Customer Service Bot",
+  "telnyx_config": {
+    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "connection_id": "1234567890"
+  },
+  "twilio_config": {
+    "account_sid": null,
+    "auth_token": null
+  }
+}
+```
+</CodeGroup>
+
+### Bulk Migration
+Use the API to migrate multiple assistants:
+
+```python
+import requests
+
+# List all assistants
+assistants = requests.get("/api/v1/assistants").json()
+
+# Migrate each one
+for assistant in assistants:
+    requests.put(f"/api/v1/assistants/{assistant['id']}", json={
+        "telnyx_config": {
+            "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "connection_id": "1234567890"
+        },
+        "twilio_config": {
+            "account_sid": None,
+            "auth_token": None
+        }
+    })
+```
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Call Not Connecting">
+    **Check:**
+    - Webhook URLs are correct and accessible
+    - Credentials are valid and have proper permissions
+    - Phone number is assigned to correct assistant
+    - Provider account has sufficient balance
+  </Accordion>
+  
+  <Accordion title="Poor Audio Quality">
+    **Twilio:** Ensure Media Streams are enabled
+    
+    **Telnyx:** Check Call Control Application settings
+    
+    **Both:** Verify network connectivity and bandwidth
+  </Accordion>
+  
+  <Accordion title="Provider Detection Issues">
+    **Check priority order:**
+    1. Assistant-level config
+    2. Organization-level config  
+    3. Environment variables
+    
+    **Debug:** Check assistant object in API response to see detected provider
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Best Practices
+
+- **Start with one provider** and add the second for specific use cases
+- **Test thoroughly** when switching providers for existing assistants
+- **Monitor costs** and usage patterns to optimize provider selection
+- **Keep credentials secure** and rotate them regularly
+- **Use environment variables** for global defaults, per-assistant config for exceptions
+
+---
+
+## What's Next?
+
+<CardGroup cols={2}>
+  <Card title="📞 Call Management" href="/call-management" icon="phone">
+    Configure call handling, transfers, and timeouts
+  </Card>
+  
+  <Card title="🎙️ Audio Configuration" href="/ai-configuration" icon="microphone">
+    Set up TTS/STT providers for voice processing
+  </Card>
+</CardGroup>
+

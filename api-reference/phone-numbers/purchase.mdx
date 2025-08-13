@@ -1,0 +1,416 @@
+---
+title: 'Purchase Phone Number'
+openapi: 'POST /phone-numbers/purchase'
+---
+
+This endpoint allows you to purchase a phone number from Twilio or Telnyx and automatically configure it for use with your AI assistants. The purchased number is immediately ready to receive calls and can be assigned to an assistant.
+
+## How It Works
+
+1. **Number Selection**: Use a phone number from the search results
+2. **Provider Purchase**: The system purchases the number from the specified provider
+3. **Automatic Configuration**: Webhooks are automatically configured for voice and SMS
+4. **Database Registration**: The number is added to your organization's phone number inventory
+5. **Assistant Assignment**: Optionally assign the number to an assistant immediately
+
+<Info>
+**Instant Activation**: Purchased numbers are immediately active and ready to receive calls and messages. No additional configuration required.
+</Info>
+
+## Request Body
+
+The request body is a JSON object containing purchase details.
+
+- `phone_number` (string, **required**): The phone number to purchase in E.164 format
+- `provider` (string, **required**): Provider to use (`"twilio"` or `"telnyx"`)
+- `assistant_id` (integer, optional): ID of the assistant to assign this number to
+- `friendly_name` (string, optional): Custom display name for the number
+
+```json Request
+{
+  "phone_number": "+14155551234",
+  "provider": "telnyx",
+  "assistant_id": 123,
+  "friendly_name": "San Francisco Support Line"
+}
+```
+
+## Response
+
+A successful request returns a `200 OK` status with purchase confirmation.
+
+```json Response
+{
+  "success": true,
+  "phone_number": "+14155551234",
+  "provider": "telnyx",
+  "purchase_details": {
+    "id": "ORD_12345",
+    "phone_number": "+14155551234",
+    "status": "completed",
+    "connection_id": "1234567890",
+    "date_created": "2024-01-15T10:30:00Z"
+  },
+  "message": "Successfully purchased phone number +14155551234 from telnyx"
+}
+```
+
+## Response Fields
+
+- `success` (boolean): Whether the purchase completed successfully
+- `phone_number` (string): The purchased phone number
+- `provider` (string): Provider used for the purchase ("twilio" or "telnyx")
+- `purchase_details` (object): Provider-specific purchase information
+  - **For Twilio**:
+    - `sid` (string): Twilio phone number SID
+    - `friendly_name` (string): Display name
+    - `voice_url` (string): Configured voice webhook URL
+    - `sms_url` (string): Configured SMS webhook URL
+    - `capabilities` (object): Number capabilities
+    - `date_created` (string): Purchase timestamp
+  - **For Telnyx**:
+    - `id` (string): Telnyx order ID
+    - `status` (string): Order status ("completed", "pending", etc.)
+    - `connection_id` (string): Associated connection ID
+    - `date_created` (string): Purchase timestamp
+- `message` (string): Human-readable confirmation message
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when the request contains invalid data.
+
+```json
+{
+  "detail": "Phone number must be in E.164 format (e.g., +1234567890)"
+}
+```
+
+Common causes:
+- Invalid `provider` value (must be "twilio" or "telnyx")
+- Invalid phone number format (must start with '+')
+- Invalid `assistant_id` (assistant doesn't exist)
+
+### 404 Not Found
+
+Returned when the specified assistant doesn't exist.
+
+```json
+{
+  "detail": "Assistant with ID 123 not found"
+}
+```
+
+### 500 Internal Server Error
+
+Returned when the purchase fails at the provider level.
+
+```json
+{
+  "detail": "Failed to purchase phone number from telnyx"
+}
+```
+
+Common causes:
+- Number no longer available
+- Insufficient account balance
+- Provider API error
+- Invalid provider credentials
+
+## Purchase Workflow
+
+### Complete Purchase Flow
+
+```bash
+# 1. Search for available numbers
+curl -X POST "https://api.burki.dev/phone-numbers/search" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "area_code": "415",
+    "provider": "telnyx"
+  }'
+
+# 2. Purchase a number from the results
+curl -X POST "https://api.burki.dev/phone-numbers/purchase" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phone_number": "+14155551234",
+    "provider": "telnyx",
+    "assistant_id": 123
+  }'
+
+# 3. Number is immediately ready for calls!
+```
+
+## Provider Differences
+
+### Twilio Purchase
+
+- **Immediate Activation**: Number is instantly active
+- **Webhook Configuration**: Voice and SMS URLs automatically set
+- **Billing**: Charged to your Twilio account
+- **Features**: Full voice, SMS, MMS support
+
+### Telnyx Purchase
+
+- **Order-Based**: Purchase creates an order that typically completes instantly
+- **Connection Assignment**: Number assigned to specified connection ID
+- **Billing**: Charged to your Telnyx account
+- **Features**: Voice, SMS, MMS support with competitive pricing
+
+## Use Cases
+
+### Scaling Customer Support
+
+Purchase numbers for different regions:
+
+```json
+{
+  "phone_number": "+12125551234",
+  "provider": "telnyx",
+  "assistant_id": 101,
+  "friendly_name": "NYC Customer Support"
+}
+```
+
+### Multi-Brand Management
+
+Assign different numbers to different assistants:
+
+```json
+{
+  "phone_number": "+18005551234",
+  "provider": "twilio",
+  "assistant_id": 202,
+  "friendly_name": "Premium Brand Support"
+}
+```
+
+### Geographic Expansion
+
+Establish local presence in new markets:
+
+```json
+{
+  "phone_number": "+14155551234",
+  "provider": "telnyx",
+  "assistant_id": 303,
+  "friendly_name": "West Coast Sales"
+}
+```
+
+## Advanced Features
+
+### Automatic Assistant Assignment
+
+When you provide an `assistant_id`, the system:
+
+1. **Assigns Ownership**: Links the number to the specified assistant
+2. **Configures Provider**: Uses the assistant's configured telephony provider
+3. **Sets Webhooks**: Configures appropriate webhook URLs based on provider
+4. **Enables Features**: Activates voice and SMS capabilities
+
+### Webhook Configuration
+
+**Twilio Numbers**: Automatically configured with:
+- Voice URL: `https://yourdomain.com/twiml`
+- SMS URL: `https://yourdomain.com/twiml`
+
+**Telnyx Numbers**: Automatically configured with:
+- Webhook URL: `https://yourdomain.com/telnyx-webhook`
+- Connection ID from assistant or organization settings
+
+## Integration Examples
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function purchasePhoneNumber(phoneNumber, provider, assistantId) {
+  try {
+    const response = await axios.post('https://api.burki.dev/phone-numbers/purchase', {
+      phone_number: phoneNumber,
+      provider: provider,
+      assistant_id: assistantId,
+      friendly_name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} Number`
+    }, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log(`Successfully purchased ${phoneNumber} via ${provider}`);
+    return response.data;
+  } catch (error) {
+    console.error('Purchase failed:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage
+const result = await purchasePhoneNumber('+14155551234', 'telnyx', 123);
+```
+
+### Python
+
+```python
+import requests
+
+def purchase_phone_number(phone_number, provider, assistant_id=None, friendly_name=None):
+    url = "https://api.burki.dev/phone-numbers/purchase"
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "phone_number": phone_number,
+        "provider": provider
+    }
+    
+    if assistant_id:
+        payload["assistant_id"] = assistant_id
+    if friendly_name:
+        payload["friendly_name"] = friendly_name
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Purchase failed: {response.json()['detail']}")
+
+# Usage
+result = purchase_phone_number(
+    phone_number="+14155551234",
+    provider="telnyx",
+    assistant_id=123,
+    friendly_name="Support Line"
+)
+```
+
+### PHP
+
+```php
+<?php
+function purchasePhoneNumber($phoneNumber, $provider, $assistantId = null, $friendlyName = null) {
+    $url = 'https://api.burki.dev/phone-numbers/purchase';
+    $headers = [
+        'Authorization: Bearer YOUR_API_KEY',
+        'Content-Type: application/json'
+    ];
+    
+    $data = [
+        'phone_number' => $phoneNumber,
+        'provider' => $provider
+    ];
+    
+    if ($assistantId) {
+        $data['assistant_id'] = $assistantId;
+    }
+    if ($friendlyName) {
+        $data['friendly_name'] = $friendlyName;
+    }
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("Purchase failed: " . $response);
+    }
+}
+
+// Usage
+$result = purchasePhoneNumber('+14155551234', 'telnyx', 123, 'Support Line');
+?>
+```
+
+## Best Practices
+
+### Pre-Purchase Validation
+
+1. **Verify Availability**: Always search before purchasing
+2. **Check Pricing**: Confirm costs, especially setup fees
+3. **Assistant Readiness**: Ensure the target assistant is properly configured
+4. **Provider Selection**: Choose the provider that best fits your needs
+
+### Error Handling
+
+Implement robust error handling for common purchase failures:
+
+```javascript
+async function safePurchase(phoneNumber, provider, assistantId) {
+  try {
+    return await purchasePhoneNumber(phoneNumber, provider, assistantId);
+  } catch (error) {
+    if (error.response?.status === 500) {
+      // Number may no longer be available, search for alternatives
+      console.log('Number unavailable, searching for alternatives...');
+      return await findAndPurchaseAlternative(phoneNumber, provider);
+    }
+    throw error;
+  }
+}
+```
+
+### Cost Management
+
+1. **Monitor Spending**: Track number purchases across providers
+2. **Compare Costs**: Evaluate monthly costs vs. setup fees
+3. **Bulk Purchases**: Consider purchasing multiple numbers for volume discounts
+4. **Regular Audits**: Review and release unused numbers
+
+### Security Considerations
+
+1. **API Key Protection**: Secure your API keys
+2. **Purchase Validation**: Validate purchases in your application
+3. **Audit Logging**: Log all purchase activities
+4. **Access Control**: Restrict purchase permissions to authorized users
+
+<Warning>
+**Billing Impact**: Phone number purchases result in immediate charges to your telephony provider account. Ensure you have sufficient account balance and proper billing alerts configured.
+</Warning>
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| "Number not available" | Number purchased by someone else | Search for new numbers |
+| "Insufficient balance" | Account balance too low | Add funds to provider account |
+| "Invalid credentials" | Wrong API keys | Check provider credentials |
+| "Assistant not found" | Invalid assistant ID | Verify assistant exists |
+
+### Provider-Specific Issues
+
+**Twilio**:
+- Ensure account is verified for international numbers
+- Check geographic permissions for certain area codes
+
+**Telnyx**:
+- Verify connection ID is correct
+- Ensure account has number purchasing enabled
+
+### Support
+
+If you encounter persistent issues:
+1. Check provider account status
+2. Verify API credentials
+3. Contact provider support for account-specific issues
+4. Reach out to Burki support for integration help

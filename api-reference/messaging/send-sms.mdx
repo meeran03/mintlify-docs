@@ -1,0 +1,300 @@
+---
+title: 'Send SMS'
+openapi: 'POST /sms/send'
+---
+
+This endpoint allows you to send SMS messages through one of your AI assistants. The system automatically determines which telephony provider (Twilio or Telnyx) to use based on the assistant configuration associated with the `from_phone_number`.
+
+## How It Works
+
+1. **Assistant Lookup**: The system identifies the assistant based on the `from_phone_number`
+2. **Provider Selection**: Automatically uses the assistant's configured telephony provider (Twilio or Telnyx)
+3. **Message Delivery**: Sends the SMS through the appropriate provider's API
+4. **Response**: Returns success status with message ID and provider information
+
+<Info>
+**Multi-Provider Support**: Your assistants can use different telephony providers. The system automatically routes SMS messages through the correct provider based on which assistant owns the phone number.
+</Info>
+
+## Request Body
+
+The request body is a JSON object containing the SMS details.
+
+- `from_phone_number` (string, **required**): The sender phone number that must be assigned to one of your assistants
+- `to_phone_number` (string, **required**): The recipient phone number in E.164 format (e.g., +1234567890)
+- `message` (string, **required**): The SMS message content (max 1600 characters)
+- `media_urls` (array of strings, optional): List of media URLs for MMS messages
+
+```json Request
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Hello! This is a follow-up message from your AI assistant.",
+  "media_urls": ["https://example.com/image.jpg"]
+}
+```
+
+## Response
+
+A successful request returns a `200 OK` status with details about the sent message.
+
+```json Response
+{
+  "success": true,
+  "message_id": "SM1234567890abcdef",
+  "message": "SMS sent successfully via telnyx",
+  "provider": "telnyx"
+}
+```
+
+## Response Fields
+
+- `success` (boolean): Whether the SMS was sent successfully
+- `message_id` (string): Unique identifier for the message from the telephony provider
+- `message` (string): Human-readable status message
+- `provider` (string): The telephony provider used ("twilio" or "telnyx")
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when the request is malformed or contains invalid data.
+
+```json
+{
+  "detail": "Invalid to_phone_number format. Use E.164 format (e.g., +1234567890)"
+}
+```
+
+Common causes:
+- Missing required fields (`from_phone_number`, `to_phone_number`, `message`)
+- Invalid phone number format (must be E.164)
+- Empty message content
+- Message exceeds 1600 characters
+
+### 404 Not Found
+
+Returned when no assistant is found for the specified `from_phone_number`.
+
+```json
+{
+  "detail": "No assistant found for phone number +1234567890"
+}
+```
+
+### 500 Internal Server Error
+
+Returned when the telephony provider fails to send the message.
+
+```json
+{
+  "detail": "Failed to send SMS via telnyx"
+}
+```
+
+## Use Cases
+
+### Customer Service Follow-up
+
+Send follow-up messages after customer service calls:
+
+```json
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Thanks for calling! Here's the link we discussed: https://support.example.com/article/123"
+}
+```
+
+### Appointment Reminders
+
+Send automated appointment reminders:
+
+```json
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Reminder: Your appointment is tomorrow at 2:00 PM. Reply CONFIRM to confirm or RESCHEDULE to change the time."
+}
+```
+
+### Document Sharing (MMS)
+
+Send documents or images via MMS:
+
+```json
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Here are the documents you requested:",
+  "media_urls": [
+    "https://yourdomain.com/documents/contract.pdf",
+    "https://yourdomain.com/images/diagram.png"
+  ]
+}
+```
+
+## Authentication
+
+This endpoint requires authentication. Include your API key in the request headers:
+
+```bash
+curl -X POST "https://api.burki.dev/sms/send" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from_phone_number": "+1234567890",
+    "to_phone_number": "+1555123456",
+    "message": "Hello from your AI assistant!"
+  }'
+```
+
+## Rate Limits
+
+SMS sending is subject to rate limits imposed by the underlying telephony providers:
+
+- **Twilio**: Varies by account type and message volume
+- **Telnyx**: Varies by account configuration
+
+<Warning>
+**Provider Limits**: Each telephony provider has its own rate limits and restrictions. Make sure your usage complies with your provider's terms of service.
+</Warning>
+
+## Best Practices
+
+### Phone Number Format
+
+Always use E.164 format for phone numbers:
+- ✅ Correct: `+1234567890`
+- ❌ Incorrect: `(123) 456-7890`, `123-456-7890`, `1234567890`
+
+### Message Content
+
+- Keep messages concise and clear
+- Include clear call-to-action when needed
+- Respect opt-out requests and regulatory requirements
+- Consider character limits for international SMS
+
+### Error Handling
+
+Always handle potential errors in your code:
+
+```python
+import requests
+
+response = requests.post(
+    "https://api.burki.dev/sms/send",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={
+        "from_phone_number": "+1234567890",
+        "to_phone_number": "+1555123456",
+        "message": "Hello from your AI assistant!"
+    }
+)
+
+if response.status_code == 200:
+    data = response.json()
+    print(f"SMS sent successfully via {data['provider']}")
+    print(f"Message ID: {data['message_id']}")
+else:
+    print(f"Error: {response.status_code} - {response.json()['detail']}")
+```
+
+## Integration Examples
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function sendSMS(fromPhone, toPhone, message) {
+  try {
+    const response = await axios.post('https://api.burki.dev/sms/send', {
+      from_phone_number: fromPhone,
+      to_phone_number: toPhone,
+      message: message
+    }, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    console.log('SMS sent:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to send SMS:', error.response.data);
+    throw error;
+  }
+}
+```
+
+### Python
+
+```python
+import requests
+
+def send_sms(from_phone, to_phone, message, media_urls=None):
+    url = "https://api.burki.dev/sms/send"
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "from_phone_number": from_phone,
+        "to_phone_number": to_phone,
+        "message": message
+    }
+    
+    if media_urls:
+        payload["media_urls"] = media_urls
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"SMS failed: {response.json()['detail']}")
+```
+
+### PHP
+
+```php
+<?php
+function sendSMS($fromPhone, $toPhone, $message, $mediaUrls = null) {
+    $url = 'https://api.burki.dev/sms/send';
+    $headers = [
+        'Authorization: Bearer YOUR_API_KEY',
+        'Content-Type: application/json'
+    ];
+    
+    $data = [
+        'from_phone_number' => $fromPhone,
+        'to_phone_number' => $toPhone,
+        'message' => $message
+    ];
+    
+    if ($mediaUrls) {
+        $data['media_urls'] = $mediaUrls;
+    }
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("SMS failed: " . $response);
+    }
+}
+?>
+```

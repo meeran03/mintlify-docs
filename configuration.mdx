@@ -14,8 +14,10 @@ Set these in your `.env` file or as environment variables in your deployment pla
 - `DATABASE_URL` — PostgreSQL connection string (e.g., `postgresql://user:pass@host:5432/dbname`)
 
 ### Telephony
-- `TWILIO_ACCOUNT_SID` — Twilio account SID
-- `TWILIO_AUTH_TOKEN` — Twilio auth token
+- `TWILIO_ACCOUNT_SID` — Twilio account SID (optional, can be set per-assistant)
+- `TWILIO_AUTH_TOKEN` — Twilio auth token (optional, can be set per-assistant)
+- `TELNYX_API_KEY` — Telnyx API key (optional, can be set per-assistant)
+- `TELNYX_CONNECTION_ID` — Telnyx Connection ID for Call Control Application (optional, can be set per-assistant)
 
 ### Speech-to-Text
 - `DEEPGRAM_API_KEY` — Deepgram API key
@@ -44,11 +46,19 @@ Set these in your `.env` file or as environment variables in your deployment pla
 ## Example .env File
 ```env
 DATABASE_URL=postgresql://user:pass@localhost:5432/burki
+
+# Telephony (choose one or both)
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_twilio_token
+TELNYX_API_KEY=KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TELNYX_CONNECTION_ID=1234567890
+
+# AI Services
 DEEPGRAM_API_KEY=your_deepgram_key
 OPENAI_API_KEY=your_openai_key
 ELEVENLABS_API_KEY=your_elevenlabs_key
+
+# Security
 SECRET_KEY=supersecretkey
 ```
 

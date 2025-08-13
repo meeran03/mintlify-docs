@@ -1,0 +1,380 @@
+---
+title: 'Search Phone Numbers'
+openapi: 'POST /phone-numbers/search'
+---
+
+This endpoint allows you to search for available phone numbers for purchase from Twilio or Telnyx. You can filter results by country, area code, location, or number patterns to find the perfect number for your assistant.
+
+## How It Works
+
+1. **Provider Selection**: Choose between Twilio or Telnyx as your search provider
+2. **Filter Application**: Apply location, pattern, or feature-based filters
+3. **Results with Pricing**: Get available numbers with cost information and capabilities
+4. **Direct Purchase**: Use the returned phone numbers in the purchase endpoint
+
+<Info>
+**Multi-Provider Comparison**: Search both Twilio and Telnyx separately to compare pricing and availability across providers for the same region.
+</Info>
+
+## Request Body
+
+The request body is a JSON object containing search criteria.
+
+- `country_code` (string, optional): Country code to search in. Defaults to `"US"`
+- `area_code` (string, optional): Specific area code to search within
+- `contains` (string, optional): Pattern or digits the number should contain
+- `locality` (string, optional): City or locality name to search in
+- `region` (string, optional): State or region to search within
+- `limit` (integer, optional): Maximum number of results (1-50). Defaults to `10`
+- `provider` (string, optional): Provider to search (`"twilio"` or `"telnyx"`). Defaults to `"telnyx"`
+
+```json Request
+{
+  "country_code": "US",
+  "area_code": "415",
+  "locality": "San Francisco",
+  "region": "CA",
+  "limit": 20,
+  "provider": "telnyx"
+}
+```
+
+## Response
+
+A successful request returns a `200 OK` status with available phone numbers.
+
+```json Response
+{
+  "success": true,
+  "numbers": [
+    {
+      "phone_number": "+14155551234",
+      "friendly_name": "+14155551234",
+      "locality": "San Francisco",
+      "region": "CA",
+      "country_code": "US",
+      "capabilities": {
+        "voice": true,
+        "sms": true,
+        "mms": true,
+        "fax": false
+      },
+      "cost": "$1.00",
+      "setup_cost": "$0.00",
+      "provider": "telnyx"
+    }
+  ],
+  "total_found": 15,
+  "provider": "telnyx"
+}
+```
+
+## Response Fields
+
+- `success` (boolean): Whether the search completed successfully
+- `numbers` (array): List of available phone numbers with details
+  - `phone_number` (string): The phone number in E.164 format
+  - `friendly_name` (string): Display name for the number
+  - `locality` (string): City/locality where the number is located
+  - `region` (string): State/region where the number is located
+  - `country_code` (string): Country code
+  - `capabilities` (object): Features supported by this number
+    - `voice` (boolean): Supports voice calls
+    - `sms` (boolean): Supports SMS messages
+    - `mms` (boolean): Supports MMS messages
+    - `fax` (boolean): Supports fax transmissions
+  - `cost` (string): Monthly cost for the number (Telnyx only)
+  - `setup_cost` (string): One-time setup fee (Telnyx only)
+  - `provider` (string): Provider name ("twilio" or "telnyx")
+- `total_found` (integer): Total number of results found
+- `provider` (string): Provider used for the search
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when the request contains invalid parameters.
+
+```json
+{
+  "detail": "Provider must be 'twilio' or 'telnyx'"
+}
+```
+
+Common causes:
+- Invalid `provider` value
+- `limit` outside of 1-50 range
+- Invalid country code format
+
+### 500 Internal Server Error
+
+Returned when the provider API fails or is unavailable.
+
+```json
+{
+  "detail": "Internal error: Provider API unavailable"
+}
+```
+
+## Search Examples
+
+### Basic Area Code Search
+
+Search for numbers in the 415 area code:
+
+```json
+{
+  "area_code": "415",
+  "provider": "telnyx",
+  "limit": 10
+}
+```
+
+### Location-Based Search
+
+Find numbers in a specific city:
+
+```json
+{
+  "locality": "New York",
+  "region": "NY",
+  "country_code": "US",
+  "provider": "twilio"
+}
+```
+
+### Pattern-Based Search
+
+Search for numbers containing specific digits:
+
+```json
+{
+  "contains": "777",
+  "area_code": "212",
+  "provider": "telnyx"
+}
+```
+
+### International Search
+
+Search for numbers in other countries:
+
+```json
+{
+  "country_code": "GB",
+  "locality": "London",
+  "provider": "telnyx",
+  "limit": 5
+}
+```
+
+## Provider Comparison
+
+### Twilio vs Telnyx
+
+| Feature | Twilio | Telnyx |
+|---------|--------|--------|
+| **Search Filters** | Area code, locality, region, contains | Area code, locality, region, contains |
+| **Pricing Info** | Not included in search | Monthly + setup costs shown |
+| **Global Coverage** | 100+ countries | 60+ countries |
+| **API Speed** | Fast | Very fast |
+| **Features** | Voice, SMS, MMS, Fax | Voice, SMS, MMS |
+
+### Cost Optimization Tips
+
+1. **Compare Providers**: Search both providers for the same criteria
+2. **Check Setup Fees**: Telnyx shows setup costs upfront
+3. **Consider Features**: Ensure the number supports required capabilities
+4. **Location Matters**: Local numbers may have better rates
+
+```bash
+# Compare pricing between providers
+curl -X POST "https://api.burki.dev/phone-numbers/search" \
+  -H "Content-Type: application/json" \
+  -d '{"area_code": "415", "provider": "telnyx"}'
+
+curl -X POST "https://api.burki.dev/phone-numbers/search" \
+  -H "Content-Type: application/json" \
+  -d '{"area_code": "415", "provider": "twilio"}'
+```
+
+## Use Cases
+
+### Sales Team Numbers
+
+Search for memorable numbers for sales teams:
+
+```json
+{
+  "contains": "SALE",
+  "area_code": "800",
+  "provider": "telnyx"
+}
+```
+
+### Local Presence
+
+Establish local presence in multiple markets:
+
+```json
+{
+  "locality": "Chicago",
+  "region": "IL",
+  "limit": 5,
+  "provider": "twilio"
+}
+```
+
+### Toll-Free Numbers
+
+Search for toll-free numbers:
+
+```json
+{
+  "area_code": "800",
+  "country_code": "US",
+  "provider": "telnyx"
+}
+```
+
+## Integration Examples
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function searchPhoneNumbers(criteria) {
+  try {
+    const response = await axios.post('https://api.burki.dev/phone-numbers/search', {
+      ...criteria,
+      provider: 'telnyx'
+    }, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return response.data.numbers;
+  } catch (error) {
+    console.error('Search failed:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage
+const numbers = await searchPhoneNumbers({
+  area_code: '415',
+  locality: 'San Francisco',
+  limit: 10
+});
+```
+
+### Python
+
+```python
+import requests
+
+def search_phone_numbers(criteria, provider='telnyx'):
+    url = "https://api.burki.dev/phone-numbers/search"
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {**criteria, "provider": provider}
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()['numbers']
+    else:
+        raise Exception(f"Search failed: {response.json()['detail']}")
+
+# Usage
+numbers = search_phone_numbers({
+    'area_code': '415',
+    'locality': 'San Francisco',
+    'limit': 10
+})
+```
+
+### PHP
+
+```php
+<?php
+function searchPhoneNumbers($criteria, $provider = 'telnyx') {
+    $url = 'https://api.burki.dev/phone-numbers/search';
+    $headers = [
+        'Authorization: Bearer YOUR_API_KEY',
+        'Content-Type: application/json'
+    ];
+    
+    $data = array_merge($criteria, ['provider' => $provider]);
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true)['numbers'];
+    } else {
+        throw new Exception("Search failed: " . $response);
+    }
+}
+
+// Usage
+$numbers = searchPhoneNumbers([
+    'area_code' => '415',
+    'locality' => 'San Francisco',
+    'limit' => 10
+]);
+?>
+```
+
+## Best Practices
+
+### Search Strategy
+
+1. **Start Broad**: Begin with area code only, then add filters
+2. **Multiple Searches**: Try different combinations to find the best options
+3. **Provider Comparison**: Always compare both Twilio and Telnyx
+4. **Capability Check**: Verify the number supports your required features
+
+### Performance Tips
+
+1. **Reasonable Limits**: Use appropriate limit values (10-20 for UI, 5 for automation)
+2. **Cache Results**: Cache search results for a few minutes to avoid repeated calls
+3. **Parallel Searches**: Search multiple providers simultaneously for comparison
+
+### Error Handling
+
+Always implement proper error handling for provider outages:
+
+```javascript
+async function robustSearch(criteria) {
+  const providers = ['telnyx', 'twilio'];
+  
+  for (const provider of providers) {
+    try {
+      return await searchPhoneNumbers({...criteria, provider});
+    } catch (error) {
+      console.warn(`${provider} search failed, trying next provider`);
+    }
+  }
+  
+  throw new Error('All providers failed');
+}
+```
+
+<Warning>
+**Rate Limits**: Search requests are subject to rate limits. For high-volume applications, implement appropriate throttling and retry logic.
+</Warning>
