@@ -152,7 +152,9 @@
               "api-reference/phone-numbers/search",
               "api-reference/phone-numbers/purchase",
               "api-reference/phone-numbers/release",
-              "api-reference/phone-numbers/countries"
+              "api-reference/phone-numbers/countries",
+              "api-reference/phone-numbers/update-webhooks",
+              "api-reference/phone-numbers/get-webhooks"
             ]
           },
           {

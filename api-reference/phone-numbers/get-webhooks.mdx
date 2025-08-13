@@ -1,0 +1,489 @@
+---
+title: 'Get Phone Number Webhooks'
+openapi: 'GET /phone-numbers/{phone_number}/webhooks'
+---
+
+This endpoint retrieves the current webhook configuration for a phone number, showing the URLs configured to receive voice call and SMS events.
+
+## How It Works
+
+1. **Provider Detection**: Automatically detects which provider owns the number
+2. **Configuration Retrieval**: Fetches current webhook URLs from the provider
+3. **Detailed Response**: Returns complete webhook configuration with metadata
+
+<Info>
+**Real-Time Data**: This endpoint queries the provider directly to get the most current webhook configuration, not cached data.
+</Info>
+
+## Path Parameters
+
+- `phone_number` (string, **required**): Phone number to get webhooks for in E.164 format (e.g., `+14155551234`)
+
+## Query Parameters
+
+- `provider` (string, optional): Provider (`"twilio"` or `"telnyx"`). Auto-detected if not provided
+
+```bash
+GET /phone-numbers/+14155551234/webhooks?provider=twilio
+```
+
+## Response
+
+A successful request returns a `200 OK` status with current webhook configuration.
+
+```json Response
+{
+  "success": true,
+  "phone_number": "+14155551234",
+  "provider": "twilio",
+  "voice_webhook_url": "https://your-app.com/webhooks/voice",
+  "sms_webhook_url": "https://your-app.com/webhooks/sms",
+  "configuration": {
+    "voice_webhook_url": "https://your-app.com/webhooks/voice",
+    "voice_method": "POST",
+    "sms_webhook_url": "https://your-app.com/webhooks/sms",
+    "sms_method": "POST",
+    "status_callback_url": "https://your-app.com/status",
+    "status_callback_method": "POST",
+    "phone_number_sid": "PN1234567890abcdef",
+    "friendly_name": "Support Line"
+  }
+}
+```
+
+## Response Fields
+
+- `success` (boolean): Whether the request completed successfully
+- `phone_number` (string): The queried phone number
+- `provider` (string): Provider that owns the number ("twilio" or "telnyx")
+- `voice_webhook_url` (string): Current voice webhook URL
+- `sms_webhook_url` (string): Current SMS webhook URL
+- `configuration` (object): Complete webhook configuration details
+  - **For Twilio**:
+    - `voice_method` (string): HTTP method for voice webhooks
+    - `sms_method` (string): HTTP method for SMS webhooks
+    - `status_callback_url` (string): URL for status callbacks
+    - `phone_number_sid` (string): Twilio phone number SID
+    - `friendly_name` (string): Display name for the number
+  - **For Telnyx**:
+    - `connection_id` (string): Associated connection ID
+    - `phone_number_id` (string): Telnyx phone number ID
+    - `status` (string): Number status
+    - `features` (array): Supported features
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when the request contains invalid parameters.
+
+```json
+{
+  "detail": "Phone number must be in E.164 format (e.g., +1234567890)"
+}
+```
+
+### 404 Not Found
+
+Returned when the phone number is not found.
+
+```json
+{
+  "detail": "Phone number +14155551234 not found in database"
+}
+```
+
+### 500 Internal Server Error
+
+Returned when the provider API fails.
+
+```json
+{
+  "detail": "Could not retrieve webhook configuration for +14155551234"
+}
+```
+
+## Provider-Specific Responses
+
+### Twilio Response Example
+
+```json
+{
+  "success": true,
+  "phone_number": "+14155551234",
+  "provider": "twilio",
+  "voice_webhook_url": "https://api.yourapp.com/twiml",
+  "sms_webhook_url": "https://api.yourapp.com/twiml",
+  "configuration": {
+    "voice_webhook_url": "https://api.yourapp.com/twiml",
+    "voice_method": "POST",
+    "sms_webhook_url": "https://api.yourapp.com/twiml",
+    "sms_method": "POST", 
+    "status_callback_url": "https://api.yourapp.com/status",
+    "status_callback_method": "POST",
+    "phone_number_sid": "PN1234567890abcdef1234567890abcdef",
+    "friendly_name": "Customer Support Line"
+  }
+}
+```
+
+### Telnyx Response Example
+
+```json
+{
+  "success": true,
+  "phone_number": "+14155551234",
+  "provider": "telnyx",
+  "voice_webhook_url": "Configured at Connection level",
+  "sms_webhook_url": "Configured at Connection level",
+  "configuration": {
+    "connection_id": "1234567890",
+    "phone_number_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "status": "active",
+    "features": ["voice", "sms", "mms"]
+  }
+}
+```
+
+<Note>
+**Telnyx Limitation**: Telnyx webhook URLs are configured at the Connection/Application level, so the exact webhook URLs may not be directly retrievable via the phone number API. The response indicates they are "Configured at Connection level".
+</Note>
+
+## Use Cases
+
+### Configuration Audit
+
+Verify webhook configurations across all numbers:
+
+```bash
+# Check multiple numbers
+for number in "+14155551234" "+12125555678" "+13105559999"; do
+  curl -H "Authorization: Bearer YOUR_API_KEY" \
+    "https://api.burki.dev/phone-numbers/${number}/webhooks"
+done
+```
+
+### Environment Verification
+
+Confirm webhooks point to the correct environment:
+
+```javascript
+async function verifyEnvironmentWebhooks(phoneNumbers, expectedEnv) {
+  for (const phoneNumber of phoneNumbers) {
+    const config = await getPhoneWebhooks(phoneNumber);
+    
+    if (!config.voice_webhook_url.includes(expectedEnv)) {
+      console.warn(`❌ ${phoneNumber} points to wrong environment`);
+    } else {
+      console.log(`✅ ${phoneNumber} correctly configured`);
+    }
+  }
+}
+```
+
+### Debugging Call Issues
+
+Check webhook configuration when troubleshooting:
+
+```python
+def debug_call_issues(phone_number):
+    config = get_phone_webhooks(phone_number)
+    
+    print(f"Phone: {config['phone_number']}")
+    print(f"Provider: {config['provider']}")
+    print(f"Voice Webhook: {config['voice_webhook_url']}")
+    
+    # Test webhook accessibility
+    if config['voice_webhook_url']:
+        try:
+            response = requests.get(config['voice_webhook_url'])
+            print(f"Webhook Status: {response.status_code}")
+        except Exception as e:
+            print(f"Webhook Error: {e}")
+```
+
+## Integration Examples
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function getPhoneWebhooks(phoneNumber, provider = null) {
+  try {
+    const params = provider ? `?provider=${provider}` : '';
+    const response = await axios.get(`https://api.burki.dev/phone-numbers/${phoneNumber}/webhooks${params}`, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get webhooks:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage
+const config = await getPhoneWebhooks('+14155551234');
+console.log('Voice webhook:', config.voice_webhook_url);
+console.log('SMS webhook:', config.sms_webhook_url);
+```
+
+### Python
+
+```python
+import requests
+
+def get_phone_webhooks(phone_number, provider=None):
+    url = f"https://api.burki.dev/phone-numbers/{phone_number}/webhooks"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    params = {}
+    if provider:
+        params["provider"] = provider
+    
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to get webhooks: {response.json()['detail']}")
+
+# Usage
+config = get_phone_webhooks("+14155551234")
+print(f"Voice: {config['voice_webhook_url']}")
+print(f"SMS: {config['sms_webhook_url']}")
+```
+
+### PHP
+
+```php
+<?php
+function getPhoneWebhooks($phoneNumber, $provider = null) {
+    $url = "https://api.burki.dev/phone-numbers/" . urlencode($phoneNumber) . "/webhooks";
+    
+    if ($provider) {
+        $url .= "?provider=" . urlencode($provider);
+    }
+    
+    $headers = ['Authorization: Bearer YOUR_API_KEY'];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("Failed to get webhooks: " . $response);
+    }
+}
+
+// Usage
+$config = getPhoneWebhooks('+14155551234');
+echo "Voice: " . $config['voice_webhook_url'] . "\n";
+echo "SMS: " . $config['sms_webhook_url'] . "\n";
+?>
+```
+
+## Batch Operations
+
+### Check Multiple Numbers
+
+```javascript
+async function auditPhoneWebhooks(phoneNumbers) {
+  const results = [];
+  
+  for (const phoneNumber of phoneNumbers) {
+    try {
+      const config = await getPhoneWebhooks(phoneNumber);
+      results.push({
+        phoneNumber,
+        provider: config.provider,
+        voiceWebhook: config.voice_webhook_url,
+        smsWebhook: config.sms_webhook_url,
+        status: 'success'
+      });
+    } catch (error) {
+      results.push({
+        phoneNumber,
+        status: 'error',
+        error: error.message
+      });
+    }
+  }
+  
+  return results;
+}
+
+// Usage
+const phoneNumbers = ['+14155551234', '+12125555678', '+13105559999'];
+const audit = await auditPhoneWebhooks(phoneNumbers);
+console.table(audit);
+```
+
+### Environment Comparison
+
+```python
+def compare_webhook_environments(phone_numbers):
+    """Compare webhook environments across numbers"""
+    
+    environments = {}
+    
+    for phone_number in phone_numbers:
+        try:
+            config = get_phone_webhooks(phone_number)
+            voice_url = config.get('voice_webhook_url', '')
+            
+            # Extract environment from URL
+            if 'staging' in voice_url:
+                env = 'staging'
+            elif 'production' in voice_url or 'api' in voice_url:
+                env = 'production'
+            else:
+                env = 'unknown'
+            
+            if env not in environments:
+                environments[env] = []
+            environments[env].append(phone_number)
+            
+        except Exception as e:
+            print(f"Error checking {phone_number}: {e}")
+    
+    return environments
+```
+
+## Monitoring and Alerting
+
+### Webhook Health Check
+
+```python
+import requests
+from urllib.parse import urlparse
+
+def health_check_webhooks(phone_numbers):
+    """Check if webhook URLs are accessible"""
+    
+    issues = []
+    
+    for phone_number in phone_numbers:
+        config = get_phone_webhooks(phone_number)
+        
+        for webhook_type in ['voice_webhook_url', 'sms_webhook_url']:
+            url = config.get(webhook_type)
+            
+            if url and not url.startswith('Configured'):
+                try:
+                    response = requests.get(url, timeout=5)
+                    if response.status_code >= 400:
+                        issues.append({
+                            'phone_number': phone_number,
+                            'webhook_type': webhook_type,
+                            'url': url,
+                            'status_code': response.status_code
+                        })
+                except Exception as e:
+                    issues.append({
+                        'phone_number': phone_number,
+                        'webhook_type': webhook_type,
+                        'url': url,
+                        'error': str(e)
+                    })
+    
+    return issues
+```
+
+### Configuration Drift Detection
+
+```javascript
+async function detectConfigDrift(phoneNumbers, expectedWebhooks) {
+  const drifts = [];
+  
+  for (const phoneNumber of phoneNumbers) {
+    const current = await getPhoneWebhooks(phoneNumber);
+    const expected = expectedWebhooks[phoneNumber];
+    
+    if (!expected) continue;
+    
+    if (current.voice_webhook_url !== expected.voice) {
+      drifts.push({
+        phoneNumber,
+        type: 'voice',
+        current: current.voice_webhook_url,
+        expected: expected.voice
+      });
+    }
+    
+    if (current.sms_webhook_url !== expected.sms) {
+      drifts.push({
+        phoneNumber,
+        type: 'sms',
+        current: current.sms_webhook_url,
+        expected: expected.sms
+      });
+    }
+  }
+  
+  return drifts;
+}
+```
+
+## Best Practices
+
+### Regular Auditing
+
+1. **Daily Checks**: Verify webhook configurations daily
+2. **Environment Validation**: Ensure correct environment URLs
+3. **Accessibility Testing**: Test webhook URL accessibility
+4. **Provider Sync**: Compare with provider console settings
+
+### Error Handling
+
+```python
+def safe_get_webhooks(phone_number, retries=3):
+    """Get webhooks with retry logic"""
+    
+    for attempt in range(retries):
+        try:
+            return get_phone_webhooks(phone_number)
+        except Exception as e:
+            if attempt == retries - 1:
+                raise
+            time.sleep(2 ** attempt)  # Exponential backoff
+```
+
+### Caching Strategy
+
+```javascript
+class WebhookConfigCache {
+  constructor(ttl = 300000) { // 5 minutes TTL
+    this.cache = new Map();
+    this.ttl = ttl;
+  }
+  
+  async get(phoneNumber) {
+    const cached = this.cache.get(phoneNumber);
+    
+    if (cached && Date.now() - cached.timestamp < this.ttl) {
+      return cached.data;
+    }
+    
+    const fresh = await getPhoneWebhooks(phoneNumber);
+    this.cache.set(phoneNumber, {
+      data: fresh,
+      timestamp: Date.now()
+    });
+    
+    return fresh;
+  }
+}
+```
+
+This endpoint is essential for maintaining visibility into your webhook configurations and ensuring your phone numbers are properly connected to your application's event handling endpoints.
