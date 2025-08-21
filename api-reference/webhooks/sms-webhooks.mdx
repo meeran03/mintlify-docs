@@ -1,0 +1,226 @@
+---
+title: "SMS Webhooks"
+description: "Configure SMS webhook endpoints to receive SMS events"
+---
+
+## Overview
+
+When an SMS is received by your assistant's phone number, Burki can forward the SMS data to your configured webhook URL. This allows you to integrate SMS functionality into your applications.
+
+## Webhook Configuration
+
+To receive SMS webhooks, configure the `sms_webhook_url` field when creating or updating an assistant. For Twilio, you can also optionally specify a `messaging_service_sid`:
+
+<CodeGroup>
+
+```javascript Node.js
+const response = await fetch('https://api.burki.ai/api/v1/assistants', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: "SMS Assistant",
+    sms_webhook_url: "https://your-app.com/webhooks/sms",
+    messaging_service_sid: "MG1234567890abcdef1234567890abcdef", // Optional: Twilio Messaging Service SID
+    // ... other assistant configuration
+  })
+});
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.burki.ai/api/v1/assistants',
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'name': 'SMS Assistant',
+        'sms_webhook_url': 'https://your-app.com/webhooks/sms',
+        'messaging_service_sid': 'MG1234567890abcdef1234567890abcdef',  # Optional: Twilio Messaging Service SID
+        # ... other assistant configuration
+    }
+)
+```
+
+```bash cURL
+curl -X POST "https://api.burki.ai/api/v1/assistants" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "SMS Assistant",
+    "sms_webhook_url": "https://your-app.com/webhooks/sms"
+  }'
+```
+
+</CodeGroup>
+
+## Webhook Payload
+
+When an SMS is received, Burki sends a POST request to your `sms_webhook_url` with the following payload:
+
+```json
+{
+  "type": "sms_received",
+  "timestamp": "2024-01-15T10:30:00.123456",
+  "data": {
+    "message_id": "SM123abc...",
+    "from": "+1234567890",
+    "to": "+1987654321", 
+    "body": "Hello, this is a test message",
+    "media_urls": ["https://example.com/image.jpg"],
+    "provider": "twilio"
+  }
+}
+```
+
+### Payload Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | string | Always `"sms_received"` for incoming SMS |
+| `timestamp` | string | ISO 8601 timestamp when the webhook was sent |
+| `data.message_id` | string | Unique identifier for the SMS message |
+| `data.from` | string | Phone number that sent the SMS (E.164 format) |
+| `data.to` | string | Phone number that received the SMS (your assistant's number) |
+| `data.body` | string | Text content of the SMS message |
+| `data.media_urls` | array | URLs of any media attachments (MMS) |
+| `data.provider` | string | Telephony provider (`"twilio"` or `"telnyx"`) |
+
+## Provider Support
+
+SMS webhooks work with both supported telephony providers:
+
+- **Twilio**: Receives webhooks at `/twilio-sms-webhook`
+- **Telnyx**: Receives webhooks at `/telnyx-webhook` (shared with voice events)
+
+The payload format is normalized between providers, so your webhook handler works regardless of the underlying provider.
+
+## Webhook Requirements
+
+### Response
+
+Your webhook endpoint should respond with:
+- **Status Code**: 200 (OK)
+- **Response Time**: Under 10 seconds
+- **Body**: Any response body is acceptable
+
+### Security
+
+- **HTTPS Required**: Your webhook URL must use HTTPS
+- **User-Agent**: Webhooks are sent with `User-Agent: Burki-SMS-Webhook/1.0`
+- **Timeout**: Requests timeout after 10 seconds
+
+## Example Implementation
+
+<CodeGroup>
+
+```javascript Express.js
+app.post('/webhooks/sms', express.json(), (req, res) => {
+  const { type, timestamp, data } = req.body;
+  
+  if (type === 'sms_received') {
+    console.log(`SMS from ${data.from} to ${data.to}: ${data.body}`);
+    
+    // Process the SMS message
+    if (data.body.toLowerCase().includes('help')) {
+      // Send response SMS via Burki API
+      sendResponseSMS(data.from, "How can I help you?");
+    }
+    
+    // Handle media attachments
+    if (data.media_urls.length > 0) {
+      console.log(`Received ${data.media_urls.length} media attachments`);
+    }
+  }
+  
+  res.status(200).send('OK');
+});
+```
+
+```python Flask
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route('/webhooks/sms', methods=['POST'])
+def handle_sms_webhook():
+    data = request.json
+    
+    if data['type'] == 'sms_received':
+        sms_data = data['data']
+        print(f"SMS from {sms_data['from']} to {sms_data['to']}: {sms_data['body']}")
+        
+        # Process the SMS message
+        if 'help' in sms_data['body'].lower():
+            # Send response SMS via Burki API
+            send_response_sms(sms_data['from'], "How can I help you?")
+        
+        # Handle media attachments
+        if sms_data['media_urls']:
+            print(f"Received {len(sms_data['media_urls'])} media attachments")
+    
+    return jsonify({'status': 'ok'}), 200
+```
+
+```php PHP
+<?php
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
+
+if ($data['type'] === 'sms_received') {
+    $smsData = $data['data'];
+    error_log("SMS from {$smsData['from']} to {$smsData['to']}: {$smsData['body']}");
+    
+    // Process the SMS message
+    if (stripos($smsData['body'], 'help') !== false) {
+        // Send response SMS via Burki API
+        sendResponseSMS($smsData['from'], "How can I help you?");
+    }
+    
+    // Handle media attachments
+    if (!empty($smsData['media_urls'])) {
+        error_log("Received " . count($smsData['media_urls']) . " media attachments");
+    }
+}
+
+http_response_code(200);
+echo "OK";
+?>
+```
+
+</CodeGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+1. **No webhooks received**
+   - Verify `sms_webhook_url` is set on your assistant
+   - Check that your endpoint is publicly accessible
+   - Ensure your server responds with 200 status
+
+2. **Webhooks timing out**
+   - Your endpoint must respond within 10 seconds
+   - Consider processing SMS asynchronously
+
+3. **Missing SMS messages**
+   - Verify your assistant's phone number is correctly configured
+   - Check that SMS capabilities are enabled on your phone number
+
+### Testing
+
+You can test your SMS webhook by:
+1. Sending an SMS to your assistant's phone number
+2. Checking your webhook endpoint logs
+3. Using the live transcript WebSocket to monitor events
+
+## Next Steps
+
+- [Send SMS Messages](/api-reference/messaging/send-sms)
+- [Phone Number Management](/api-reference/phone-numbers/update-webhooks)
+- [Assistant Configuration](/api-reference/assistants/create)

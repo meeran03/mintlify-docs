@@ -93,6 +93,8 @@ This section covers the core AI models for language, speech-to-text, and text-to
   - `api_key` (string): Your Telnyx API Key.
   - `connection_id` (string): Your Telnyx Connection ID for Call Control Application.
 - `webhook_url` (string, optional): A URL to send call event webhooks to.
+- `sms_webhook_url` (string, optional): A URL to send SMS event webhooks to.
+- `messaging_service_sid` (string, optional): Twilio Messaging Service SID for SMS handling. If not provided, uses the default from environment variables.
 
 **Telephony Provider Selection:**
 - If both `twilio_config` and `telnyx_config` are provided, Telnyx takes priority.

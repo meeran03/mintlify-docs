@@ -1,405 +1,109 @@
 ---
-title: 'Update Phone Number Webhooks'
-openapi: 'PUT /phone-numbers/webhooks'
+title: "Update Phone Number Webhooks"
+openapi: "PUT /api/v1/phone-numbers/webhooks"
 ---
 
-This endpoint allows you to update the voice and/or SMS webhook URLs for a phone number. Webhooks are essential for receiving real-time notifications about calls and messages for your phone numbers.
+## Overview
 
-## How It Works
+Update voice webhook URLs and optionally disable SMS webhooks for a phone number. 
 
-1. **Provider Detection**: The system automatically detects which provider owns the number
-2. **Webhook Configuration**: Updates voice and/or SMS webhook URLs at the provider level
-3. **Immediate Effect**: Changes take effect immediately for new calls and messages
-4. **Verification**: Returns confirmation of which webhooks were successfully updated
-
-<Info>
-**Flexible Updates**: You can update just the voice webhook, just the SMS webhook, or both at the same time. The system will update only the webhooks you specify.
-</Info>
+**Important**: SMS webhook URLs are managed automatically through assistant assignment. This endpoint only allows you to disable SMS webhooks when needed.
 
 ## Request Body
 
-The request body is a JSON object containing webhook update details.
+- `phone_number` (string, **required**): The phone number to update in E.164 format (e.g., `+1234567890`)
+- `voice_webhook_url` (string, optional): URL for voice call webhooks
+- `disable_sms` (boolean, optional): Set to `true` to disable SMS webhooks. Default: `false`
+- `enable_sms` (boolean, optional): Set to `true` to enable SMS webhooks based on assigned assistant. Default: `false`
+- `provider` (string, optional): Provider (`twilio` or `telnyx`). Auto-detected if not provided
 
-- `phone_number` (string, **required**): Phone number to update webhooks for in E.164 format
-- `voice_webhook_url` (string, optional): URL to receive voice call events
-- `sms_webhook_url` (string, optional): URL to receive SMS/MMS events  
-- `provider` (string, optional): Provider (`"twilio"` or `"telnyx"`). Auto-detected if not provided
+**Note**: You cannot set both `disable_sms` and `enable_sms` to `true` in the same request.
 
-<Note>
-**At least one webhook URL** (voice or SMS) must be provided in the request.
-</Note>
+## SMS Webhook Management
 
-```json Request
+SMS webhooks are automatically configured when you assign a phone number to an assistant with an `sms_webhook_url`. Use this endpoint to temporarily disable SMS handling:
+
+### Disabling SMS Webhooks
+
+```json Request - Disable SMS
 {
-  "phone_number": "+14155551234",
-  "voice_webhook_url": "https://your-app.com/webhooks/voice",
-  "sms_webhook_url": "https://your-app.com/webhooks/sms",
-  "provider": "twilio"
+  "phone_number": "+15551234567",
+  "disable_sms": true
+}
+```
+
+**What happens when SMS is disabled:**
+- **Twilio**: Sets SMS webhook to `https://demo.twilio.com/welcome/sms/reply`
+- **Telnyx**: Sets SMS webhook to empty URL
+- **Result**: Incoming SMS messages are ignored
+
+### Re-enabling SMS Webhooks
+
+```json Request - Enable SMS
+{
+  "phone_number": "+15551234567",
+  "enable_sms": true
+}
+```
+
+**What happens when SMS is enabled:**
+- **Prerequisites**: Phone number must be assigned to an assistant with `sms_webhook_url` configured
+- **Twilio**: Sets SMS webhook to `/twilio-sms-webhook` and enables messaging service
+- **Telnyx**: Sets SMS webhook to `/telnyx-webhook`
+- **Result**: SMS messages are forwarded to assistant's `sms_webhook_url`
+
+### Updating Voice Webhooks
+
+```json Request - Update Voice Webhook
+{
+  "phone_number": "+15551234567",
+  "voice_webhook_url": "https://your-app.com/voice-webhook"
+}
+```
+
+### Combined Updates
+
+```json Request - Update Voice + Disable SMS
+{
+  "phone_number": "+15551234567",
+  "voice_webhook_url": "https://your-app.com/voice-webhook",
+  "disable_sms": true
+}
+```
+
+```json Request - Update Voice + Enable SMS
+{
+  "phone_number": "+15551234567",
+  "voice_webhook_url": "https://your-app.com/voice-webhook",
+  "enable_sms": true
 }
 ```
 
 ## Response
 
-A successful request returns a `200 OK` status with update confirmation.
-
 ```json Response
 {
   "success": true,
-  "phone_number": "+14155551234",
+  "phone_number": "+15551234567",
   "provider": "twilio",
   "updated_webhooks": {
-    "voice": "https://your-app.com/webhooks/voice",
-    "sms": "https://your-app.com/webhooks/sms"
+    "voice": "https://your-app.com/voice-webhook",
+    "sms": "disabled (demo URL)"
   },
-  "message": "Successfully updated 2 webhook(s) for +14155551234 via twilio"
-}
-```
-
-## Response Fields
-
-- `success` (boolean): Whether the update completed successfully
-- `phone_number` (string): The phone number that was updated
-- `provider` (string): Provider used for the update ("twilio" or "telnyx")
-- `updated_webhooks` (object): Map of webhook types to their new URLs
-  - `voice` (string): New voice webhook URL (if updated)
-  - `sms` (string): New SMS webhook URL (if updated)
-- `message` (string): Human-readable confirmation message
-
-## Error Responses
-
-### 400 Bad Request
-
-Returned when the request contains invalid data.
-
-```json
-{
-  "detail": "At least one webhook URL (voice_webhook_url or sms_webhook_url) must be provided"
-}
-```
-
-Common causes:
-- No webhook URLs provided
-- Invalid phone number format (must be E.164)
-- Invalid provider value
-
-### 404 Not Found
-
-Returned when the phone number is not found.
-
-```json
-{
-  "detail": "Phone number +14155551234 not found in database"
-}
-```
-
-### 500 Internal Server Error
-
-Returned when the webhook update fails at the provider level.
-
-```json
-{
-  "detail": "Failed to update webhooks for +14155551234 via twilio"
+  "message": "Successfully updated 2 webhook(s) for +15551234567 via twilio"
 }
 ```
 
 ## Use Cases
 
-### Update Voice Webhook Only
+1. **Voice webhook updates** - Change where voice call events are sent
+2. **Temporary SMS disable** - Disable SMS during maintenance or testing
+3. **Emergency SMS disable** - Quickly stop SMS processing if needed
+4. **Re-enable SMS after maintenance** - Restore SMS functionality without reassigning phone numbers
 
-Update just the voice webhook URL:
+## Notes
 
-```json
-{
-  "phone_number": "+14155551234",
-  "voice_webhook_url": "https://your-app.com/voice-handler"
-}
-```
-
-### Update SMS Webhook Only
-
-Update just the SMS webhook URL:
-
-```json
-{
-  "phone_number": "+14155551234", 
-  "sms_webhook_url": "https://your-app.com/sms-handler"
-}
-```
-
-### Update Both Webhooks
-
-Update both voice and SMS webhooks:
-
-```json
-{
-  "phone_number": "+14155551234",
-  "voice_webhook_url": "https://your-app.com/voice",
-  "sms_webhook_url": "https://your-app.com/sms"
-}
-```
-
-### Environment-Based Updates
-
-Update webhooks when deploying to different environments:
-
-```json
-{
-  "phone_number": "+14155551234",
-  "voice_webhook_url": "https://staging.your-app.com/webhooks/voice",
-  "sms_webhook_url": "https://staging.your-app.com/webhooks/sms"
-}
-```
-
-## Provider Differences
-
-### Twilio Webhook Configuration
-
-- **Separate URLs**: Voice and SMS can have completely different webhook URLs
-- **Method Support**: Both GET and POST methods supported (POST recommended)
-- **Immediate Effect**: Changes take effect immediately
-- **Fallback URLs**: Supports fallback URLs for webhook failures
-
-### Telnyx Webhook Configuration
-
-- **Connection-Level**: Webhooks are typically configured at the Connection/Application level
-- **Unified Webhooks**: Voice and SMS often share the same webhook endpoint
-- **Call Control**: Uses Call Control Application for voice webhooks
-- **Messaging Profile**: Uses Messaging Profile for SMS webhooks
-
-<Warning>
-**Provider Behavior**: Telnyx webhook configuration is more complex as it involves Connection-level settings. The API handles this complexity for you, but be aware that changes may affect other numbers on the same Connection.
-</Warning>
-
-## Webhook Event Types
-
-### Voice Webhook Events
-
-Your voice webhook will receive events for:
-- **Call Initiated**: When a call starts
-- **Call Answered**: When the call is answered
-- **Call Ended**: When the call completes
-- **Call Failed**: When the call fails to connect
-- **Recording Events**: Recording start/stop/completion
-
-### SMS Webhook Events
-
-Your SMS webhook will receive events for:
-- **Message Received**: Incoming SMS/MMS
-- **Message Status**: Delivery status updates
-- **Message Failed**: Failed delivery notifications
-
-## Integration Examples
-
-### Node.js
-
-```javascript
-const axios = require('axios');
-
-async function updatePhoneWebhooks(phoneNumber, voiceUrl, smsUrl) {
-  try {
-    const response = await axios.put('https://api.burki.dev/phone-numbers/webhooks', {
-      phone_number: phoneNumber,
-      voice_webhook_url: voiceUrl,
-      sms_webhook_url: smsUrl
-    }, {
-      headers: {
-        'Authorization': 'Bearer YOUR_API_KEY',
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    console.log(`Updated webhooks for ${phoneNumber}`);
-    return response.data;
-  } catch (error) {
-    console.error('Webhook update failed:', error.response.data);
-    throw error;
-  }
-}
-
-// Usage
-await updatePhoneWebhooks(
-  '+14155551234',
-  'https://your-app.com/voice',
-  'https://your-app.com/sms'
-);
-```
-
-### Python
-
-```python
-import requests
-
-def update_phone_webhooks(phone_number, voice_url=None, sms_url=None):
-    url = "https://api.burki.dev/phone-numbers/webhooks"
-    headers = {
-        "Authorization": "Bearer YOUR_API_KEY",
-        "Content-Type": "application/json"
-    }
-    
-    payload = {"phone_number": phone_number}
-    if voice_url:
-        payload["voice_webhook_url"] = voice_url
-    if sms_url:
-        payload["sms_webhook_url"] = sms_url
-    
-    response = requests.put(url, json=payload, headers=headers)
-    
-    if response.status_code == 200:
-        return response.json()
-    else:
-        raise Exception(f"Webhook update failed: {response.json()['detail']}")
-
-# Usage
-result = update_phone_webhooks(
-    phone_number="+14155551234",
-    voice_url="https://your-app.com/voice",
-    sms_url="https://your-app.com/sms"
-)
-```
-
-### PHP
-
-```php
-<?php
-function updatePhoneWebhooks($phoneNumber, $voiceUrl = null, $smsUrl = null) {
-    $url = 'https://api.burki.dev/phone-numbers/webhooks';
-    $headers = [
-        'Authorization: Bearer YOUR_API_KEY',
-        'Content-Type: application/json'
-    ];
-    
-    $data = ['phone_number' => $phoneNumber];
-    if ($voiceUrl) {
-        $data['voice_webhook_url'] = $voiceUrl;
-    }
-    if ($smsUrl) {
-        $data['sms_webhook_url'] = $smsUrl;
-    }
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    if ($httpCode === 200) {
-        return json_decode($response, true);
-    } else {
-        throw new Exception("Webhook update failed: " . $response);
-    }
-}
-
-// Usage
-$result = updatePhoneWebhooks('+14155551234', 'https://your-app.com/voice', 'https://your-app.com/sms');
-?>
-```
-
-## Best Practices
-
-### Webhook URL Requirements
-
-1. **HTTPS Only**: All webhook URLs must use HTTPS for security
-2. **Public Accessibility**: URLs must be publicly accessible from the internet
-3. **Fast Response**: Respond to webhooks within 5-10 seconds
-4. **Idempotent**: Handle duplicate webhook deliveries gracefully
-
-### Error Handling
-
-```javascript
-async function safeWebhookUpdate(phoneNumber, webhooks) {
-  try {
-    return await updatePhoneWebhooks(phoneNumber, webhooks.voice, webhooks.sms);
-  } catch (error) {
-    if (error.response?.status === 404) {
-      console.log('Phone number not found, may need to sync from provider');
-    } else if (error.response?.status === 500) {
-      console.log('Provider error, will retry later');
-      // Implement retry logic
-    }
-    throw error;
-  }
-}
-```
-
-### Testing Webhooks
-
-1. **Local Development**: Use ngrok or similar tools to expose local endpoints
-2. **Staging Environment**: Test webhook changes in staging first
-3. **Webhook Validation**: Verify webhook signatures where supported
-4. **Monitoring**: Set up alerts for webhook delivery failures
-
-### Deployment Strategy
-
-```python
-def deploy_webhook_updates(phone_numbers, environment):
-    """Safely deploy webhook updates across multiple numbers"""
-    
-    base_url = f"https://{environment}.your-app.com"
-    
-    for phone_number in phone_numbers:
-        try:
-            result = update_phone_webhooks(
-                phone_number=phone_number,
-                voice_url=f"{base_url}/webhooks/voice",
-                sms_url=f"{base_url}/webhooks/sms"
-            )
-            print(f"✅ Updated {phone_number}")
-        except Exception as e:
-            print(f"❌ Failed to update {phone_number}: {e}")
-```
-
-## Security Considerations
-
-### Webhook Authentication
-
-1. **IP Whitelisting**: Restrict webhook calls to provider IP ranges
-2. **Signature Verification**: Validate webhook signatures when provided
-3. **HTTPS Enforcement**: Never use HTTP for webhook URLs
-4. **Rate Limiting**: Implement rate limiting on webhook endpoints
-
-### Access Control
-
-1. **API Key Security**: Protect your API keys used for webhook updates
-2. **Audit Logging**: Log all webhook URL changes
-3. **Approval Process**: Require approval for production webhook changes
-4. **Rollback Plan**: Have procedures to quickly revert webhook changes
-
-## Troubleshooting
-
-### Common Issues
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| "Phone number not found" | Number not in database | Sync numbers from provider |
-| "Webhook update failed" | Provider API error | Check provider account status |
-| "Invalid URL format" | Malformed webhook URL | Verify URL format and accessibility |
-| "SSL certificate error" | HTTPS certificate issue | Fix SSL configuration |
-
-### Provider-Specific Issues
-
-**Twilio**:
-- Webhook URL must respond within 15 seconds
-- Maximum 5 redirect hops allowed
-- HTTP status codes 200-299 considered success
-
-**Telnyx**:
-- Webhooks configured at Connection level
-- May affect multiple numbers on same Connection
-- Call Control Applications required for voice webhooks
-
-### Monitoring
-
-Set up monitoring for:
-- Webhook update success/failure rates
-- Response times from your webhook endpoints
-- Provider webhook delivery status
-- Changes in webhook configuration
-
-<Info>
-**Testing Tip**: After updating webhooks, make a test call or send a test SMS to verify the new webhooks are working correctly.
-</Info>
+- At least one of `voice_webhook_url`, `disable_sms`, or `enable_sms` must be provided
+- Cannot set both `disable_sms` and `enable_sms` to `true` in the same request
+- To enable SMS, the phone number must be assigned to an assistant with `sms_webhook_url` configured
+- Voice webhooks can be updated independently of SMS webhook state

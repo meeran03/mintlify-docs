@@ -179,6 +179,7 @@
             "group": "Webhooks & System",
             "pages": [
               "api-reference/webhooks/twilio-twiml",
+              "api-reference/webhooks/sms-webhooks",
               "api-reference/webhooks/recording-status",
               "api-reference/webhooks/initiate-call"
             ]
