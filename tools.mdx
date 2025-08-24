@@ -1,14 +1,40 @@
 ---
-title: Tools Configuration
+title: Tools & Custom Actions
 ---
 
 <Callout type="info">
-Tools let your assistant perform actions during calls—like ending conversations gracefully or transferring to human agents. Configure when and how these tools should be used.
+Tools empower your AI assistants to perform real actions during calls—from built-in actions like call transfers to custom integrations with your APIs, Python functions, and AWS Lambda services.
 </Callout>
 
 ---
 
-## Available Tools
+## Tool Types Overview
+
+Burki Voice AI supports three main categories of tools:
+
+<CardGroup cols={3}>
+  <Card title="🔧 Built-in Tools" icon="wrench">
+    **Ready-to-use actions**
+    
+    Call transfers, graceful endings, and essential call management features.
+  </Card>
+  
+  <Card title="🛠️ Custom Tools" icon="code">
+    **Your integrations**
+    
+    Connect to APIs, run Python code, or trigger Lambda functions during calls.
+  </Card>
+  
+  <Card title="📚 Tool Library" icon="library">
+    **Reusable & Shareable**
+    
+    Create once, use across multiple assistants. Build your organization's tool ecosystem.
+  </Card>
+</CardGroup>
+
+---
+
+## Built-in Tools
 
 <Accordion title="End Call Tool">
 **What it does:** Allows the assistant to end calls automatically when appropriate.
@@ -55,21 +81,21 @@ Make sure transfer numbers are valid and staffed. Failed transfers create poor c
 </Accordion>
 
 <Accordion title="Custom Tools">
-**What they are:** Advanced tools you can define for specific use cases.
+**What they are:** Powerful, reusable integrations that extend your assistant's capabilities.
 
-**Use Cases:**
-- Database lookups
-- API integrations
-- Custom business logic
-- External system interactions
+**Three Types Available:**
+1. **Endpoint Tools:** Call external APIs during conversations
+2. **Python Function Tools:** Execute custom Python code with full library access
+3. **AWS Lambda Tools:** Trigger serverless functions for scalable processing
 
-**Configuration:**
-- **Tool Definition:** JSON schema defining the tool
-- **Parameters:** Input parameters the tool accepts
-- **Description:** How the AI should use the tool
+**Key Benefits:**
+- **Reusable:** Create once, use across multiple assistants
+- **Secure:** Built-in sandboxing and input validation
+- **Flexible:** Support any API, database, or business logic
+- **Scalable:** From simple lookups to complex workflows
 
-<Callout type="note">
-Custom tools require development work to implement the actual functionality. Contact your development team for custom tool implementation.
+<Callout type="tip">
+Custom tools are managed through the **Tools Library** in your dashboard. Create, test, and assign tools to assistants with a few clicks.
 </Callout>
 </Accordion>
 
@@ -175,4 +201,497 @@ customer says goodbye, issue resolved, request completed, complaint escalated
 
 <Callout type="tip">
 Use call recordings and transcripts to analyze tool usage and improve configurations.
-</Callout> 
+</Callout>
+
+---
+
+## Custom Tools Deep Dive
+
+### Creating Custom Tools
+
+Custom tools are created and managed through the **Tools Library** in your dashboard. Each tool is independent and can be assigned to multiple assistants.
+
+<Tabs>
+  <Tab title="Endpoint Tools">
+    
+    ### What are Endpoint Tools?
+    
+    Endpoint tools allow your assistant to make HTTP requests to external APIs during conversations. Perfect for:
+    - CRM lookups
+    - Database queries
+    - Order status checks
+    - User authentication
+    - Third-party integrations
+    
+    ### Configuration
+    
+    ```json Example Tool Definition
+    {
+      "name": "get_customer_info",
+      "display_name": "Customer Information Lookup",
+      "description": "Look up customer information by phone number or email",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string",
+            "description": "Customer's phone number"
+          },
+          "email": {
+            "type": "string", 
+            "description": "Customer's email address"
+          }
+        },
+        "required": ["phone_number"]
+      }
+    }
+    ```
+    
+    ### Endpoint Configuration
+    
+    - **URL:** `https://api.yourcompany.com/customers/lookup`
+    - **Method:** GET, POST, PUT, DELETE
+    - **Headers:** Authentication, Content-Type, etc.
+    - **Authentication:** API keys, Bearer tokens, Basic auth
+    - **Timeout:** Maximum execution time (default: 30 seconds)
+    
+    <Callout type="tip">
+    Test your endpoint tools thoroughly. Failed API calls can interrupt conversations.
+    </Callout>
+    
+  </Tab>
+  <Tab title="Python Functions">
+    
+    ### What are Python Function Tools?
+    
+    Execute custom Python code during calls with access to popular libraries. Perfect for:
+    - Complex calculations
+    - Data processing
+    - Business logic
+    - API integrations with libraries
+    - File operations
+    
+    ### Available Libraries
+    
+    Pre-installed libraries include:
+    - `requests` - HTTP requests
+    - `pandas` - Data manipulation
+    - `numpy` - Numerical computing
+    - `datetime` - Date/time operations
+    - `json` - JSON processing
+    - `re` - Regular expressions
+    - `math` - Mathematical functions
+    
+    ### Example Python Tool
+    
+    ```python
+    def calculate_monthly_payment(principal, rate, years):
+        """Calculate monthly loan payment"""
+        monthly_rate = rate / 100 / 12
+        num_payments = years * 12
+        
+        if monthly_rate == 0:
+            return principal / num_payments
+        
+        payment = principal * (monthly_rate * (1 + monthly_rate) ** num_payments) / \
+                 ((1 + monthly_rate) ** num_payments - 1)
+        
+        return round(payment, 2)
+    
+    # Your function should return a dictionary
+    return {
+        "monthly_payment": calculate_monthly_payment(
+            float(principal), 
+            float(annual_rate), 
+            int(loan_years)
+        ),
+        "total_paid": round(payment * years * 12, 2)
+    }
+    ```
+    
+    ### Security Features
+    
+    - **Sandboxed Execution:** Code runs in isolated environment
+    - **Timeout Protection:** Maximum execution time limits
+    - **Resource Limits:** Memory and CPU usage controls
+    - **Input Validation:** Parameter validation before execution
+    
+    <Callout type="warning">
+    Python tools are sandboxed but avoid executing untrusted code. Always validate inputs.
+    </Callout>
+    
+  </Tab>
+  <Tab title="AWS Lambda">
+    
+    ### What are Lambda Tools?
+    
+    Trigger AWS Lambda functions during calls for serverless, scalable processing. Perfect for:
+    - Heavy computations
+    - Database operations
+    - Machine learning inference
+    - Integration with AWS services
+    - Scalable business logic
+    
+    ### ✨ **Lambda Function Discovery**
+    
+    Burki Voice AI now includes **automatic function discovery** to make Lambda integration effortless:
+    
+    <Steps>
+      <Step title="Enter AWS Credentials">
+        Provide your AWS Access Key ID and Secret Access Key in the tool configuration form.
+      </Step>
+      <Step title="Select Region">
+        Choose the AWS region where your Lambda functions are deployed.
+      </Step>
+      <Step title="Discover Functions">
+        Click **"🔍 Discover Functions"** to automatically fetch all Lambda functions from your AWS account.
+      </Step>
+      <Step title="Browse & Select">
+        Choose from a visual list showing function names, descriptions, runtime, and memory configuration.
+      </Step>
+      <Step title="Auto-populate">
+        Tool details are automatically filled based on your function's metadata.
+      </Step>
+    </Steps>
+    
+    <Callout type="tip">
+    **Function Discovery Benefits:**
+    - 🔍 **No Guesswork**: See all available functions
+    - 📊 **Rich Metadata**: Runtime, memory, timeout info
+    - ✅ **Validation**: Ensures function exists before saving
+    - ⚡ **Speed**: Auto-fills description and details
+    - 🛡️ **Error Prevention**: Reduces typos and invalid names
+    </Callout>
+    
+    ### Configuration Options
+    
+    **Option 1: Function Discovery (Recommended)**
+    ```json Auto-discovered Function
+    {
+      "function_name": "customer-lookup-service",
+      "description": "Look up customer data by phone number",
+      "runtime": "python3.9",
+      "memory_size": 512,
+      "timeout": 30,
+      "aws_region": "us-east-1"
+    }
+    ```
+    
+    **Option 2: Manual Entry**
+    ```json Manual Configuration
+    {
+      "function_name": "customer-lookup-function",
+      "aws_region": "us-east-1", 
+      "invocation_type": "RequestResponse",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "description": "Unique customer identifier"
+          }
+        }
+      }
+    }
+    ```
+    
+    ### Authentication Setup
+    
+    Configure AWS credentials for function discovery and execution:
+    - **Access Key ID:** Your AWS access key
+    - **Secret Access Key:** Your AWS secret key  
+    - **Region:** AWS region containing your Lambda functions
+    
+    <Callout type="warning">
+    **Security Note:** Credentials are stored securely and encrypted. For production, consider using IAM roles for enhanced security.
+    </Callout>
+    
+    ### Lambda Function Requirements
+    
+    Your Lambda function should:
+    1. Accept parameters in the `event` object
+    2. Return a JSON-serializable response
+    3. Handle errors gracefully
+    4. Complete within timeout limits (default: 30 seconds)
+    
+    ```python Example Lambda Function
+    import json
+    import boto3
+    
+    def lambda_handler(event, context):
+        try:
+            customer_id = event.get('customer_id')
+            
+            # Your business logic here
+            customer_data = get_customer_from_db(customer_id)
+            
+            return {
+                'statusCode': 200,
+                'body': {
+                    'customer_name': customer_data['name'],
+                    'account_status': customer_data['status'],
+                    'last_order': customer_data['last_order_date']
+                }
+            }
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'body': {'error': str(e)}
+            }
+    ```
+    
+    ### Function Discovery Workflow
+    
+    The discovery process provides detailed function information:
+    
+    ```json Function Discovery Response
+    {
+      "functions": [
+        {
+          "function_name": "customer-lookup-service",
+          "description": "Look up customer data by phone number", 
+          "runtime": "python3.9",
+          "timeout": 30,
+          "memory_size": 512,
+          "code_size": 1024000,
+          "handler": "lambda_function.lambda_handler",
+          "version": "$LATEST",
+          "last_modified": "2024-01-15T10:30:00Z"
+        },
+        {
+          "function_name": "order-processing",
+          "description": "Process customer orders and payments",
+          "runtime": "nodejs18.x",
+          "timeout": 60,
+          "memory_size": 1024,
+          "handler": "index.handler"
+        }
+      ]
+    }
+    ```
+    
+    ### IAM Permissions Required
+    
+    For function discovery to work, your AWS credentials need the following permissions:
+    
+    ```json IAM Policy
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "lambda:ListFunctions",
+            "lambda:GetFunction", 
+            "lambda:GetFunctionConfiguration",
+            "lambda:InvokeFunction"
+          ],
+          "Resource": "*"
+        }
+      ]
+    }
+    ```
+    
+    <Callout type="note">
+    **Security Best Practice:** Create a dedicated IAM user for Burki Voice AI with minimal required permissions. Never use your root AWS credentials.
+    </Callout>
+    
+  </Tab>
+</Tabs>
+
+### Tool Testing & Validation
+
+Before deploying tools to production:
+
+<Accordion title="Testing Checklist">
+1. **Parameter Validation:**
+   - Test with valid parameters
+   - Test with invalid/missing parameters
+   - Verify parameter type conversion
+
+2. **Error Handling:**
+   - Network timeouts
+   - API errors (4xx, 5xx)
+   - Invalid responses
+   - Service unavailability
+
+3. **Performance:**
+   - Response times under load
+   - Timeout scenarios
+   - Rate limiting behavior
+
+4. **Security:**
+   - Input sanitization
+   - Authentication validation
+   - Data privacy compliance
+</Accordion>
+
+### Best Practices
+
+<Accordion title="Tool Design Best Practices">
+**Keep It Simple:**
+- One tool, one purpose
+- Clear, descriptive names
+- Minimal required parameters
+
+**Handle Errors Gracefully:**
+- Return meaningful error messages
+- Provide fallback responses
+- Log errors for debugging
+
+**Optimize Performance:**
+- Cache frequently accessed data
+- Use efficient APIs
+- Set appropriate timeouts
+
+**Security First:**
+- Validate all inputs
+- Use secure authentication
+- Follow data privacy rules
+- Audit tool usage regularly
+</Accordion>
+
+### Tool Assignment & Management
+
+<Accordion title="Managing Tools Across Assistants">
+**Tool Library Workflow:**
+1. Create tools in the Tools Library
+2. Test tools with sample data
+3. Assign tools to specific assistants
+4. Monitor usage and performance
+5. Update tools as needed
+
+**Assignment Benefits:**
+- **Reusability:** Use the same tool across multiple assistants
+- **Consistency:** Standardize integrations across your organization
+- **Maintenance:** Update tools in one place, apply everywhere
+- **Governance:** Control which assistants can use specific tools
+
+**Usage Analytics:**
+- Track tool execution frequency
+- Monitor success/failure rates
+- Analyze performance metrics
+- Identify optimization opportunities
+</Accordion>
+
+---
+
+## Tool Integration Examples
+
+<Accordion title="Customer Service Use Cases">
+
+### CRM Integration
+```json
+{
+  "name": "lookup_customer",
+  "tool_type": "endpoint",
+  "endpoint_url": "https://api.salesforce.com/services/data/v52.0/query",
+  "description": "Look up customer information from Salesforce CRM"
+}
+```
+
+**Use Case:** Assistant can instantly access customer history, preferences, and previous interactions during calls.
+
+### Order Status Check
+```python
+def get_order_status(order_number):
+    """Look up order status from internal database"""
+    import requests
+    
+    response = requests.get(f"https://internal-api.company.com/orders/{order_number}")
+    order_data = response.json()
+    
+    return {
+        "status": order_data["status"],
+        "estimated_delivery": order_data["delivery_date"],
+        "tracking_number": order_data["tracking"]
+    }
+```
+
+**Use Case:** Customers can get real-time order updates without transferring to human agents.
+
+</Accordion>
+
+<Accordion title="Sales & Lead Qualification">
+
+### Lead Scoring
+```json
+{
+  "name": "calculate_lead_score",
+  "tool_type": "lambda",
+  "function_name": "lead-scoring-ml-model",
+  "description": "Calculate lead score using ML model"
+}
+```
+
+**Use Case:** Assistant gathers information and provides real-time lead scoring to prioritize follow-ups.
+
+### Product Recommendations
+```python
+def get_product_recommendations(customer_profile, budget):
+    """Generate personalized product recommendations"""
+    # Business logic for recommendations
+    recommendations = analyze_customer_preferences(customer_profile, budget)
+    
+    return {
+        "recommended_products": recommendations,
+        "reasoning": "Based on your preferences and budget",
+        "next_steps": "Schedule a demo call"
+    }
+```
+
+**Use Case:** Provide personalized product suggestions during sales calls.
+
+</Accordion>
+
+<Accordion title="Technical Support">
+
+### System Status Check
+```json
+{
+  "name": "check_system_status",
+  "tool_type": "endpoint", 
+  "endpoint_url": "https://status-api.company.com/health",
+  "description": "Check if customer's systems are experiencing issues"
+}
+```
+
+**Use Case:** Proactively identify system issues before customers report them.
+
+### Troubleshooting Assistant
+```python
+def diagnose_connectivity_issue(ip_address, error_code):
+    """Diagnose network connectivity issues"""
+    import subprocess
+    import json
+    
+    # Run network diagnostics
+    ping_result = subprocess.run(['ping', '-c', '3', ip_address], 
+                               capture_output=True, text=True)
+    
+    return {
+        "connectivity": "good" if ping_result.returncode == 0 else "poor",
+        "recommended_action": get_action_for_error(error_code),
+        "escalate_to_tech": ping_result.returncode != 0
+    }
+```
+
+**Use Case:** Provide first-level technical diagnostics and troubleshooting.
+
+</Accordion>
+
+---
+
+## API Reference
+
+For programmatic tool management, see the API documentation:
+
+<CardGroup cols={2}>
+  <Card title="Tool Management API" href="/api-reference/tools/create" icon="api">
+    Create, update, and manage tools programmatically
+  </Card>
+  
+  <Card title="Tool Assignment API" href="/api-reference/tools/assign" icon="link">
+    Assign tools to assistants via API
+  </Card>
+</CardGroup> 

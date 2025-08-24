@@ -1,0 +1,409 @@
+---
+title: 'Assign Tool to Assistant'
+openapi: 'POST /api/v1/tools/{tool_id}/assign'
+---
+
+This endpoint assigns a tool to one or more assistants, making it available during their conversations. Tools can be assigned to multiple assistants simultaneously.
+
+### Path Parameters
+
+- `tool_id` (integer, **required**): The unique identifier of the tool to assign
+
+### Request Body
+
+```json Request
+{
+  "assistant_ids": [123, 456, 789],
+  "enabled": true
+}
+```
+
+### Request Fields
+
+- `assistant_ids` (array of integers, **required**): List of assistant IDs to assign the tool to
+- `enabled` (boolean, optional): Whether the tool is enabled for these assistants (default: `true`)
+
+### Response
+
+A successful request returns assignment details:
+
+```json Response
+{
+  "success": true,
+  "tool_id": 123,
+  "assignments": [
+    {
+      "assistant_id": 123,
+      "assistant_name": "Customer Service Bot",
+      "enabled": true,
+      "assigned_at": "2024-01-15T16:30:00Z"
+    },
+    {
+      "assistant_id": 456,
+      "assistant_name": "Sales Assistant",
+      "enabled": true,
+      "assigned_at": "2024-01-15T16:30:00Z"
+    },
+    {
+      "assistant_id": 789,
+      "assistant_name": "Technical Support",
+      "enabled": true,
+      "assigned_at": "2024-01-15T16:30:00Z"
+    }
+  ],
+  "message": "Tool successfully assigned to 3 assistants"
+}
+```
+
+### Single Assistant Assignment
+
+You can also assign a tool to a single assistant:
+
+```json Single Assignment Request
+{
+  "assistant_ids": [123],
+  "enabled": true
+}
+```
+
+```json Single Assignment Response
+{
+  "success": true,
+  "tool_id": 123,
+  "assignments": [
+    {
+      "assistant_id": 123,
+      "assistant_name": "Customer Service Bot",
+      "enabled": true,
+      "assigned_at": "2024-01-15T16:30:00Z"
+    }
+  ],
+  "message": "Tool successfully assigned to 1 assistant"
+}
+```
+
+### Error Responses
+
+**404 Not Found - Tool**
+```json
+{
+  "detail": "Tool with ID 123 not found"
+}
+```
+
+**404 Not Found - Assistant**
+```json
+{
+  "detail": "Assistant with ID 456 not found in your organization"
+}
+```
+
+**400 Bad Request - Already Assigned**
+```json
+{
+  "detail": "Tool is already assigned to assistant 123"
+}
+```
+
+**400 Bad Request - Empty Assignment**
+```json
+{
+  "detail": "assistant_ids cannot be empty"
+}
+```
+
+### Unassign Tool
+
+To unassign a tool from assistants, use the unassign endpoint:
+
+```bash Unassign Tool
+POST /api/v1/tools/{tool_id}/unassign
+```
+
+```json Unassign Request
+{
+  "assistant_ids": [123, 456]
+}
+```
+
+### List Tool Assignments
+
+Get all current assignments for a tool:
+
+```bash List Assignments
+GET /api/v1/tools/{tool_id}/assignments
+```
+
+```json Assignments Response
+{
+  "tool_id": 123,
+  "tool_name": "get_customer_info",
+  "assignments": [
+    {
+      "assistant_id": 123,
+      "assistant_name": "Customer Service Bot",
+      "enabled": true,
+      "assigned_at": "2024-01-15T16:30:00Z",
+      "usage_count": 45,
+      "last_used_at": "2024-01-15T18:15:00Z"
+    },
+    {
+      "assistant_id": 456,
+      "assistant_name": "Sales Assistant", 
+      "enabled": false,
+      "assigned_at": "2024-01-15T16:30:00Z",
+      "usage_count": 12,
+      "last_used_at": "2024-01-15T17:20:00Z"
+    }
+  ],
+  "total_assignments": 2
+}
+```
+
+### Integration Examples
+
+<Accordion title="Node.js Example">
+```javascript
+const axios = require('axios');
+
+async function assignToolToAssistants(toolId, assistantIds, enabled = true) {
+  try {
+    const response = await axios.post(`https://api.burki.dev/api/v1/tools/${toolId}/assign`, {
+      assistant_ids: assistantIds,
+      enabled: enabled
+    }, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Failed to assign tool:', error.response.data);
+    throw error;
+  }
+}
+
+async function unassignToolFromAssistants(toolId, assistantIds) {
+  try {
+    const response = await axios.post(`https://api.burki.dev/api/v1/tools/${toolId}/unassign`, {
+      assistant_ids: assistantIds
+    }, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Failed to unassign tool:', error.response.data);
+    throw error;
+  }
+}
+
+async function getToolAssignments(toolId) {
+  try {
+    const response = await axios.get(`https://api.burki.dev/api/v1/tools/${toolId}/assignments`, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Failed to get assignments:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage examples
+const result = await assignToolToAssistants(123, [456, 789]);
+const assignments = await getToolAssignments(123);
+await unassignToolFromAssistants(123, [456]);
+```
+</Accordion>
+
+<Accordion title="Python Example">
+```python
+import requests
+from typing import List, Dict, Any
+
+def assign_tool_to_assistants(
+    tool_id: int, 
+    assistant_ids: List[int], 
+    enabled: bool = True
+) -> Dict[str, Any]:
+    """Assign a tool to multiple assistants."""
+    url = f"https://api.burki.dev/api/v1/tools/{tool_id}/assign"
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "assistant_ids": assistant_ids,
+        "enabled": enabled
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to assign tool: {response.json()['detail']}")
+
+def unassign_tool_from_assistants(
+    tool_id: int, 
+    assistant_ids: List[int]
+) -> Dict[str, Any]:
+    """Unassign a tool from multiple assistants."""
+    url = f"https://api.burki.dev/api/v1/tools/{tool_id}/unassign"
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {"assistant_ids": assistant_ids}
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to unassign tool: {response.json()['detail']}")
+
+def get_tool_assignments(tool_id: int) -> Dict[str, Any]:
+    """Get all assignments for a tool."""
+    url = f"https://api.burki.dev/api/v1/tools/{tool_id}/assignments"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to get assignments: {response.json()['detail']}")
+
+# Usage examples
+result = assign_tool_to_assistants(123, [456, 789])
+assignments = get_tool_assignments(123)
+unassign_result = unassign_tool_from_assistants(123, [456])
+```
+</Accordion>
+
+<Accordion title="PHP Example">
+```php
+<?php
+function assignToolToAssistants($toolId, $assistantIds, $enabled = true) {
+    $url = "https://api.burki.dev/api/v1/tools/{$toolId}/assign";
+    $headers = [
+        'Authorization: Bearer YOUR_API_KEY',
+        'Content-Type: application/json'
+    ];
+    
+    $data = [
+        'assistant_ids' => $assistantIds,
+        'enabled' => $enabled
+    ];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("Failed to assign tool: " . $response);
+    }
+}
+
+function getToolAssignments($toolId) {
+    $url = "https://api.burki.dev/api/v1/tools/{$toolId}/assignments";
+    $headers = ['Authorization: Bearer YOUR_API_KEY'];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("Failed to get assignments: " . $response);
+    }
+}
+
+// Usage
+$result = assignToolToAssistants(123, [456, 789]);
+$assignments = getToolAssignments(123);
+?>
+```
+</Accordion>
+
+### Best Practices
+
+1. **Selective Assignment**: Only assign tools to assistants that actually need them
+2. **Testing**: Test tool functionality with specific assistants before broad deployment  
+3. **Monitoring**: Track tool usage per assistant to optimize assignments
+4. **Documentation**: Document which tools are assigned to which assistants
+5. **Performance**: Consider the number of tools per assistant for optimal performance
+
+### Use Cases
+
+<Accordion title="Department-Specific Tools">
+**Scenario**: Different tools for different departments
+
+```javascript
+// Assign CRM lookup to sales assistants
+await assignToolToAssistants(
+  crmToolId, 
+  [salesBot1, salesBot2, salesBot3]
+);
+
+// Assign technical diagnostics to support assistants  
+await assignToolToAssistants(
+  diagToolId,
+  [supportBot1, supportBot2]
+);
+```
+</Accordion>
+
+<Accordion title="Gradual Rollout">
+**Scenario**: Rolling out new tools gradually
+
+```javascript
+// Phase 1: Assign to test assistant
+await assignToolToAssistants(newToolId, [testAssistant]);
+
+// Phase 2: Assign to pilot group
+await assignToolToAssistants(newToolId, [pilot1, pilot2]);
+
+// Phase 3: Full rollout
+await assignToolToAssistants(newToolId, allAssistantIds);
+```
+</Accordion>
+
+<Accordion title="Temporary Access">
+**Scenario**: Temporary tool access for specific periods
+
+```javascript
+// Assign tool for promotion period
+await assignToolToAssistants(promoToolId, marketingBots, true);
+
+// Later: Disable tool after promotion
+await assignToolToAssistants(promoToolId, marketingBots, false);
+```
+</Accordion>

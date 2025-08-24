@@ -1,0 +1,239 @@
+---
+title: 'Get Tool by ID'
+openapi: 'GET /api/v1/tools/{tool_id}'
+---
+
+This endpoint retrieves a specific tool by its unique ID, including full configuration details and usage statistics.
+
+### Path Parameters
+
+- `tool_id` (integer, **required**): The unique identifier of the tool to retrieve
+
+### Response
+
+A successful request returns the complete tool object:
+
+```json Response
+{
+  "id": 123,
+  "name": "get_customer_info",
+  "display_name": "Customer Information Lookup",
+  "description": "Look up customer information by phone number or email",
+  "tool_type": "endpoint",
+  "configuration": {
+    "url": "https://api.yourcompany.com/customers/lookup",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer [REDACTED]",
+      "Content-Type": "application/json"
+    },
+    "timeout_seconds": 30,
+    "follow_redirects": true,
+    "verify_ssl": true
+  },
+  "function_definition": {
+    "name": "get_customer_info",
+    "description": "Look up customer information by phone number or email",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string",
+          "description": "Customer's phone number in E.164 format"
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer's email address"
+        }
+      },
+      "required": ["phone_number"]
+    }
+  },
+  "is_active": true,
+  "is_public": false,
+  "timeout_seconds": 30,
+  "retry_attempts": 1,
+  "execution_count": 156,
+  "success_rate": 94.2,
+  "avg_execution_time": 1.24,
+  "last_executed_at": "2024-01-15T15:30:00Z",
+  "organization_id": 456,
+  "created_by": 789,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T15:45:00Z"
+}
+```
+
+### Error Responses
+
+**404 Not Found**
+```json
+{
+  "detail": "Tool with ID 123 not found"
+}
+```
+
+**403 Forbidden**
+```json
+{
+  "detail": "You don't have permission to access this tool"
+}
+```
+
+### Tool Type Specific Fields
+
+<Accordion title="Endpoint Tool Configuration">
+```json
+{
+  "configuration": {
+    "url": "https://api.example.com/endpoint",
+    "method": "POST",
+    "headers": {
+      "Authorization": "Bearer [REDACTED]",
+      "Content-Type": "application/json"
+    },
+    "timeout_seconds": 30,
+    "follow_redirects": true,
+    "verify_ssl": true,
+    "request_template": {
+      "query": "SELECT * FROM customers WHERE id = '${customer_id}'"
+    },
+    "response_mapping": {
+      "customer_name": "data.name",
+      "customer_email": "data.email"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Python Function Tool Configuration">
+```json
+{
+  "configuration": {
+    "python_code": "def calculate_payment(principal, rate, years):\n    monthly_rate = rate / 100 / 12\n    num_payments = years * 12\n    payment = principal * (monthly_rate * (1 + monthly_rate) ** num_payments) / ((1 + monthly_rate) ** num_payments - 1)\n    return {'monthly_payment': round(payment, 2)}",
+    "timeout_seconds": 10,
+    "max_memory_mb": 128,
+    "allowed_modules": ["math", "datetime", "json"]
+  }
+}
+```
+</Accordion>
+
+<Accordion title="AWS Lambda Tool Configuration">
+```json
+{
+  "configuration": {
+    "function_name": "customer-lookup-prod",
+    "aws_region": "us-east-1",
+    "invocation_type": "RequestResponse",
+    "timeout_seconds": 30,
+    "environment_variables": {
+      "DATABASE_URL": "[REDACTED]",
+      "API_KEY": "[REDACTED]"
+    }
+  }
+}
+```
+</Accordion>
+
+### Usage Statistics
+
+The response includes detailed usage statistics:
+
+- `execution_count`: Total number of times the tool has been executed
+- `success_rate`: Percentage of successful executions (0-100)
+- `avg_execution_time`: Average execution time in seconds
+- `last_executed_at`: Timestamp of the most recent execution
+
+### Integration Examples
+
+<CodeGroup>
+```javascript Node.js
+const axios = require('axios');
+
+async function getTool(toolId) {
+  try {
+    const response = await axios.get(`https://api.burki.dev/api/v1/tools/${toolId}`, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      throw new Error(`Tool with ID ${toolId} not found`);
+    }
+    throw error;
+  }
+}
+
+// Usage
+const tool = await getTool(123);
+console.log(`Tool: ${tool.display_name}`);
+console.log(`Type: ${tool.tool_type}`);
+console.log(`Success Rate: ${tool.success_rate}%`);
+```
+
+```python Python
+import requests
+
+def get_tool(tool_id: int) -> dict:
+    """Get a tool by its ID."""
+    url = f"https://api.burki.dev/api/v1/tools/{tool_id}"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    elif response.status_code == 404:
+        raise Exception(f"Tool with ID {tool_id} not found")
+    else:
+        raise Exception(f"Failed to get tool: {response.json()['detail']}")
+
+# Usage
+tool = get_tool(123)
+print(f"Tool: {tool['display_name']}")
+print(f"Type: {tool['tool_type']}")
+print(f"Executions: {tool['execution_count']}")
+```
+
+```php PHP
+<?php
+function getTool($toolId) {
+    $url = "https://api.burki.dev/api/v1/tools/{$toolId}";
+    $headers = ['Authorization: Bearer YOUR_API_KEY'];
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } elseif ($httpCode === 404) {
+        throw new Exception("Tool with ID {$toolId} not found");
+    } else {
+        throw new Exception("Failed to get tool: " . $response);
+    }
+}
+
+// Usage
+$tool = getTool(123);
+echo "Tool: " . $tool['display_name'] . "\n";
+echo "Type: " . $tool['tool_type'] . "\n";
+?>
+```
+</CodeGroup>
+
+### Security Notes
+
+- **Sensitive Data**: Configuration fields containing sensitive information (API keys, passwords) are redacted in responses
+- **Access Control**: Users can only access tools within their organization
+- **Audit Trail**: Tool access is logged for security monitoring

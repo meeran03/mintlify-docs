@@ -1,0 +1,376 @@
+---
+title: 'List Tools'
+openapi: 'GET /api/v1/tools'
+---
+
+This endpoint retrieves a paginated list of all tools in your organization with advanced filtering, sorting, and search capabilities.
+
+### Query Parameters
+
+- `page` (integer, optional, default: 1): Page number for pagination
+- `per_page` (integer, optional, default: 12): Number of tools per page (max: 100)
+- `tool_type` (string, optional): Filter by tool type
+  - Allowed values: `"endpoint"`, `"python_function"`, `"lambda"`
+- `is_active` (boolean, optional): Filter by active status
+- `search` (string, optional): Search in tool names, display names, and descriptions
+- `sort_by` (string, optional, default: `"name"`): Sort field
+  - Allowed values: `"name"`, `"display_name"`, `"created_at"`, `"updated_at"`, `"execution_count"`
+- `sort_order` (string, optional, default: `"asc"`): Sort direction
+  - Allowed values: `"asc"`, `"desc"`
+
+### Example Requests
+
+<CodeGroup>
+```bash Basic List
+curl -X GET "https://api.burki.dev/api/v1/tools" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Filtered by Type
+curl -X GET "https://api.burki.dev/api/v1/tools?tool_type=endpoint&is_active=true" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Search and Sort
+curl -X GET "https://api.burki.dev/api/v1/tools?search=customer&sort_by=execution_count&sort_order=desc" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Paginated
+curl -X GET "https://api.burki.dev/api/v1/tools?page=2&per_page=20" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+</CodeGroup>
+
+### Response
+
+A successful request returns a paginated list of tools:
+
+```json Response
+{
+  "tools": [
+    {
+      "id": 123,
+      "name": "get_customer_info",
+      "display_name": "Customer Information Lookup",
+      "description": "Look up customer information by phone number or email",
+      "tool_type": "endpoint",
+      "configuration": {
+        "url": "https://api.yourcompany.com/customers/lookup",
+        "method": "GET",
+        "timeout_seconds": 30
+      },
+      "function_definition": {
+        "name": "get_customer_info",
+        "description": "Look up customer information by phone number or email",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "phone_number": {
+              "type": "string",
+              "description": "Customer's phone number in E.164 format"
+            }
+          },
+          "required": ["phone_number"]
+        }
+      },
+      "is_active": true,
+      "is_public": false,
+      "execution_count": 156,
+      "success_rate": 94.2,
+      "avg_execution_time": 1.24,
+      "organization_id": 456,
+      "created_by": 789,
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T15:45:00Z"
+    },
+    {
+      "id": 124,
+      "name": "calculate_loan_payment",
+      "display_name": "Loan Payment Calculator",
+      "description": "Calculate monthly loan payment based on principal, rate, and term",
+      "tool_type": "python_function",
+      "configuration": {
+        "timeout_seconds": 10
+      },
+      "function_definition": {
+        "name": "calculate_loan_payment",
+        "description": "Calculate monthly loan payment and totals",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "principal": {"type": "number"},
+            "annual_rate": {"type": "number"},
+            "years": {"type": "integer"}
+          },
+          "required": ["principal", "annual_rate", "years"]
+        }
+      },
+      "is_active": true,
+      "is_public": false,
+      "execution_count": 89,
+      "success_rate": 100.0,
+      "avg_execution_time": 0.12,
+      "organization_id": 456,
+      "created_by": 789,
+      "created_at": "2024-01-14T09:15:00Z",
+      "updated_at": "2024-01-14T09:15:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 12,
+    "total": 2,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+```
+
+### Response Fields
+
+**Tool Object:**
+- `id` (integer): Unique tool identifier
+- `name` (string): Tool name (unique within organization)
+- `display_name` (string): Human-readable name
+- `description` (string): Tool description
+- `tool_type` (string): Tool type (`"endpoint"`, `"python_function"`, or `"lambda"`)
+- `configuration` (object): Tool-specific configuration (sensitive data redacted)
+- `function_definition` (object): OpenAI function calling schema
+- `is_active` (boolean): Whether the tool is active
+- `is_public` (boolean): Whether the tool is publicly visible
+- `execution_count` (integer): Total number of executions
+- `success_rate` (float): Success rate percentage (0-100)
+- `avg_execution_time` (float): Average execution time in seconds
+- `organization_id` (integer): Organization that owns the tool
+- `created_by` (integer): User ID who created the tool
+- `created_at` (string): ISO 8601 creation timestamp
+- `updated_at` (string): ISO 8601 last update timestamp
+
+**Pagination Object:**
+- `page` (integer): Current page number
+- `per_page` (integer): Items per page
+- `total` (integer): Total number of tools
+- `total_pages` (integer): Total number of pages
+- `has_next` (boolean): Whether there's a next page
+- `has_prev` (boolean): Whether there's a previous page
+
+### Filtering Examples
+
+<Accordion title="Filter by Tool Type">
+**Endpoint Tools Only:**
+```bash
+GET /api/v1/tools?tool_type=endpoint
+```
+
+**Python Function Tools Only:**
+```bash
+GET /api/v1/tools?tool_type=python_function
+```
+
+**Active Lambda Tools:**
+```bash
+GET /api/v1/tools?tool_type=lambda&is_active=true
+```
+</Accordion>
+
+<Accordion title="Search Examples">
+**Search by Name:**
+```bash
+GET /api/v1/tools?search=customer
+```
+
+**Search by Description:**
+```bash
+GET /api/v1/tools?search=lookup
+```
+
+**Complex Search:**
+```bash
+GET /api/v1/tools?search=payment%20calculator&tool_type=python_function
+```
+</Accordion>
+
+<Accordion title="Sorting Examples">
+**Most Used Tools:**
+```bash
+GET /api/v1/tools?sort_by=execution_count&sort_order=desc
+```
+
+**Recently Created:**
+```bash
+GET /api/v1/tools?sort_by=created_at&sort_order=desc
+```
+
+**Best Performance:**
+```bash
+GET /api/v1/tools?sort_by=success_rate&sort_order=desc
+```
+
+**Fastest Execution:**
+```bash
+GET /api/v1/tools?sort_by=avg_execution_time&sort_order=asc
+```
+</Accordion>
+
+### Error Responses
+
+**400 Bad Request**
+```json
+{
+  "detail": "Invalid sort_by field. Must be one of: name, display_name, created_at, updated_at, execution_count"
+}
+```
+
+**422 Validation Error**
+```json
+{
+  "detail": [
+    {
+      "loc": ["query", "per_page"],
+      "msg": "ensure this value is less than or equal to 100",
+      "type": "value_error.number.not_le"
+    }
+  ]
+}
+```
+
+### Integration Examples
+
+<Accordion title="Node.js Example">
+```javascript
+const axios = require('axios');
+
+async function listTools(filters = {}) {
+  try {
+    const params = new URLSearchParams();
+    
+    // Add filters
+    if (filters.toolType) params.append('tool_type', filters.toolType);
+    if (filters.isActive !== undefined) params.append('is_active', filters.isActive);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.sortBy) params.append('sort_by', filters.sortBy);
+    if (filters.sortOrder) params.append('sort_order', filters.sortOrder);
+    if (filters.page) params.append('page', filters.page);
+    if (filters.perPage) params.append('per_page', filters.perPage);
+    
+    const response = await axios.get(`https://api.burki.dev/api/v1/tools?${params}`, {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Failed to list tools:', error.response.data);
+    throw error;
+  }
+}
+
+// Usage examples
+const allTools = await listTools();
+const endpointTools = await listTools({ toolType: 'endpoint', isActive: true });
+const mostUsed = await listTools({ sortBy: 'execution_count', sortOrder: 'desc' });
+```
+</Accordion>
+
+<Accordion title="Python Example">
+```python
+import requests
+from typing import Optional, Dict, Any
+
+def list_tools(
+    tool_type: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    search: Optional[str] = None,
+    sort_by: str = "name",
+    sort_order: str = "asc",
+    page: int = 1,
+    per_page: int = 12
+) -> Dict[str, Any]:
+    """List tools with optional filtering and sorting."""
+    
+    url = "https://api.burki.dev/api/v1/tools"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    params = {
+        "sort_by": sort_by,
+        "sort_order": sort_order,
+        "page": page,
+        "per_page": per_page
+    }
+    
+    # Add optional filters
+    if tool_type:
+        params["tool_type"] = tool_type
+    if is_active is not None:
+        params["is_active"] = is_active
+    if search:
+        params["search"] = search
+    
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Failed to list tools: {response.json()['detail']}")
+
+# Usage examples
+all_tools = list_tools()
+python_tools = list_tools(tool_type="python_function", is_active=True)
+search_results = list_tools(search="customer", sort_by="execution_count", sort_order="desc")
+```
+</Accordion>
+
+<Accordion title="PHP Example">
+```php
+<?php
+function listTools($filters = []) {
+    $url = 'https://api.burki.dev/api/v1/tools';
+    $headers = ['Authorization: Bearer YOUR_API_KEY'];
+    
+    // Build query parameters
+    $params = [];
+    if (isset($filters['tool_type'])) $params['tool_type'] = $filters['tool_type'];
+    if (isset($filters['is_active'])) $params['is_active'] = $filters['is_active'] ? 'true' : 'false';
+    if (isset($filters['search'])) $params['search'] = $filters['search'];
+    if (isset($filters['sort_by'])) $params['sort_by'] = $filters['sort_by'];
+    if (isset($filters['sort_order'])) $params['sort_order'] = $filters['sort_order'];
+    if (isset($filters['page'])) $params['page'] = $filters['page'];
+    if (isset($filters['per_page'])) $params['per_page'] = $filters['per_page'];
+    
+    if (!empty($params)) {
+        $url .= '?' . http_build_query($params);
+    }
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        return json_decode($response, true);
+    } else {
+        throw new Exception("Failed to list tools: " . $response);
+    }
+}
+
+// Usage examples
+$allTools = listTools();
+$activeEndpointTools = listTools(['tool_type' => 'endpoint', 'is_active' => true]);
+$searchResults = listTools(['search' => 'customer', 'sort_by' => 'execution_count']);
+?>
+```
+</Accordion>
+
+### Performance Considerations
+
+- **Pagination**: Use appropriate page sizes (default 12, max 100)
+- **Filtering**: Apply filters to reduce response size
+- **Caching**: Consider caching results for frequently accessed tool lists
+- **Search**: Use specific search terms for better performance

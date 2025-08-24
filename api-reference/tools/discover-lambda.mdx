@@ -1,0 +1,206 @@
+---
+title: 'Discover Lambda Functions'
+openapi: 'POST /api/lambda/list-functions'
+---
+
+This endpoint discovers and lists all AWS Lambda functions available in your AWS account for the specified region and credentials. This is used by the Tools Library to provide an interactive function selector when creating Lambda tools.
+
+### Request Body
+
+Send AWS credentials and region as query parameters:
+
+```json Example Request
+{
+  "access_key": "AKIA1234567890EXAMPLE",
+  "secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+  "region": "us-east-1"
+}
+```
+
+### Query Parameters
+
+- `access_key` (string, **required**): AWS Access Key ID with Lambda permissions
+- `secret_key` (string, **required**): AWS Secret Access Key  
+- `region` (string, optional, default: "us-east-1"): AWS region to search for Lambda functions
+
+### Response
+
+A successful request returns detailed information about all Lambda functions:
+
+```json Response
+{
+  "success": true,
+  "message": "Found 3 Lambda functions",
+  "functions": [
+    {
+      "function_name": "customer-lookup-service",
+      "description": "Look up customer data by phone number",
+      "runtime": "python3.9",
+      "timeout": 30,
+      "memory_size": 512,
+      "code_size": 1024000,
+      "handler": "lambda_function.lambda_handler",
+      "version": "$LATEST",
+      "last_modified": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "function_name": "order-processing",
+      "description": "Process customer orders and payments", 
+      "runtime": "nodejs18.x",
+      "timeout": 60,
+      "memory_size": 1024,
+      "code_size": 2048000,
+      "handler": "index.handler",
+      "version": "$LATEST",
+      "last_modified": "2024-01-10T14:22:15.000Z"
+    },
+    {
+      "function_name": "send-notifications",
+      "description": "",
+      "runtime": "python3.8", 
+      "timeout": 15,
+      "memory_size": 256,
+      "code_size": 512000,
+      "handler": "notification.send",
+      "version": "$LATEST",
+      "last_modified": "2024-01-05T09:15:30.000Z"
+    }
+  ]
+}
+```
+
+### Function Object Properties
+
+Each function object in the response contains:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `function_name` | string | Lambda function name (used for invocation) |
+| `description` | string | Function description (may be empty) |
+| `runtime` | string | Runtime environment (e.g., python3.9, nodejs18.x) |
+| `timeout` | integer | Function timeout in seconds |
+| `memory_size` | integer | Allocated memory in MB |
+| `code_size` | integer | Function code size in bytes |
+| `handler` | string | Function entry point |
+| `version` | string | Function version (usually $LATEST) |
+| `last_modified` | string | ISO timestamp of last modification |
+
+### Error Responses
+
+#### 400 Bad Request - Missing Credentials
+```json
+{
+  "success": false,
+  "detail": "AWS credentials not found. Please configure access_key and secret_key."
+}
+```
+
+#### 400 Bad Request - Invalid Credentials
+```json
+{
+  "success": false,
+  "detail": "AWS error (InvalidUserID.NotFound): The AWS Access Key Id you provided does not exist in our records."
+}
+```
+
+#### 400 Bad Request - Access Denied
+```json
+{
+  "success": false,
+  "detail": "AWS error (AccessDenied): User: arn:aws:iam::123456789012:user/example is not authorized to perform: lambda:ListFunctions"
+}
+```
+
+#### 500 Internal Server Error
+```json
+{
+  "success": false,
+  "detail": "Failed to list Lambda functions: Connection timeout"
+}
+```
+
+### Required IAM Permissions
+
+Your AWS credentials must have the following permissions:
+
+```json IAM Policy
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:ListFunctions",
+        "lambda:GetFunctionConfiguration"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### Usage in Tools Library
+
+This endpoint is automatically called when users:
+
+1. **Enter AWS credentials** in the Lambda tool configuration form
+2. **Select a region** from the dropdown
+3. **Click "🔍 Discover Functions"** button
+4. **Browse the interactive function list** to select their Lambda function
+
+The selected function's metadata is used to auto-populate the tool configuration form.
+
+### Rate Limits
+
+- **Rate Limit:** 10 requests per minute per organization
+- **Timeout:** 30 seconds maximum per request
+- **Pagination:** Returns all functions (AWS API handles pagination internally)
+
+<Callout type="warning">
+**Security Note:** This endpoint requires AWS credentials to be sent in the request. Credentials are not stored on our servers and are only used for the duration of the API call.
+</Callout>
+
+### Example Usage
+
+```bash cURL Example
+curl -X POST "https://api.burkivoice.ai/api/lambda/list-functions" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "access_key=AKIA1234567890EXAMPLE" \
+  -d "secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" \
+  -d "region=us-west-2"
+```
+
+```python Python Example
+import requests
+
+response = requests.post(
+    "https://api.burkivoice.ai/api/lambda/list-functions",
+    headers={"Authorization": "Bearer YOUR_API_TOKEN"},
+    data={
+        "access_key": "AKIA1234567890EXAMPLE",
+        "secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", 
+        "region": "us-east-1"
+    }
+)
+
+functions = response.json()["functions"]
+print(f"Found {len(functions)} Lambda functions")
+```
+
+```javascript JavaScript Example
+const response = await fetch('/api/lambda/list-functions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+  body: new URLSearchParams({
+    access_key: 'AKIA1234567890EXAMPLE',
+    secret_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+    region: 'us-east-1'
+  })
+});
+
+const data = await response.json();
+console.log(`Discovered ${data.functions.length} functions`);
+```

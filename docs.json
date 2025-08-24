@@ -63,6 +63,7 @@
               "rag",
               "call-management",
               "tools",
+              "lambda-discovery",
               "live-transcript"
             ]
           },
@@ -188,6 +189,16 @@
             "group": "WebSockets",
             "pages": [
               "api-reference/websockets/live-transcript"
+            ]
+          },
+          {
+            "group": "Tools & Custom Actions",
+            "pages": [
+              "api-reference/tools/create",
+              "api-reference/tools/list",
+              "api-reference/tools/get-by-id",
+              "api-reference/tools/assign",
+              "api-reference/tools/discover-lambda"
             ]
           }
         ]

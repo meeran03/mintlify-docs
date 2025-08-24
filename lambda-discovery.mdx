@@ -1,0 +1,298 @@
+---
+title: 'AWS Lambda Function Discovery'
+description: 'Automatically discover and integrate your existing Lambda functions with Burki Voice AI'
+---
+
+# 🔍 AWS Lambda Function Discovery
+
+Burki Voice AI provides **automatic Lambda function discovery** to streamline the integration of your existing serverless functions. No more manual typing or guessing function names!
+
+## Overview
+
+The Lambda Function Discovery feature allows you to:
+
+- **🔍 Browse** all Lambda functions in your AWS account
+- **📊 View** detailed function metadata (runtime, memory, timeout)
+- **✅ Validate** function existence before creating tools
+- **⚡ Auto-populate** tool configuration forms
+- **🛡️ Prevent** typos and invalid function names
+
+---
+
+## How It Works
+
+<Steps>
+  <Step title="Enter AWS Credentials">
+    Provide your AWS Access Key ID and Secret Access Key in the Lambda tool configuration form.
+    
+    ```json Credentials Required
+    {
+      "access_key": "AKIA1234567890EXAMPLE",
+      "secret_key": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    }
+    ```
+  </Step>
+  
+  <Step title="Select Region">
+    Choose the AWS region where your Lambda functions are deployed from the dropdown menu.
+    
+    **Supported Regions:**
+    - us-east-1 (N. Virginia)
+    - us-west-2 (Oregon)  
+    - eu-west-1 (Ireland)
+    - ap-southeast-1 (Singapore)
+    - And more...
+  </Step>
+  
+  <Step title="Discover Functions">
+    Click the **"🔍 Discover Functions"** button to automatically fetch all Lambda functions from your AWS account.
+    
+    The system will call the AWS Lambda `ListFunctions` API to retrieve function metadata.
+  </Step>
+  
+  <Step title="Browse & Select">
+    A dropdown menu appears showing all discovered functions with:
+    - Function name
+    - Description (if available)
+    - Runtime environment
+    - Memory allocation
+    - Last modified date
+  </Step>
+  
+  <Step title="Auto-populate Form">
+    When you select a function, the form automatically fills in:
+    - Function name
+    - Tool description (based on Lambda description)
+    - Default payload template
+  </Step>
+</Steps>
+
+---
+
+## Function Discovery Response
+
+When you discover functions, you'll see detailed metadata for each:
+
+```json Example Discovery Response
+{
+  "success": true,
+  "message": "Found 5 Lambda functions",
+  "functions": [
+    {
+      "function_name": "customer-lookup-service",
+      "description": "Look up customer data by phone number",
+      "runtime": "python3.9",
+      "timeout": 30,
+      "memory_size": 512,
+      "code_size": 1024000,
+      "handler": "lambda_function.lambda_handler",
+      "version": "$LATEST",
+      "last_modified": "2024-01-15T10:30:00Z"
+    },
+    {
+      "function_name": "order-processing",
+      "description": "Process customer orders and payments",
+      "runtime": "nodejs18.x", 
+      "timeout": 60,
+      "memory_size": 1024,
+      "handler": "index.handler"
+    },
+    {
+      "function_name": "inventory-check",
+      "description": "Check product availability in real-time",
+      "runtime": "python3.8",
+      "timeout": 15,
+      "memory_size": 256,
+      "handler": "check.availability"
+    }
+  ]
+}
+```
+
+---
+
+## Required IAM Permissions
+
+For function discovery to work, your AWS credentials need specific permissions:
+
+<Accordion title="IAM Policy Configuration">
+
+```json Required IAM Policy
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:ListFunctions",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:InvokeFunction"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+**Permission Breakdown:**
+- `lambda:ListFunctions` - Required for discovery
+- `lambda:GetFunction` - Gets function code and configuration
+- `lambda:GetFunctionConfiguration` - Gets runtime settings
+- `lambda:InvokeFunction` - Required for tool execution
+
+</Accordion>
+
+---
+
+## Security Best Practices
+
+<Accordion title="AWS Credentials Security">
+
+**✅ Recommended:**
+- Create a **dedicated IAM user** for Burki Voice AI
+- Use **minimal required permissions** (principle of least privilege)
+- **Rotate credentials** regularly
+- Use **IAM roles** in production environments when possible
+
+**❌ Avoid:**
+- Using root AWS account credentials
+- Overly broad permissions (`*` on all resources)
+- Hardcoding credentials in code
+- Sharing credentials across multiple applications
+
+**Example IAM User Setup:**
+1. Create new IAM user: `burkivoice-lambda-integration`
+2. Attach custom policy with Lambda permissions
+3. Generate Access Key ID and Secret Access Key
+4. Use these credentials only for Burki Voice AI
+
+</Accordion>
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common Issues and Solutions">
+
+### ❌ "AWS credentials not found"
+**Problem:** Missing or invalid AWS credentials
+**Solution:** 
+- Verify Access Key ID and Secret Access Key are correct
+- Ensure credentials have not expired
+- Check for typos in credential entry
+
+### ❌ "Access denied" error
+**Problem:** Insufficient IAM permissions
+**Solution:**
+- Attach required Lambda permissions to your IAM user
+- Verify the IAM policy includes `lambda:ListFunctions`
+- Check AWS region permissions
+
+### ❌ "No functions found"
+**Problem:** No Lambda functions in selected region
+**Solution:**
+- Verify you're searching in the correct AWS region
+- Confirm Lambda functions exist in your account
+- Try a different region where functions are deployed
+
+### ❌ Connection timeout
+**Problem:** Network or AWS service issues
+**Solution:**
+- Check your internet connection
+- Verify AWS service status
+- Try again after a few minutes
+- Ensure your IP isn't blocked by AWS
+
+</Accordion>
+
+---
+
+## Alternative: Manual Entry
+
+If function discovery isn't suitable for your use case, you can still **manually enter** Lambda function details:
+
+<Tabs>
+  <Tab title="When to Use Manual Entry">
+    - **Security constraints** prevent credential sharing
+    - **Cross-account** Lambda functions
+    - **Custom deployment** processes
+    - **Testing** with functions that don't exist yet
+  </Tab>
+  
+  <Tab title="Manual Configuration">
+    Simply type the function name directly:
+    
+    ```json Manual Entry Example
+    {
+      "function_name": "my-custom-function",
+      "region": "us-east-1",
+      "description": "Custom business logic function"
+    }
+    ```
+    
+    **Note:** Manual entry requires exact function names and won't validate existence until tool execution.
+  </Tab>
+</Tabs>
+
+---
+
+## Integration Examples
+
+<Accordion title="Real-World Use Cases">
+
+### Customer Service Integration
+```json
+{
+  "function_name": "customer-lookup-service",
+  "description": "Look up customer information by phone number",
+  "use_case": "Assistant can access customer history during calls"
+}
+```
+
+### E-commerce Order Management
+```json
+{
+  "function_name": "order-processing",
+  "description": "Process and track customer orders",
+  "use_case": "Handle order status inquiries and modifications"
+}
+```
+
+### Inventory Management
+```json
+{
+  "function_name": "inventory-check",
+  "description": "Check real-time product availability",
+  "use_case": "Provide accurate stock information during sales calls"
+}
+```
+
+### Payment Processing
+```json
+{
+  "function_name": "payment-gateway",
+  "description": "Process payments and refunds securely",
+  "use_case": "Handle billing inquiries and payment processing"
+}
+```
+
+</Accordion>
+
+---
+
+## Next Steps
+
+After discovering and selecting your Lambda function:
+
+1. **Configure payload template** - Define how parameters are passed
+2. **Set up function parameters** - Specify what inputs the LLM should provide
+3. **Test the integration** - Use the built-in testing feature
+4. **Assign to assistants** - Make the tool available to your AI assistants
+5. **Monitor usage** - Track performance and success rates
+
+<Callout type="tip">
+**Pro Tip:** Start with simple, stateless Lambda functions for your first integrations. They're easier to test and debug!
+</Callout>
+
+Ready to integrate your Lambda functions? Head to the [Tools Library](/tools) and create your first Lambda tool with automatic function discovery!

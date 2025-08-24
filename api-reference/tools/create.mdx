@@ -1,0 +1,280 @@
+---
+title: 'Create Tool'
+openapi: 'POST /api/v1/tools'
+---
+
+This endpoint allows you to create a new custom tool for your organization. Tools can be endpoint-based (HTTP API calls), Python functions, or AWS Lambda functions.
+
+### Request Body
+
+The request body structure varies based on the tool type you're creating:
+
+<AccordionGroup>
+<Accordion title="Endpoint Tool">
+Create a tool that makes HTTP requests to external APIs.
+
+```json Example Request
+{
+  "name": "get_customer_info",
+  "display_name": "Customer Information Lookup",
+  "description": "Look up customer information by phone number or email",
+  "tool_type": "endpoint",
+  "configuration": {
+    "url": "https://api.yourcompany.com/customers/lookup",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_API_KEY",
+      "Content-Type": "application/json"
+    },
+    "timeout_seconds": 30
+  },
+  "function_definition": {
+    "name": "get_customer_info",
+    "description": "Look up customer information by phone number or email",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string",
+          "description": "Customer's phone number in E.164 format"
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer's email address"
+        }
+      },
+      "required": ["phone_number"]
+    }
+  },
+  "is_active": true,
+  "is_public": false
+}
+```
+</Accordion>
+
+<Accordion title="Python Function Tool">
+Create a tool that executes custom Python code.
+
+```json Example Request
+{
+  "name": "calculate_loan_payment",
+  "display_name": "Loan Payment Calculator",
+  "description": "Calculate monthly loan payment based on principal, rate, and term",
+  "tool_type": "python_function",
+  "configuration": {
+    "python_code": "def calculate_monthly_payment(principal, annual_rate, years):\n    monthly_rate = annual_rate / 100 / 12\n    num_payments = years * 12\n    \n    if monthly_rate == 0:\n        return principal / num_payments\n    \n    payment = principal * (monthly_rate * (1 + monthly_rate) ** num_payments) / ((1 + monthly_rate) ** num_payments - 1)\n    \n    return {\n        'monthly_payment': round(payment, 2),\n        'total_paid': round(payment * num_payments, 2),\n        'total_interest': round((payment * num_payments) - principal, 2)\n    }",
+    "timeout_seconds": 10
+  },
+  "function_definition": {
+    "name": "calculate_loan_payment",
+    "description": "Calculate monthly loan payment and totals",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "principal": {
+          "type": "number",
+          "description": "Loan principal amount in dollars"
+        },
+        "annual_rate": {
+          "type": "number",
+          "description": "Annual interest rate as percentage (e.g., 5.5 for 5.5%)"
+        },
+        "years": {
+          "type": "integer",
+          "description": "Loan term in years"
+        }
+      },
+      "required": ["principal", "annual_rate", "years"]
+    }
+  },
+  "is_active": true
+}
+```
+</Accordion>
+
+<Accordion title="AWS Lambda Tool">
+Create a tool that invokes AWS Lambda functions.
+
+```json Example Request
+{
+  "name": "customer_lookup_lambda",
+  "display_name": "Customer Lookup (Lambda)",
+  "description": "Look up customer data using AWS Lambda function",
+  "tool_type": "lambda",
+  "configuration": {
+    "function_name": "customer-lookup-function",
+    "aws_region": "us-east-1",
+    "invocation_type": "RequestResponse",
+    "timeout_seconds": 30
+  },
+  "function_definition": {
+    "name": "customer_lookup",
+    "description": "Look up customer information from database",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "description": "Unique customer identifier"
+        },
+        "phone_number": {
+          "type": "string",
+          "description": "Customer phone number"
+        }
+      },
+      "required": ["customer_id"]
+    }
+  },
+  "is_active": true
+}
+```
+</Accordion>
+</AccordionGroup>
+
+### Response
+
+A successful request returns the created tool object:
+
+```json Response
+{
+  "id": 123,
+  "name": "get_customer_info",
+  "display_name": "Customer Information Lookup",
+  "description": "Look up customer information by phone number or email",
+  "tool_type": "endpoint",
+  "configuration": {
+    "url": "https://api.yourcompany.com/customers/lookup",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer [REDACTED]",
+      "Content-Type": "application/json"
+    },
+    "timeout_seconds": 30
+  },
+  "function_definition": {
+    "name": "get_customer_info",
+    "description": "Look up customer information by phone number or email",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "phone_number": {
+          "type": "string",
+          "description": "Customer's phone number in E.164 format"
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer's email address"
+        }
+      },
+      "required": ["phone_number"]
+    }
+  },
+  "is_active": true,
+  "is_public": false,
+  "execution_count": 0,
+  "success_rate": 0.0,
+  "avg_execution_time": 0.0,
+  "organization_id": 456,
+  "created_by": 789,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z"
+}
+```
+
+### Field Descriptions
+
+- `name` (string, **required**): Unique identifier for the tool within your organization
+- `display_name` (string, **required**): Human-readable name shown in the UI
+- `description` (string, **required**): Clear description of what the tool does
+- `tool_type` (string, **required**): Type of tool (`"endpoint"`, `"python_function"`, or `"lambda"`)
+- `configuration` (object, **required**): Tool-specific configuration (varies by type)
+- `function_definition` (object, **required**): OpenAI function calling schema
+- `is_active` (boolean, optional): Whether the tool is active (default: `true`)
+- `is_public` (boolean, optional): Whether other organizations can see this tool (default: `false`)
+- `timeout_seconds` (integer, optional): Maximum execution time (default: 30)
+- `retry_attempts` (integer, optional): Number of retry attempts on failure (default: 1)
+
+### Error Responses
+
+**400 Bad Request**
+```json
+{
+  "detail": "Tool name 'get_customer_info' already exists in organization"
+}
+```
+
+**422 Validation Error**
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "tool_type"],
+      "msg": "value is not a valid enumeration member; permitted: 'endpoint', 'python_function', 'lambda'",
+      "type": "type_error.enum"
+    }
+  ]
+}
+```
+
+### Configuration Examples
+
+<Accordion title="Advanced Endpoint Configuration">
+```json
+{
+  "configuration": {
+    "url": "https://api.example.com/data",
+    "method": "POST",
+    "headers": {
+      "Authorization": "Bearer ${API_KEY}",
+      "Content-Type": "application/json",
+      "User-Agent": "BurkiVoiceAI/1.0"
+    },
+    "timeout_seconds": 45,
+    "follow_redirects": true,
+    "verify_ssl": true,
+    "request_template": {
+      "query": "SELECT * FROM customers WHERE phone = '${phone_number}'",
+      "format": "json"
+    }
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Python Function with Libraries">
+```json
+{
+  "configuration": {
+    "python_code": "import requests\nimport pandas as pd\nfrom datetime import datetime\n\ndef analyze_customer_data(customer_id):\n    # Fetch data from API\n    response = requests.get(f'https://api.internal.com/customers/{customer_id}')\n    data = response.json()\n    \n    # Process with pandas\n    df = pd.DataFrame(data['transactions'])\n    \n    return {\n        'total_spent': df['amount'].sum(),\n        'transaction_count': len(df),\n        'last_purchase': df['date'].max(),\n        'avg_order_value': df['amount'].mean()\n    }",
+    "timeout_seconds": 15,
+    "max_memory_mb": 128
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Lambda Function with Environment Variables">
+```json
+{
+  "configuration": {
+    "function_name": "customer-analytics-prod",
+    "aws_region": "us-west-2",
+    "invocation_type": "RequestResponse",
+    "environment_variables": {
+      "DATABASE_URL": "${DB_URL}",
+      "API_KEY": "${EXTERNAL_API_KEY}"
+    },
+    "timeout_seconds": 60
+  }
+}
+```
+</Accordion>
+
+### Best Practices
+
+1. **Naming**: Use clear, descriptive names that indicate the tool's purpose
+2. **Security**: Never include sensitive data in tool definitions; use environment variables
+3. **Testing**: Test tools thoroughly before deploying to production
+4. **Documentation**: Provide clear descriptions and parameter documentation
+5. **Error Handling**: Design tools to handle failures gracefully
+6. **Performance**: Set appropriate timeouts and optimize for call-time execution
