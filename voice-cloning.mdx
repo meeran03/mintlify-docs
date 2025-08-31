@@ -1,0 +1,551 @@
+---
+title: Voice Cloning
+description: Create custom voices for your AI assistants using voice cloning technology
+---
+
+<Callout type="info">
+Voice cloning allows you to create custom voices from audio samples, giving your AI assistants unique and personalized voices that match your brand or specific use cases.
+</Callout>
+
+---
+
+## Overview
+
+Burki Voice AI's voice cloning feature enables you to:
+
+- **Upload Voice Samples**: Upload high-quality audio recordings to create voice models
+- **Multi-Provider Support**: Use ElevenLabs, Resemble AI, and other providers that support voice cloning
+- **Instant Voice Creation**: Generate cloned voices ready for immediate use
+- **Voice Management**: Organize, test, and manage your custom voices
+- **Usage Analytics**: Track voice usage for billing and optimization
+
+<CardGroup cols={2}>
+  <Card title="🎙️ Voice Sample Upload" icon="microphone">
+    Upload audio samples with validation and processing
+  </Card>
+  
+  <Card title="🤖 AI Voice Training" icon="robot">
+    Provider-powered voice training with quality optimization
+  </Card>
+  
+  <Card title="📊 Usage Analytics" icon="chart-line">
+    Track synthesis usage and voice performance
+  </Card>
+  
+  <Card title="🔧 Easy Integration" icon="gear">
+    Seamless integration with existing assistant configurations
+  </Card>
+</CardGroup>
+
+---
+
+## Supported Providers
+
+### ElevenLabs
+- **Instant Voice Cloning**: Create voices from single audio samples
+- **High Quality**: Professional-grade voice synthesis
+- **Multiple Languages**: Support for 29+ languages
+- **Quick Processing**: Voices ready in seconds
+
+### Resemble AI
+- **Professional Training**: Advanced voice training algorithms
+- **Custom Models**: Highly personalized voice characteristics
+- **Unlimited Voices**: Create as many voices as needed
+- **Enterprise Features**: Advanced customization options
+
+### Future Providers
+- **Inworld AI**: Coming soon with emotional voice cloning
+- **OpenAI**: Voice cloning capabilities when available
+
+---
+
+## Voice Sample Requirements
+
+### Audio Quality Guidelines
+
+<Accordion title="File Format Requirements">
+**Supported Formats:**
+- MP3 (recommended)
+- WAV (highest quality)
+- FLAC (lossless)
+- M4A/AAC
+- OGG
+
+**Technical Specifications:**
+- **Sample Rate**: 22kHz or higher
+- **Bit Rate**: 128kbps minimum
+- **Channels**: Mono preferred, stereo acceptable
+- **File Size**: Maximum 50MB
+</Accordion>
+
+<Accordion title="Recording Guidelines">
+**Duration Requirements:**
+- **Minimum**: 10 seconds of clear speech
+- **Recommended**: 30-60 seconds for better quality
+- **Maximum**: 10 minutes (longer samples may not improve quality)
+
+**Content Guidelines:**
+- **Clear Speech**: No background noise or music
+- **Natural Tone**: Conversational, not monotone
+- **Consistent Volume**: Steady audio levels throughout
+- **Single Speaker**: Only the target voice in the recording
+</Accordion>
+
+<Accordion title="Quality Tips">
+**For Best Results:**
+1. **Environment**: Record in a quiet room with soft furnishings
+2. **Microphone**: Use a quality microphone 6-12 inches from mouth
+3. **Content**: Read varied sentences with different emotions
+4. **Consistency**: Maintain the same speaking style throughout
+5. **Format**: Save in WAV format for highest quality
+</Accordion>
+
+---
+
+## Getting Started
+
+### Step 1: Upload Voice Sample
+
+Navigate to your assistant's configuration and open the Voice Cloning section:
+
+1. **Upload Audio File**: Drag and drop or click to select your audio file
+2. **Add Metadata**: Provide a name, description, and tags
+3. **Validation**: System automatically validates audio quality
+4. **Processing**: File is uploaded and prepared for cloning
+
+```javascript Example Upload
+const formData = new FormData();
+formData.append('file', audioFile);
+formData.append('name', 'Professional Voice');
+formData.append('description', 'Clear, professional speaking voice');
+formData.append('tags', 'professional, clear, business');
+
+const response = await fetch('/assistants/123/voice-samples/upload', {
+  method: 'POST',
+  body: formData,
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+```
+
+### Step 2: Create Cloned Voice
+
+Once your sample is uploaded, create a cloned voice:
+
+1. **Select Provider**: Choose ElevenLabs or Resemble AI
+2. **Configure Options**: Set voice name, language, and quality settings
+3. **Initiate Cloning**: Start the voice training process
+4. **Monitor Progress**: Track cloning status in real-time
+
+```javascript Example Voice Creation
+const response = await fetch('/assistants/123/cloned-voices/create', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    voice_sample_id: 456,
+    provider: 'elevenlabs',
+    name: 'Custom Professional Voice',
+    language: 'en',
+    enhance_quality: true
+  })
+});
+```
+
+### Step 3: Use Cloned Voice
+
+Once processing is complete, assign the voice to your assistant:
+
+1. **Voice Selection**: Choose from your cloned voices
+2. **Testing**: Preview the voice with sample text
+3. **Assignment**: Set as the assistant's default voice
+4. **Go Live**: Start using the voice in live calls
+
+---
+
+## Voice Management
+
+### Voice Library
+
+<Accordion title="Organizing Voices">
+**Voice Categories:**
+- **Brand Voices**: Official company voices
+- **Character Voices**: Specific personas or characters
+- **Language Variants**: Same voice in different languages
+- **Seasonal/Campaign**: Temporary or promotional voices
+
+**Tagging System:**
+- Use consistent tags for easy filtering
+- Include language, gender, style descriptors
+- Add use case tags (customer service, sales, etc.)
+</Accordion>
+
+<Accordion title="Voice Analytics">
+**Usage Tracking:**
+- **Synthesis Count**: Number of times voice was used
+- **Duration Metrics**: Total audio generated
+- **Cost Tracking**: Provider usage and billing
+- **Performance**: Quality scores and user feedback
+
+**Optimization Insights:**
+- Most/least used voices
+- Cost per synthesis by provider
+- Quality trends over time
+- User preference patterns
+</Accordion>
+
+### Voice Testing
+
+Test your cloned voices before deployment:
+
+1. **Text-to-Speech Preview**: Enter sample text to hear the voice
+2. **Quality Assessment**: Evaluate clarity, naturalness, and accuracy
+3. **Comparison Testing**: Compare with original samples and other voices
+4. **A/B Testing**: Test different voices with real users
+
+---
+
+## API Integration
+
+### Upload Voice Sample
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://api.burki.dev/assistants/123/voice-samples/upload" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F "file=@voice_sample.wav" \
+  -F "name=Professional Voice" \
+  -F "description=Clear professional speaking voice"
+```
+
+```python Python
+import requests
+
+def upload_voice_sample(assistant_id, audio_file_path, name, description=""):
+    url = f"https://api.burki.dev/assistants/{assistant_id}/voice-samples/upload"
+    
+    files = {'file': open(audio_file_path, 'rb')}
+    data = {
+        'name': name,
+        'description': description
+    }
+    headers = {'Authorization': 'Bearer YOUR_API_KEY'}
+    
+    response = requests.post(url, files=files, data=data, headers=headers)
+    return response.json()
+
+# Usage
+result = upload_voice_sample(123, 'voice_sample.wav', 'Professional Voice')
+```
+
+```javascript Node.js
+const axios = require('axios');
+const FormData = require('form-data');
+const fs = require('fs');
+
+async function uploadVoiceSample(assistantId, filePath, name, description = '') {
+  const form = new FormData();
+  form.append('file', fs.createReadStream(filePath));
+  form.append('name', name);
+  form.append('description', description);
+
+  const response = await axios.post(
+    `https://api.burki.dev/assistants/${assistantId}/voice-samples/upload`,
+    form,
+    {
+      headers: {
+        ...form.getHeaders(),
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    }
+  );
+  
+  return response.data;
+}
+```
+</CodeGroup>
+
+### Create Cloned Voice
+
+<CodeGroup>
+```bash cURL
+curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voice_sample_id": 456,
+    "provider": "elevenlabs",
+    "name": "Custom Professional Voice",
+    "language": "en",
+    "enhance_quality": true
+  }'
+```
+
+```python Python
+def create_cloned_voice(assistant_id, voice_sample_id, provider, name, language="en"):
+    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices/create"
+    
+    payload = {
+        "voice_sample_id": voice_sample_id,
+        "provider": provider,
+        "name": name,
+        "language": language,
+        "enhance_quality": True
+    }
+    
+    headers = {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
+    return response.json()
+
+# Usage
+result = create_cloned_voice(123, 456, 'elevenlabs', 'Custom Professional Voice')
+```
+
+```javascript Node.js
+async function createClonedVoice(assistantId, voiceSampleId, provider, name, language = 'en') {
+  const response = await axios.post(
+    `https://api.burki.dev/assistants/${assistantId}/cloned-voices/create`,
+    {
+      voice_sample_id: voiceSampleId,
+      provider: provider,
+      name: name,
+      language: language,
+      enhance_quality: true
+    },
+    {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY',
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+  
+  return response.data;
+}
+```
+</CodeGroup>
+
+### List Cloned Voices
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://api.burki.dev/assistants/123/cloned-voices" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+def list_cloned_voices(assistant_id, status=None, provider=None):
+    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices"
+    
+    params = {}
+    if status:
+        params['status'] = status
+    if provider:
+        params['provider'] = provider
+    
+    headers = {'Authorization': 'Bearer YOUR_API_KEY'}
+    
+    response = requests.get(url, params=params, headers=headers)
+    return response.json()
+
+# Usage
+voices = list_cloned_voices(123, status='ready')
+```
+
+```javascript Node.js
+async function listClonedVoices(assistantId, status = null, provider = null) {
+  const params = new URLSearchParams();
+  if (status) params.append('status', status);
+  if (provider) params.append('provider', provider);
+  
+  const response = await axios.get(
+    `https://api.burki.dev/assistants/${assistantId}/cloned-voices?${params}`,
+    {
+      headers: {
+        'Authorization': 'Bearer YOUR_API_KEY'
+      }
+    }
+  );
+  
+  return response.data;
+}
+```
+</CodeGroup>
+
+---
+
+## Best Practices
+
+### Recording Quality
+
+<Accordion title="Professional Recording Setup">
+**Equipment Recommendations:**
+- **Microphone**: USB condenser microphone (Audio-Technica AT2020USB+)
+- **Environment**: Quiet room with minimal echo
+- **Software**: Audacity, GarageBand, or professional DAW
+- **Monitoring**: Use headphones to monitor audio quality
+
+**Recording Techniques:**
+1. **Consistent Distance**: Maintain 6-12 inches from microphone
+2. **Proper Levels**: Keep audio peaks between -12dB and -6dB
+3. **Room Treatment**: Use blankets or acoustic foam to reduce echo
+4. **Multiple Takes**: Record several versions and choose the best
+</Accordion>
+
+<Accordion title="Content Selection">
+**Ideal Voice Sample Content:**
+- **Varied Sentences**: Different sentence structures and lengths
+- **Emotional Range**: Include slight variations in tone
+- **Natural Speech**: Conversational, not reading tone
+- **Complete Thoughts**: Full sentences with natural pauses
+
+**What to Avoid:**
+- Background noise or music
+- Multiple speakers
+- Heavy accents (unless desired)
+- Monotone or robotic delivery
+- Incomplete sentences or stuttering
+</Accordion>
+
+### Voice Management
+
+1. **Naming Convention**: Use descriptive, consistent names
+2. **Version Control**: Keep track of voice iterations and improvements
+3. **Usage Documentation**: Document which voices work best for different scenarios
+4. **Regular Testing**: Periodically test voice quality and user satisfaction
+5. **Cost Monitoring**: Track usage and costs across different providers
+
+### Security and Privacy
+
+<Warning>
+**Privacy Considerations**: Voice cloning involves processing personal audio data. Ensure you have proper consent and follow privacy regulations when using voice samples.
+</Warning>
+
+- **Consent**: Always obtain explicit consent before using someone's voice
+- **Data Protection**: Store voice samples securely and follow GDPR/CCPA requirements
+- **Access Control**: Limit who can create and manage cloned voices
+- **Audit Trail**: Keep logs of voice creation and usage
+- **Retention Policy**: Define how long voice samples and models are stored
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+<Accordion title="Upload Problems">
+**File Upload Fails:**
+- Check file format is supported (MP3, WAV, FLAC, M4A, OGG)
+- Ensure file size is under 50MB
+- Verify audio duration is between 10 seconds and 10 minutes
+- Check internet connection stability
+
+**Audio Quality Issues:**
+- Use higher sample rate (22kHz+) and bit rate (128kbps+)
+- Remove background noise using audio editing software
+- Re-record in a quieter environment
+- Check microphone positioning and levels
+</Accordion>
+
+<Accordion title="Voice Creation Issues">
+**Cloning Process Fails:**
+- Verify provider API credentials are valid
+- Check account balance with voice cloning provider
+- Ensure voice sample meets provider requirements
+- Contact provider support for specific error messages
+
+**Poor Voice Quality:**
+- Use higher quality source audio
+- Try different provider (ElevenLabs vs Resemble AI)
+- Experiment with quality enhancement settings
+- Consider recording new samples with better equipment
+</Accordion>
+
+<Accordion title="Performance Issues">
+**Slow Processing:**
+- Provider processing times vary (ElevenLabs: seconds, Resemble: minutes)
+- Check provider status pages for service issues
+- Large files take longer to process
+- Peak usage times may cause delays
+
+**High Costs:**
+- Monitor usage through analytics dashboard
+- Set usage limits and alerts
+- Compare provider pricing for your use case
+- Optimize voice selection for cost efficiency
+</Accordion>
+
+---
+
+## Provider Comparison
+
+| Feature | ElevenLabs | Resemble AI | Coming Soon |
+|---------|------------|-------------|-------------|
+| **Processing Time** | Seconds | Minutes | Varies |
+| **Quality** | Excellent | Excellent | TBD |
+| **Languages** | 29+ | English+ | TBD |
+| **Cost Model** | Per character | Per synthesis | TBD |
+| **Sample Requirements** | 30s+ | 60s+ | TBD |
+| **Instant Preview** | ✅ | ❌ | TBD |
+| **Emotional Control** | Basic | Advanced | TBD |
+| **Enterprise Features** | Limited | Full | TBD |
+
+---
+
+## Use Cases
+
+### Customer Service
+- **Consistent Brand Voice**: Maintain brand identity across all interactions
+- **Multilingual Support**: Create voices in different languages for global support
+- **Personality Matching**: Match voice characteristics to brand personality
+
+### Sales and Marketing
+- **Campaign Voices**: Create specific voices for marketing campaigns
+- **Regional Variants**: Adapt voices for different geographical markets
+- **Seasonal Adjustments**: Modify voice characteristics for holidays or events
+
+### Entertainment and Media
+- **Character Voices**: Create unique voices for virtual characters
+- **Narrator Voices**: Professional voices for content narration
+- **Interactive Experiences**: Engaging voices for games and interactive media
+
+### Enterprise Applications
+- **Executive Voices**: Clone executive voices for consistent communication
+- **Training Systems**: Consistent voices for e-learning and training
+- **Brand Ambassadors**: Virtual representatives with authentic brand voices
+
+---
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="📖 Documentation" href="/tts-providers">
+    Complete TTS provider documentation
+  </Card>
+  
+  <Card title="🎛️ Voice Tuning" href="/tts-providers/voice-tuning">
+    Advanced voice configuration guide
+  </Card>
+  
+  <Card title="💬 Community Support" href="https://community.burki.dev">
+    Get help from the community
+  </Card>
+  
+  <Card title="🎧 Technical Support" href="mailto:support@burki.dev">
+    Contact our support team
+  </Card>
+</CardGroup>
+
+---
+
+<Callout type="tip">
+**Pro Tip**: Start with ElevenLabs for quick prototyping and testing, then consider Resemble AI for production deployments requiring advanced customization and enterprise features.
+</Callout>
+

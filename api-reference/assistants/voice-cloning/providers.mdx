@@ -1,0 +1,500 @@
+---
+title: 'List Voice Cloning Providers'
+openapi: 'GET /api/v1/assistants/{assistant_id}/voice-cloning/providers'
+---
+
+This endpoint returns a list of TTS providers that support voice cloning, along with their specific requirements and capabilities. Use this information to determine which provider best fits your voice cloning needs.
+
+### Path Parameters
+
+- `assistant_id` (integer, **required**): The unique identifier of the assistant for which you want to list available voice cloning providers.
+
+### Response
+
+Returns an array of providers with their capabilities and requirements.
+
+```json Response
+{
+  "success": true,
+  "providers": [
+    {
+      "provider": "elevenlabs",
+      "name": "ElevenLabs",
+      "requirements": {
+        "formats": ["mp3", "wav", "flac", "m4a"],
+        "min_duration": 10,
+        "max_duration": 300,
+        "max_size": 26214400,
+        "quality_requirements": {
+          "sample_rate": 22050,
+          "bit_rate": 128,
+          "channels": 1
+        }
+      }
+    },
+    {
+      "provider": "resemble",
+      "name": "Resemble",
+      "requirements": {
+        "formats": ["wav", "mp3", "flac"],
+        "min_duration": 10,
+        "max_duration": 600,
+        "max_size": 52428800,
+        "quality_requirements": {
+          "sample_rate": 22050,
+          "bit_rate": 128,
+          "channels": 1
+        }
+      }
+    }
+  ]
+}
+```
+
+### Provider Information
+
+Each provider object contains:
+
+- **provider**: Unique identifier for the provider (used in API calls)
+- **name**: Human-readable name of the provider
+- **requirements**: Technical requirements for voice samples
+
+### Requirements Details
+
+#### File Formats
+- **formats**: Array of supported audio file extensions
+- Common formats: `mp3`, `wav`, `flac`, `m4a`, `ogg`
+
+#### Duration Limits
+- **min_duration**: Minimum audio duration in seconds
+- **max_duration**: Maximum audio duration in seconds
+- Typical range: 10-600 seconds (10 seconds to 10 minutes)
+
+#### File Size
+- **max_size**: Maximum file size in bytes
+- Typical range: 25MB to 50MB
+
+#### Quality Requirements
+- **sample_rate**: Minimum sample rate in Hz
+- **bit_rate**: Minimum bit rate in kbps
+- **channels**: Number of audio channels (1 = mono, 2 = stereo)
+
+### Provider Comparison
+
+| Provider | Quality | Speed | Cost | Special Features |
+|----------|---------|-------|------|------------------|
+| **ElevenLabs** | High | Fast | Premium | Instant cloning, emotion control |
+| **Resemble** | High | Medium | Moderate | Real-time streaming, voice mixing |
+| **Inworld** | Good | Fast | Gaming-focused | Character voices, emotional range |
+
+### Example Request
+
+```bash cURL
+curl -X GET "https://api.burki.dev/assistants/123/voice-cloning/providers" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Integration Examples
+
+```python Python - Provider Selection Logic
+import requests
+
+def select_best_provider(audio_file_info):
+    """
+    Select the best provider based on audio file characteristics
+    """
+    # Get available providers
+    response = requests.get(
+        "https://api.burki.dev/assistants/123/voice-cloning/providers",
+        headers={"Authorization": "Bearer YOUR_API_KEY"}
+    )
+    providers = response.json()["providers"]
+    
+    file_size = audio_file_info["size"]
+    duration = audio_file_info["duration"]
+    format = audio_file_info["format"]
+    
+    compatible_providers = []
+    
+    for provider in providers:
+        req = provider["requirements"]
+        
+        # Check compatibility
+        if (format.lower() in req["formats"] and
+            req["min_duration"] <= duration <= req["max_duration"] and
+            file_size <= req["max_size"]):
+            
+            compatible_providers.append({
+                "provider": provider["provider"],
+                "name": provider["name"],
+                "quality_score": calculate_quality_score(provider, audio_file_info)
+            })
+    
+    # Sort by quality score
+    compatible_providers.sort(key=lambda x: x["quality_score"], reverse=True)
+    
+    return compatible_providers
+
+def calculate_quality_score(provider, audio_info):
+    """
+    Calculate a quality score based on provider capabilities and audio characteristics
+    """
+    score = 0
+    req = provider["requirements"]
+    
+    # Bonus for higher quality requirements
+    if req["quality_requirements"]["sample_rate"] >= 22050:
+        score += 10
+    if req["quality_requirements"]["bit_rate"] >= 128:
+        score += 10
+        
+    # Provider-specific bonuses
+    if provider["provider"] == "elevenlabs":
+        score += 20  # High quality, instant cloning
+    elif provider["provider"] == "resemble":
+        score += 15  # Good quality, streaming support
+        
+    return score
+
+# Usage
+audio_info = {
+    "size": 15000000,  # 15MB
+    "duration": 45,    # 45 seconds
+    "format": "wav"
+}
+
+best_providers = select_best_provider(audio_info)
+print(f"Best provider: {best_providers[0]['name']}")
+```
+
+```javascript Node.js - Requirements Validation
+async function validateAudioFile(assistantId, audioFile) {
+  try {
+    // Get provider requirements
+    const response = await axios.get(
+      `https://api.burki.dev/assistants/${assistantId}/voice-cloning/providers`,
+      { headers: { 'Authorization': 'Bearer YOUR_API_KEY' } }
+    );
+    
+    const providers = response.data.providers;
+    const validationResults = {};
+    
+    // Check file against each provider
+    for (const provider of providers) {
+      const req = provider.requirements;
+      const validation = {
+        provider: provider.provider,
+        name: provider.name,
+        compatible: true,
+        issues: []
+      };
+      
+      // Check file format
+      const fileExtension = audioFile.name.split('.').pop().toLowerCase();
+      if (!req.formats.includes(fileExtension)) {
+        validation.compatible = false;
+        validation.issues.push(
+          `Format '${fileExtension}' not supported. Supported: ${req.formats.join(', ')}`
+        );
+      }
+      
+      // Check file size
+      if (audioFile.size > req.max_size) {
+        validation.compatible = false;
+        validation.issues.push(
+          `File too large (${(audioFile.size / 1024 / 1024).toFixed(1)}MB). Max: ${(req.max_size / 1024 / 1024).toFixed(1)}MB`
+        );
+      }
+      
+      // Check duration (if available)
+      if (audioFile.duration) {
+        if (audioFile.duration < req.min_duration) {
+          validation.compatible = false;
+          validation.issues.push(
+            `Audio too short (${audioFile.duration}s). Min: ${req.min_duration}s`
+          );
+        }
+        
+        if (audioFile.duration > req.max_duration) {
+          validation.compatible = false;
+          validation.issues.push(
+            `Audio too long (${audioFile.duration}s). Max: ${req.max_duration}s`
+          );
+        }
+      }
+      
+      validationResults[provider.provider] = validation;
+    }
+    
+    return validationResults;
+    
+  } catch (error) {
+    console.error('Failed to validate audio file:', error);
+    throw error;
+  }
+}
+
+// Usage example
+const audioFile = {
+  name: 'voice-sample.wav',
+  size: 15000000,  // 15MB
+  duration: 45     // 45 seconds
+};
+
+const results = await validateAudioFile(123, audioFile);
+
+// Show compatible providers
+const compatibleProviders = Object.values(results)
+  .filter(result => result.compatible)
+  .map(result => result.name);
+
+console.log('Compatible providers:', compatibleProviders.join(', '));
+
+// Show issues for incompatible providers
+Object.values(results)
+  .filter(result => !result.compatible)
+  .forEach(result => {
+    console.log(`${result.name} issues:`, result.issues.join('; '));
+  });
+```
+
+### Error Responses
+
+**404 Not Found** - Assistant not found:
+```json
+{
+  "detail": "Assistant not found"
+}
+```
+
+**403 Forbidden** - Insufficient permissions:
+```json
+{
+  "detail": "You don't have permission to access this assistant"
+}
+```
+
+**500 Internal Server Error** - Service unavailable:
+```json
+{
+  "detail": "Error listing providers"
+}
+```
+
+### Best Practices
+
+#### Provider Selection Strategy
+
+1. **Quality First**: Choose providers with higher quality requirements for professional use
+2. **Cost Consideration**: Factor in provider pricing for your usage volume
+3. **Feature Requirements**: Select based on needed features (streaming, emotions, etc.)
+4. **Fallback Options**: Always have a secondary provider configured
+
+#### Audio Preparation
+
+```python Audio Preparation Helper
+import librosa
+import soundfile as sf
+
+def prepare_audio_for_cloning(input_file, target_provider):
+    """
+    Optimize audio file for a specific provider's requirements
+    """
+    # Load audio
+    audio, sr = librosa.load(input_file, sr=None)
+    
+    # Get provider requirements
+    providers = get_voice_cloning_providers()
+    provider_req = next(p for p in providers if p["provider"] == target_provider)
+    req = provider_req["requirements"]
+    
+    # Optimize for provider
+    target_sr = req["quality_requirements"]["sample_rate"]
+    target_channels = req["quality_requirements"]["channels"]
+    
+    # Resample if needed
+    if sr != target_sr:
+        audio = librosa.resample(audio, orig_sr=sr, target_sr=target_sr)
+    
+    # Convert to mono if required
+    if target_channels == 1 and len(audio.shape) > 1:
+        audio = librosa.to_mono(audio)
+    
+    # Trim silence
+    audio, _ = librosa.effects.trim(audio, top_db=20)
+    
+    # Normalize volume
+    audio = librosa.util.normalize(audio)
+    
+    # Check duration
+    duration = len(audio) / target_sr
+    if duration < req["min_duration"]:
+        raise ValueError(f"Audio too short: {duration:.1f}s, minimum: {req['min_duration']}s")
+    
+    if duration > req["max_duration"]:
+        # Trim to maximum duration
+        max_samples = int(req["max_duration"] * target_sr)
+        audio = audio[:max_samples]
+    
+    return audio, target_sr
+
+# Usage
+optimized_audio, sample_rate = prepare_audio_for_cloning(
+    "voice-sample.wav", 
+    "elevenlabs"
+)
+
+# Save optimized version
+sf.write("optimized-sample.wav", optimized_audio, sample_rate)
+```
+
+#### Multi-Provider Strategy
+
+```python Multi-Provider Voice Cloning
+async def clone_voice_multi_provider(audio_file, voice_name):
+    """
+    Clone voice with multiple providers for redundancy
+    """
+    providers = await get_voice_cloning_providers()
+    compatible_providers = validate_audio_file(audio_file, providers)
+    
+    cloning_results = {}
+    
+    for provider in compatible_providers:
+        try:
+            # Upload voice sample
+            upload_result = await upload_voice_sample(
+                audio_file,
+                assistant_id=123,
+                provider=provider["provider"]
+            )
+            
+            # Create cloned voice
+            clone_result = await create_cloned_voice(
+                voice_sample_id=upload_result["voice_sample"]["id"],
+                provider=provider["provider"],
+                name=f"{voice_name} ({provider['name']})"
+            )
+            
+            cloning_results[provider["provider"]] = {
+                "success": True,
+                "voice_id": clone_result["cloned_voice"]["id"],
+                "status": clone_result["cloned_voice"]["status"]
+            }
+            
+        except Exception as e:
+            cloning_results[provider["provider"]] = {
+                "success": False,
+                "error": str(e)
+            }
+    
+    return cloning_results
+
+# Usage
+results = await clone_voice_multi_provider("voice-sample.wav", "My Custom Voice")
+
+# Check results
+successful_clones = {k: v for k, v in results.items() if v["success"]}
+print(f"Successfully cloned with {len(successful_clones)} providers")
+```
+
+### Dynamic Provider Configuration
+
+For applications that need to adapt to changing provider availability:
+
+```python Dynamic Provider Management
+class VoiceCloningManager:
+    def __init__(self, assistant_id):
+        self.assistant_id = assistant_id
+        self.provider_cache = {}
+        self.cache_expiry = 300  # 5 minutes
+    
+    async def get_available_providers(self, force_refresh=False):
+        """Get available providers with caching"""
+        now = time.time()
+        
+        if (not force_refresh and 
+            'providers' in self.provider_cache and
+            now - self.provider_cache['timestamp'] < self.cache_expiry):
+            return self.provider_cache['providers']
+        
+        try:
+            providers = await fetch_voice_cloning_providers(self.assistant_id)
+            self.provider_cache = {
+                'providers': providers,
+                'timestamp': now
+            }
+            return providers
+        except Exception as e:
+            # Return cached data if available, otherwise raise
+            if 'providers' in self.provider_cache:
+                return self.provider_cache['providers']
+            raise e
+    
+    async def select_optimal_provider(self, audio_characteristics, preferences=None):
+        """Select the best provider based on audio and preferences"""
+        providers = await self.get_available_providers()
+        
+        # Filter compatible providers
+        compatible = []
+        for provider in providers:
+            if self.is_compatible(provider, audio_characteristics):
+                score = self.calculate_provider_score(provider, preferences or {})
+                compatible.append((provider, score))
+        
+        if not compatible:
+            raise ValueError("No compatible providers found")
+        
+        # Sort by score and return best
+        compatible.sort(key=lambda x: x[1], reverse=True)
+        return compatible[0][0]
+    
+    def is_compatible(self, provider, audio_characteristics):
+        """Check if provider is compatible with audio characteristics"""
+        req = provider["requirements"]
+        
+        return (
+            audio_characteristics.get("format", "").lower() in req["formats"] and
+            req["min_duration"] <= audio_characteristics.get("duration", 0) <= req["max_duration"] and
+            audio_characteristics.get("size", 0) <= req["max_size"]
+        )
+    
+    def calculate_provider_score(self, provider, preferences):
+        """Calculate provider score based on preferences"""
+        score = 0
+        
+        # Base score from quality requirements
+        req = provider["requirements"]
+        score += req["quality_requirements"]["sample_rate"] / 1000
+        score += req["quality_requirements"]["bit_rate"] / 10
+        
+        # Preference bonuses
+        if preferences.get("prioritize_quality") and provider["provider"] == "elevenlabs":
+            score += 50
+        
+        if preferences.get("prioritize_cost") and provider["provider"] == "resemble":
+            score += 30
+        
+        if preferences.get("prioritize_speed") and provider["provider"] in ["elevenlabs"]:
+            score += 40
+        
+        return score
+
+# Usage
+manager = VoiceCloningManager(assistant_id=123)
+
+audio_chars = {
+    "format": "wav",
+    "duration": 60,
+    "size": 10000000
+}
+
+preferences = {
+    "prioritize_quality": True,
+    "prioritize_speed": False
+}
+
+best_provider = await manager.select_optimal_provider(audio_chars, preferences)
+print(f"Selected provider: {best_provider['name']}")
+```
+

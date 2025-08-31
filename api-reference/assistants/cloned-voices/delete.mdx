@@ -1,0 +1,214 @@
+---
+title: 'Delete Cloned Voice'
+openapi: 'DELETE /api/v1/assistants/{assistant_id}/cloned-voices/{voice_id}'
+---
+
+This endpoint permanently deletes a cloned voice from both your organization's database and the TTS provider's system. This action cannot be undone.
+
+### Path Parameters
+
+- `assistant_id` (integer, **required**): The unique identifier of the assistant that owns the cloned voice.
+- `voice_id` (integer, **required**): The unique identifier of the cloned voice to delete.
+
+### Response
+
+A successful deletion returns a confirmation message.
+
+```json Response
+{
+  "success": true,
+  "message": "Cloned voice deleted successfully"
+}
+```
+
+### Deletion Process
+
+When you delete a cloned voice, the following actions occur:
+
+1. **Provider Cleanup**: The voice is deleted from the TTS provider (ElevenLabs, Resemble, etc.)
+2. **Database Removal**: All voice records and metadata are removed from the database
+3. **Usage Logs**: Historical usage logs are preserved for analytics
+4. **Immediate Effect**: The voice becomes unavailable for new synthesis requests
+
+<Warning>
+**Permanent Action**: Once deleted, a cloned voice cannot be recovered. You would need to re-upload the voice sample and recreate the cloned voice if needed.
+</Warning>
+
+### Example Request
+
+```bash cURL
+curl -X DELETE "https://api.burki.dev/assistants/123/cloned-voices/456" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Error Responses
+
+**404 Not Found** - Voice not found:
+```json
+{
+  "detail": "Cloned voice with ID 456 not found"
+}
+```
+
+**403 Forbidden** - Insufficient permissions:
+```json
+{
+  "detail": "You don't have permission to delete this cloned voice"
+}
+```
+
+**500 Internal Server Error** - Provider deletion failed:
+```json
+{
+  "detail": "Failed to delete voice from provider, but removed from database"
+}
+```
+
+### Integration Examples
+
+```python Python - Safe Deletion with Confirmation
+import requests
+
+def delete_cloned_voice(assistant_id, voice_id, confirm=False):
+    if not confirm:
+        raise ValueError("Deletion requires explicit confirmation")
+    
+    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices/{voice_id}"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    response = requests.delete(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Deletion failed: {response.json()['detail']}")
+
+# Usage with explicit confirmation
+result = delete_cloned_voice(123, 456, confirm=True)
+```
+
+```javascript Node.js - Batch Deletion
+async function deleteUnusedVoices(assistantId, daysUnused = 30) {
+  // First, get all voices
+  const voicesResponse = await axios.get(
+    `https://api.burki.dev/assistants/${assistantId}/cloned-voices`,
+    { headers: { 'Authorization': 'Bearer YOUR_API_KEY' } }
+  );
+  
+  const voices = voicesResponse.data.cloned_voices;
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysUnused);
+  
+  // Find unused voices
+  const unusedVoices = voices.filter(voice => {
+    if (voice.synthesis_count === 0) return true;
+    if (!voice.last_used_at) return true;
+    return new Date(voice.last_used_at) < cutoffDate;
+  });
+  
+  // Delete unused voices
+  const deletionResults = [];
+  for (const voice of unusedVoices) {
+    try {
+      await axios.delete(
+        `https://api.burki.dev/assistants/${assistantId}/cloned-voices/${voice.id}`,
+        { headers: { 'Authorization': 'Bearer YOUR_API_KEY' } }
+      );
+      deletionResults.push({ id: voice.id, name: voice.name, success: true });
+    } catch (error) {
+      deletionResults.push({ 
+        id: voice.id, 
+        name: voice.name, 
+        success: false, 
+        error: error.response?.data?.detail 
+      });
+    }
+  }
+  
+  return deletionResults;
+}
+```
+
+### Best Practices
+
+#### Before Deletion
+
+1. **Check Usage**: Verify the voice isn't actively used by assistants
+2. **Backup Information**: Save voice metadata and configuration if needed
+3. **User Notification**: Inform team members who might be using the voice
+4. **Alternative Voices**: Ensure alternative voices are available
+
+#### Batch Operations
+
+When deleting multiple voices:
+
+1. **Rate Limiting**: Add delays between deletions to avoid API limits
+2. **Error Handling**: Handle partial failures gracefully
+3. **Logging**: Keep detailed logs of deletion operations
+4. **Rollback Plan**: Have a plan to recreate accidentally deleted voices
+
+#### Cleanup Strategy
+
+```python Automated Cleanup Strategy
+def cleanup_old_voices(assistant_id, criteria):
+    """
+    Cleanup voices based on multiple criteria
+    """
+    voices = get_cloned_voices(assistant_id)
+    
+    voices_to_delete = []
+    
+    for voice in voices:
+        should_delete = False
+        
+        # Check usage criteria
+        if criteria.get('min_quality') and voice.get('quality_score', 1.0) < criteria['min_quality']:
+            should_delete = True
+            
+        # Check age criteria  
+        if criteria.get('max_age_days'):
+            voice_age = (datetime.now() - datetime.fromisoformat(voice['created_at'])).days
+            if voice_age > criteria['max_age_days'] and voice['synthesis_count'] == 0:
+                should_delete = True
+                
+        # Check status criteria
+        if voice['status'] == 'failed':
+            should_delete = True
+            
+        if should_delete:
+            voices_to_delete.append(voice)
+    
+    # Delete identified voices
+    for voice in voices_to_delete:
+        try:
+            delete_cloned_voice(assistant_id, voice['id'], confirm=True)
+            print(f"Deleted voice: {voice['name']} (ID: {voice['id']})")
+        except Exception as e:
+            print(f"Failed to delete voice {voice['name']}: {e}")
+
+# Example usage
+cleanup_criteria = {
+    'min_quality': 0.7,      # Delete voices with quality < 0.7
+    'max_age_days': 90       # Delete unused voices older than 90 days
+}
+
+cleanup_old_voices(123, cleanup_criteria)
+```
+
+### Recovery Considerations
+
+Since deletion is permanent, consider these recovery strategies:
+
+1. **Voice Sample Retention**: Keep original voice samples to recreate voices if needed
+2. **Metadata Backup**: Export voice configurations before deletion
+3. **Staging Environment**: Test deletion procedures in a staging environment
+4. **Alternative Providers**: Have voices cloned with multiple providers as backup
+
+### Monitoring and Alerts
+
+Set up monitoring for:
+- Voice deletion events
+- Failed deletion attempts
+- Accidental deletion of high-usage voices
+- Provider-side deletion failures
+

@@ -64,7 +64,8 @@
               "call-management",
               "tools",
               "lambda-discovery",
-              "live-transcript"
+              "live-transcript",
+              "voice-cloning"
             ]
           },
           {
@@ -126,6 +127,17 @@
               "api-reference/assistants/documents/list",
               "api-reference/assistants/documents/get-status",
               "api-reference/assistants/documents/delete"
+            ]
+          },
+          {
+            "group": "Voice Cloning",
+            "pages": [
+              "api-reference/assistants/voice-samples/upload",
+              "api-reference/assistants/voice-samples/list",
+              "api-reference/assistants/cloned-voices/create",
+              "api-reference/assistants/cloned-voices/list",
+              "api-reference/assistants/cloned-voices/delete",
+              "api-reference/assistants/voice-cloning/providers"
             ]
           },
           {

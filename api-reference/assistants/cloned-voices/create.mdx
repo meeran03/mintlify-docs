@@ -1,0 +1,149 @@
+---
+title: 'Create Cloned Voice'
+openapi: 'POST /api/v1/assistants/{assistant_id}/cloned-voices/create'
+---
+
+This endpoint creates a cloned voice from an uploaded voice sample using the specified TTS provider. The cloning process varies by provider but typically completes within seconds to minutes.
+
+### Path Parameters
+
+- `assistant_id` (integer, **required**): The unique identifier of the assistant to associate the cloned voice with.
+
+### Request Body
+
+The request body is a JSON object containing cloning configuration.
+
+- `voice_sample_id` (integer, **required**): ID of the uploaded voice sample to clone from
+- `provider` (string, **required**): TTS provider to use for voice cloning
+  - Allowed values: `elevenlabs`, `resemble`, `inworld`
+- `name` (string, **required**): Display name for the cloned voice
+- `description` (string, optional): Description of the cloned voice
+- `language` (string, optional): Language code (e.g., `en`, `es`, `fr`)
+- `enhance_quality` (boolean, optional): Whether to apply quality enhancement. Default: `true`
+- `tags` (array of strings, optional): Tags for organizing cloned voices
+- `metadata` (object, optional): Additional provider-specific metadata
+
+### Example Request
+
+```json Request
+{
+  "voice_sample_id": 123,
+  "provider": "elevenlabs",
+  "name": "Custom Professional Voice",
+  "description": "Professional voice for customer service interactions",
+  "language": "en",
+  "enhance_quality": true,
+  "tags": ["professional", "customer-service"],
+  "metadata": {
+    "use_case": "customer_support"
+  }
+}
+```
+
+### Response
+
+A successful request returns the cloned voice object with initial status.
+
+```json Response
+{
+  "success": true,
+  "cloned_voice": {
+    "id": 456,
+    "name": "Custom Professional Voice",
+    "provider": "elevenlabs",
+    "provider_voice_id": "voice_abc123xyz",
+    "status": "processing",
+    "created_at": "2024-01-15T10:45:00Z"
+  }
+}
+```
+
+### Response Fields
+
+- `id` (integer): Unique identifier for the cloned voice
+- `name` (string): Display name of the cloned voice
+- `provider` (string): TTS provider used for cloning
+- `provider_voice_id` (string): Provider-specific voice identifier
+- `status` (string): Current cloning status
+- `created_at` (string): ISO 8601 timestamp of creation
+
+### Cloning Status
+
+- `processing`: Voice cloning is in progress
+- `ready`: Voice is successfully cloned and ready for use
+- `failed`: Voice cloning failed, check error details
+
+### Provider-Specific Behavior
+
+#### ElevenLabs
+- **Processing Time**: Usually 5-30 seconds
+- **Instant Preview**: Voice ready for immediate testing
+- **Voice ID**: Returns ElevenLabs voice ID for direct API usage
+- **Quality**: High-quality instant cloning from short samples
+
+#### Resemble AI
+- **Processing Time**: 2-10 minutes for training
+- **Professional Quality**: Advanced training algorithms
+- **Voice UUID**: Returns Resemble voice UUID
+- **Customization**: Supports advanced voice customization options
+
+### Example Requests
+
+```bash ElevenLabs Voice Cloning
+curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voice_sample_id": 123,
+    "provider": "elevenlabs",
+    "name": "ElevenLabs Professional Voice",
+    "language": "en",
+    "enhance_quality": true
+  }'
+```
+
+```bash Resemble AI Voice Cloning
+curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voice_sample_id": 123,
+    "provider": "resemble",
+    "name": "Resemble Custom Voice",
+    "description": "High-quality professional voice",
+    "enhance_quality": true,
+    "tags": ["professional", "brand"]
+  }'
+```
+
+### Error Responses
+
+**400 Bad Request** - Invalid parameters:
+```json
+{
+  "detail": "Provider 'invalid_provider' is not supported"
+}
+```
+
+**404 Not Found** - Voice sample not found:
+```json
+{
+  "detail": "Voice sample with ID 123 not found"
+}
+```
+
+**500 Internal Server Error** - Provider cloning failed:
+```json
+{
+  "detail": "Voice cloning failed: Insufficient account balance"
+}
+```
+
+### Best Practices
+
+1. **Provider Selection**: Choose ElevenLabs for quick prototyping, Resemble for production quality
+2. **Naming Convention**: Use descriptive names that indicate voice characteristics
+3. **Quality Settings**: Enable quality enhancement for better results
+4. **Monitoring**: Check cloning status regularly for large-scale operations
+5. **Error Handling**: Implement retry logic for transient provider failures
+

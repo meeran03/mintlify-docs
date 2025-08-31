@@ -1,0 +1,177 @@
+---
+title: 'List Cloned Voices'
+openapi: 'GET /api/v1/assistants/{assistant_id}/cloned-voices'
+---
+
+This endpoint retrieves a list of all cloned voices available to a specific assistant's organization. You can filter by status and provider to find specific voices.
+
+### Path Parameters
+
+- `assistant_id` (integer, **required**): The unique identifier of the assistant whose cloned voices you want to list.
+
+### Query Parameters
+
+- `status` (string, optional): Filter cloned voices by status.
+  - Allowed values: `processing`, `ready`, `failed`, `archived`
+- `provider` (string, optional): Filter cloned voices by TTS provider.
+  - Allowed values: `elevenlabs`, `resemble`, `inworld`
+
+### Response
+
+The response is a JSON object containing an array of cloned voice objects.
+
+```json Response
+{
+  "success": true,
+  "cloned_voices": [
+    {
+      "id": 456,
+      "name": "Custom Professional Voice",
+      "provider": "elevenlabs",
+      "provider_voice_id": "voice_abc123xyz",
+      "language": "en",
+      "gender": null,
+      "status": "ready",
+      "quality_score": 0.95,
+      "created_at": "2024-01-15T10:45:00Z",
+      "last_used_at": "2024-01-15T14:30:00Z",
+      "synthesis_count": 47
+    },
+    {
+      "id": 457,
+      "name": "Resemble Brand Voice",
+      "provider": "resemble",
+      "provider_voice_id": "uuid-def456-ghi789",
+      "language": "en",
+      "gender": "female",
+      "status": "ready",
+      "quality_score": 0.98,
+      "created_at": "2024-01-14T16:20:00Z",
+      "last_used_at": "2024-01-15T12:15:00Z",
+      "synthesis_count": 23
+    },
+    {
+      "id": 458,
+      "name": "Training Voice Sample",
+      "provider": "elevenlabs",
+      "provider_voice_id": "voice_training123",
+      "language": "en",
+      "gender": null,
+      "status": "processing",
+      "quality_score": null,
+      "created_at": "2024-01-15T15:00:00Z",
+      "last_used_at": null,
+      "synthesis_count": 0
+    }
+  ]
+}
+```
+
+### Response Fields
+
+- `id` (integer): Unique identifier for the cloned voice
+- `name` (string): Display name of the cloned voice
+- `provider` (string): TTS provider that hosts this voice
+- `provider_voice_id` (string): Provider-specific voice identifier
+- `language` (string): Language code of the voice (e.g., "en", "es")
+- `gender` (string): Detected or specified gender ("male", "female", null)
+- `status` (string): Current status of the cloned voice
+- `quality_score` (float): Quality score from 0.0 to 1.0 (if available)
+- `created_at` (string): ISO 8601 timestamp of voice creation
+- `last_used_at` (string): ISO 8601 timestamp of last synthesis (null if never used)
+- `synthesis_count` (integer): Total number of times this voice has been used
+
+### Voice Status Values
+
+- `processing`: Voice cloning is still in progress
+- `ready`: Voice is successfully cloned and ready for use
+- `failed`: Voice cloning failed during processing
+- `archived`: Voice has been archived and is no longer active
+
+### Quality Scores
+
+Quality scores are provider-dependent and may not be available for all voices:
+
+- **0.9 - 1.0**: Excellent quality, production-ready
+- **0.8 - 0.9**: Good quality, suitable for most use cases
+- **0.7 - 0.8**: Fair quality, may need improvement
+- **< 0.7**: Poor quality, consider re-training with better samples
+
+### Example Requests
+
+```bash List All Cloned Voices
+curl -X GET "https://api.burki.dev/assistants/123/cloned-voices" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Filter by Status
+curl -X GET "https://api.burki.dev/assistants/123/cloned-voices?status=ready" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Filter by Provider
+curl -X GET "https://api.burki.dev/assistants/123/cloned-voices?provider=elevenlabs" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash Multiple Filters
+curl -X GET "https://api.burki.dev/assistants/123/cloned-voices?status=ready&provider=resemble" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Usage Analytics
+
+The response includes usage analytics for each voice:
+
+- **synthesis_count**: Track voice popularity and ROI
+- **last_used_at**: Identify unused voices for cleanup
+- **quality_score**: Make data-driven decisions about voice selection
+
+### Integration Examples
+
+```python Python - List and Analyze Voices
+import requests
+
+def analyze_voice_usage(assistant_id):
+    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices"
+    headers = {"Authorization": "Bearer YOUR_API_KEY"}
+    
+    response = requests.get(url, headers=headers)
+    voices = response.json()['cloned_voices']
+    
+    # Analyze usage patterns
+    total_synthesis = sum(voice['synthesis_count'] for voice in voices)
+    ready_voices = [v for v in voices if v['status'] == 'ready']
+    unused_voices = [v for v in voices if v['synthesis_count'] == 0]
+    
+    return {
+        'total_voices': len(voices),
+        'ready_voices': len(ready_voices),
+        'unused_voices': len(unused_voices),
+        'total_synthesis': total_synthesis
+    }
+```
+
+```javascript Node.js - Filter High-Quality Voices
+async function getHighQualityVoices(assistantId, minQuality = 0.8) {
+  const response = await axios.get(
+    `https://api.burki.dev/assistants/${assistantId}/cloned-voices?status=ready`,
+    {
+      headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
+    }
+  );
+  
+  return response.data.cloned_voices.filter(voice => 
+    voice.quality_score && voice.quality_score >= minQuality
+  );
+}
+```
+
+### Best Practices
+
+1. **Regular Monitoring**: Check voice status regularly for processing voices
+2. **Quality Assessment**: Use quality scores to evaluate voice performance
+3. **Usage Tracking**: Monitor synthesis_count to identify popular voices
+4. **Cleanup**: Archive or delete unused voices to reduce costs
+5. **Provider Comparison**: Compare quality and usage across providers
+
