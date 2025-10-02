@@ -13,15 +13,21 @@ The request body is a JSON object specifying the details of the outbound call.
 
 - `assistant_id` (integer, **required**): The ID of the assistant that should make the call.
 - `to_phone_number` (string, **required**): The destination phone number to call, in E.164 format.
-- `welcome_message` (string, optional): A custom welcome message for the assistant to say at the beginning of the call. If not provided, the assistant's default greeting will be used.
-- `agenda` (string, optional): A specific topic or goal for the call. This can be used to guide the assistant's conversation.
+- `welcome_message` (string, optional): A custom welcome message for the assistant to say at the beginning of the call. If not provided, the assistant's default greeting will be used. Supports variable substitution using `{{variable}}` syntax.
+- `agenda` (string, optional): A specific topic or goal for the call. This can be used to guide the assistant's conversation. Supports variable substitution using `{{variable}}` syntax.
+- `variables` (object, optional): A dictionary of custom variables for template substitution in the welcome_message and agenda. Variables can be referenced using double curly brackets, e.g., `{{name}}`, `{{company}}`, etc.
 
 ```json Request
 {
   "assistant_id": 123,
   "to_phone_number": "+15559876543",
-  "welcome_message": "Hello, this is a reminder about your appointment tomorrow at 10 AM.",
-  "agenda": "Remind the user about their upcoming appointment."
+  "welcome_message": "Hello {{name}}, this is a reminder about your appointment tomorrow at {{time}}.",
+  "agenda": "Remind {{name}} about their upcoming {{appointment_type}} appointment.",
+  "variables": {
+    "name": "John Doe",
+    "time": "10 AM",
+    "appointment_type": "dental"
+  }
 }
 ```
 

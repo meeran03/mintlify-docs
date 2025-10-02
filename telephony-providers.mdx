@@ -1,17 +1,17 @@
 ---
 title: Telephony Providers
-description: "Configure Twilio or Telnyx for your voice AI assistants"
+description: "Configure Twilio, Telnyx, or BYO SIP Trunk for your voice AI assistants"
 ---
 
 <Callout type="info">
-Burki Voice AI supports both Twilio and Telnyx as telephony providers. You can use different providers for different assistants, enabling cost optimization and redundancy.
+Burki Voice AI supports Twilio, Telnyx, and BYO (Bring Your Own) SIP Trunk as telephony providers. You can use different providers for different assistants, enabling cost optimization and redundancy.
 </Callout>
 
 ---
 
 ## Provider Comparison
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="🏢 Twilio" icon="phone">
     **Traditional Leader**
     
@@ -32,6 +32,17 @@ Burki Voice AI supports both Twilio and Telnyx as telephony providers. You can u
     - SMS/MMS messaging support
     - Global carrier-grade network
     - WebRTC and SIP support
+  </Card>
+  
+  <Card title="🔧 BYO SIP Trunk" icon="network-wired">
+    **Maximum Flexibility**
+    
+    - Use any SIP provider (Zadarma, VoIP.ms, etc.)
+    - Potentially lowest costs
+    - Full control over infrastructure
+    - Supports SIP REFER for call transfers
+    - Voice calls only (no SMS typically)
+    - Requires SIP provider configuration
   </Card>
 </CardGroup>
 
@@ -156,26 +167,269 @@ TELNYX_CONNECTION_ID=1234567890
 
 ---
 
+## BYO SIP Trunk Setup
+
+<Accordion title="BYO SIP Trunk Configuration">
+
+### 1. Overview
+Bring Your Own (BYO) SIP Trunk allows you to integrate any SIP-based telephony provider with Burki Voice AI. This is ideal for:
+- Cost optimization with existing SIP provider relationships
+- Regional/specialized SIP providers (Zadarma, VoIP.ms, etc.)
+- Full control over telephony infrastructure
+- Integration with on-premise PBX systems
+
+### 2. Prerequisites
+Before setting up BYO SIP trunk:
+- Purchase phone numbers from your SIP provider
+- Obtain SIP gateway address (e.g., `sip.zadarma.com`, `sip.voip.ms`)
+- Get SIP authentication credentials (username/password) or configure IP authentication
+- Configure your provider to forward calls to Burki
+
+### 3. Network Requirements
+Ensure your SIP provider allows traffic to/from these IPs:
+```
+44.229.228.186/32
+44.238.177.138/32
+```
+
+<Warning>
+IP-based authentication can cause routing issues on shared infrastructure. Use credential-based authentication when possible.
+</Warning>
+
+### 4. Organization-Level Configuration
+
+**Environment Variables (Global):**
+```env
+SIP_GATEWAY=sip.zadarma.com
+SIP_USERNAME=15551234567
+SIP_PASSWORD=your_sip_password
+```
+
+**API Configuration:**
+```bash
+curl -X PUT "https://yourdomain.com/api/v1/organizations/{org_id}" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sip_gateway": "sip.zadarma.com",
+    "sip_username": "15551234567",
+    "sip_password": "your_sip_password",
+    "sip_trunk_config": {
+      "sip_domain": "zadarma.com",
+      "inbound_enabled": true,
+      "outbound_leading_plus_enabled": true,
+      "auth_plan": {
+        "type": "credentials",
+        "username": "15551234567",
+        "password": "your_sip_password"
+      }
+    }
+  }'
+```
+
+### 5. Register Phone Numbers
+
+Register your existing SIP phone numbers with Burki:
+
+```bash
+curl -X POST "https://yourdomain.com/api/v1/phone-numbers/purchase" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "phone_number": "+15551234567",
+    "provider": "byo-sip-trunk",
+    "friendly_name": "My SIP Number",
+    "assistant_id": 123
+  }'
+```
+
+### 6. Configure Provider Webhooks
+
+Configure your SIP provider to forward inbound calls to:
+```
+https://yourdomain.com/sip-webhook
+```
+
+For specific SIP URI format (varies by provider):
+```
+sip:{phone_number}@{your-burki-domain}.com
+```
+
+### 7. Outbound Calls
+
+Initiate outbound calls through your SIP trunk:
+
+```bash
+curl -X POST "https://yourdomain.com/api/v1/calls/initiate" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to_phone_number": "+15557654321",
+    "from_phone_number": "+15551234567",
+    "assistant_id": 123
+  }'
+```
+
+### 8. Call Transfers (SIP REFER)
+
+For call transfers, configure the transfer tool with SIP URI format:
+
+```json
+{
+  "type": "transferCall",
+  "destinations": [
+    {
+      "type": "sip",
+      "sipUri": "sip:+15557654321@sip.zadarma.com"
+    }
+  ]
+}
+```
+
+<Note>
+Some providers require E.164 formatting with the `+` prefix: `sip:+15557654321@sip.provider.com`
+</Note>
+
+### 9. Provider-Specific Examples
+
+<Tabs>
+  <Tab title="Zadarma">
+    ```json
+    {
+      "sip_gateway": "sip.zadarma.com",
+      "sip_username": "YOUR_SIP_NUMBER",
+      "sip_password": "YOUR_SIP_PASSWORD",
+      "sip_trunk_config": {
+        "inbound_enabled": false,
+        "outbound_leading_plus_enabled": true,
+        "auth_plan": {
+          "type": "credentials"
+        }
+      }
+    }
+    ```
+  </Tab>
+  
+  <Tab title="VoIP.ms">
+    ```json
+    {
+      "sip_gateway": "sip.voip.ms",
+      "sip_username": "your_account",
+      "sip_password": "your_password",
+      "sip_trunk_config": {
+        "inbound_enabled": true,
+        "outbound_leading_plus_enabled": true,
+        "auth_plan": {
+          "type": "credentials"
+        }
+      }
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Generic SIP">
+    ```json
+    {
+      "sip_gateway": "sip.yourprovider.com",
+      "sip_username": "your_username",
+      "sip_password": "your_password",
+      "sip_trunk_config": {
+        "sip_domain": "yourprovider.com",
+        "inbound_enabled": true,
+        "outbound_leading_plus_enabled": true,
+        "gateways": [
+          {
+            "ip": "sip.yourprovider.com",
+            "inbound_enabled": true,
+            "port": 5060
+          }
+        ],
+        "auth_plan": {
+          "type": "credentials",
+          "username": "your_username",
+          "password": "your_password"
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### 10. Features & Limitations
+
+**Supported:**
+- ✅ Inbound calls (with provider webhook configuration)
+- ✅ Outbound calls
+- ✅ Call transfers (SIP REFER)
+- ✅ Call recording (application-level)
+- ✅ Credential-based and IP-based authentication
+
+**Not Supported:**
+- ❌ SMS/MMS (most SIP trunks are voice-only)
+- ❌ Phone number search/purchase via API (use provider portal)
+- ❌ Automatic webhook configuration (manual setup required)
+
+### 11. Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized Errors">
+    - Verify SIP credentials are correct
+    - Ensure all signaling IP addresses are whitelisted
+    - Check if IP-based auth is properly configured
+  </Accordion>
+  
+  <Accordion title="Calls Not Routing">
+    - Confirm webhook URL is accessible from your provider
+    - Check SIP URI format matches provider requirements
+    - Verify phone number is registered in Burki database
+  </Accordion>
+  
+  <Accordion title="Transfer Not Working">
+    - Enable SIP REFER on your provider
+    - Verify transfer destination format (some providers require E.164)
+    - Check provider supports blind transfers
+  </Accordion>
+</AccordionGroup>
+
+</Accordion>
+
+---
+
 ## Mixed Environment Examples
 
 ### Use Case 1: Cost Optimization
 ```json
-// High-volume sales assistant - use Telnyx for cost savings
+// High-volume sales assistant - use BYO SIP for lowest costs
 {
   "name": "Sales Dialer Bot",
-  "telnyx_config": {
-    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "connection_id": "1234567890"
-  }
+  "phone_numbers": [
+    {
+      "phone_number": "+15551234567",
+      "provider": "byo-sip-trunk"
+    }
+  ]
+}
+
+// Standard support - use Telnyx for good balance
+{
+  "name": "Support Bot",
+  "phone_numbers": [
+    {
+      "phone_number": "+15559876543",
+      "provider": "telnyx"
+    }
+  ]
 }
 
 // Premium support assistant - use Twilio for reliability
 {
   "name": "VIP Support Bot", 
-  "twilio_config": {
-    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "auth_token": "your_twilio_auth_token"
-  }
+  "phone_numbers": [
+    {
+      "phone_number": "+15555555555",
+      "provider": "twilio"
+    }
+  ]
 }
 ```
 
