@@ -191,7 +191,7 @@ The server gracefully handles:
 ```javascript
 const callSid = 'CA123abc...';
 const apiKey = 'burki_your_api_key_here';
-const websocket = new WebSocket(`ws://localhost:8000/live-transcript/${callSid}?token=${apiKey}`);
+const websocket = new WebSocket(`wss://api.burki.dev/live-transcript/${callSid}?token=${apiKey}`);
 
 websocket.onopen = function() {
     console.log('Connected to live transcript stream');
@@ -232,7 +232,7 @@ import websockets
 import json
 
 async def listen_to_call(call_sid, api_key):
-    uri = f"ws://localhost:8000/live-transcript/{call_sid}?token={api_key}"
+    uri = f"wss://api.burki.dev/live-transcript/{call_sid}?token={api_key}"
     
     try:
         async with websockets.connect(uri) as websocket:

@@ -1,38 +1,45 @@
 ---
 title: Features
-description: "Everything vapi.ai promises, but delivered with superior performance and usability"
+description: "A complete voice AI platform with everything you need to build intelligent phone assistants"
 ---
 
 # Features
 
-**Why Burki delivers what other platforms promise:** While vapi.ai struggles with 4-5 second latency and broken UIs, Burki provides a complete, production-ready platform with 0.8-1.2 second response times and interfaces that actually work.
-
-<Warning>
-**Real User Experience:** "I was a vapi.ai power user for 2.5 years. The UI never worked properly, latency was terrible (4-5 seconds), and their recent pricing changes would cost my startup $800/month. With Burki, I get sub-second response times and complete control over my costs."
-</Warning>
+Burki Voice AI provides a complete, production-ready platform for building voice-powered applications. From ultra-low latency to advanced call management, everything you need is built in.
 
 ## Core Voice AI Capabilities
-- **Multi-Provider Telephony**: Support for both Twilio and Telnyx with automatic provider selection per assistant.
+
+- **Multi-Provider Telephony**: Support for Twilio, Vonage, and Telnyx with automatic provider selection per assistant.
 - **Speech-to-Text**: Real-time transcription using Deepgram Nova 3 with confidence scoring.
-- **Natural Language Processing**: Generate intelligent responses with OpenAI GPT models or custom LLM providers.
-- **Text-to-Speech**: Convert responses to natural speech with ElevenLabs, Deepgram, Inworld, or Resemble.
+- **Natural Language Processing**: Generate intelligent responses with OpenAI, Anthropic, Gemini, Groq, and xAI.
+- **Text-to-Speech**: Convert responses to natural speech with ElevenLabs, Cartesia, Deepgram, or Resemble.
 - **Audio Denoising**: Built-in RNNoise integration for crystal-clear audio quality.
 - **Call Recording**: Automatic recording with transcription storage and metadata tracking.
 - **Live Transcript Streaming**: Real-time WebSocket streaming of call transcripts for monitoring and analytics.
 - **SMS & MMS Messaging**: Send text messages and multimedia content through your assistants with multi-provider support.
 
-<Callout type="success">
-Burki supports multiple TTS and LLM providers out of the box. You can easily switch or add new integrations.
-</Callout>
+<Info>
+Burki supports multiple TTS and LLM providers. You can easily switch or add new integrations at any time.
+</Info>
+
+## Performance & Reliability
+
+- **Ultra-Low Latency**: 0.8-1.2 second response times for natural conversations
+- **Automatic Scaling**: Infrastructure scales automatically with your call volume
+- **99.9% Uptime SLA**: Enterprise-grade reliability for business-critical applications
+- **Global Edge Network**: Low-latency connections worldwide
+- **Provider Fallbacks**: Automatic failover to backup providers if primary fails
 
 ## Multi-Assistant Management
+
 - **Multiple AI Assistants**: Configure different assistants with unique personalities and settings.
 - **Phone Number Assignment**: Assign specific assistants to different phone numbers.
-- **Database-Driven Configuration**: Store and manage assistant configurations dynamically.
-- **Real-time Assistant Loading**: Hot-reload assistant configurations without restart.
+- **Real-time Configuration**: Update assistant settings without any restart or downtime.
+- **Organization Management**: Manage multiple teams and assistants under one account.
 
 ## SMS & MMS Messaging
-- **Multi-Provider SMS**: Send messages through Twilio or Telnyx based on assistant configuration.
+
+- **Multi-Provider SMS**: Send messages through Twilio, Vonage, or Telnyx based on assistant configuration.
 - **Multimedia Support**: Send images, documents, and other media files via MMS.
 - **Assistant-Based Routing**: Messages automatically use the correct provider for each assistant.
 - **E.164 Validation**: Automatic phone number format validation for reliable delivery.
@@ -40,9 +47,10 @@ Burki supports multiple TTS and LLM providers out of the box. You can easily swi
 - **Integration Ready**: Easy-to-use REST API for sending messages from your applications.
 
 ## Phone Number Management
-- **Search & Discovery**: Find available phone numbers from Twilio and Telnyx with advanced filtering by area code, locality, and patterns.
+
+- **Search & Discovery**: Find available phone numbers with advanced filtering by area code, locality, and patterns.
 - **Direct Purchase**: Buy phone numbers instantly through the API with automatic webhook configuration and assistant assignment.
-- **Multi-Provider Support**: Purchase and manage numbers from both Twilio and Telnyx in a unified interface.
+- **Multi-Provider Support**: Purchase and manage numbers from Twilio, Vonage, and Telnyx in a unified interface.
 - **Cost Comparison**: Compare pricing between providers for the same region to optimize costs.
 - **Global Coverage**: Access phone numbers in 60+ countries worldwide with local presence capabilities.
 - **Inventory Management**: Centralized dashboard to track usage, costs, and assignment across all providers.
@@ -50,26 +58,32 @@ Burki supports multiple TTS and LLM providers out of the box. You can easily swi
 - **Bulk Operations**: Purchase or release multiple numbers simultaneously for scaling operations.
 
 ## Web Dashboard & Management
+
 - **Modern Web Interface**: Beautiful, responsive dashboard for managing your voice AI system.
 - **Real-time Analytics**: Advanced call statistics, success rates, and performance metrics.
 - **Call Management**: View call history, transcripts, and recordings through the web interface.
 - **Assistant Configuration**: Create and manage assistants through an intuitive web UI.
-- **User Profile Management**: Comprehensive user and organization management.
+- **Usage Monitoring**: Track minutes, costs, and wallet balance in real-time.
 
 ## Authentication & Security
+
 - **Multi-tenant Architecture**: Support for multiple organizations with isolated data.
 - **Google OAuth Integration**: Seamless authentication with Google accounts.
 - **API Key Management**: Generate and manage API keys for programmatic access.
 - **Session Management**: Secure session handling with JWT tokens.
 - **Role-based Access Control**: User roles and permissions system.
+- **Data Encryption**: All data encrypted at rest and in transit.
 
 ## Advanced Audio Processing
+
 - **Real-time Noise Reduction**: RNNoise integration for superior audio quality.
 - **Voice Activity Detection**: Smart silence detection and speech processing.
 - **Audio Format Support**: Support for various audio formats with automatic conversion.
 - **Recording Quality Enhancement**: Post-processing tools for improving recording quality.
+- **Background Sounds**: Add ambient audio to create realistic call environments.
 
 ## Tools & Custom Actions
+
 - **Built-in Call Tools**: Call transfers, graceful call endings, and essential call management actions.
 - **Endpoint Tools**: Make HTTP requests to external APIs during conversations for CRM lookups, database queries, and third-party integrations.
 - **Python Function Tools**: Execute custom Python code with access to popular libraries for calculations, data processing, and business logic.
@@ -79,17 +93,65 @@ Burki supports multiple TTS and LLM providers out of the box. You can easily swi
 - **Sandbox Security**: Python functions run in secure, isolated environments with resource limits.
 - **Usage Analytics**: Track tool performance, success rates, and execution times across all assistants.
 
-<Callout type="success">
+<Info>
 Tools are independent of assistants, allowing you to build a library of reusable integrations. Create once, use everywhere.
-</Callout>
+</Info>
 
 ## API & Integration
+
 - **RESTful API**: Comprehensive REST API for all system operations.
 - **WebSocket Support**: Real-time communication for live call handling and transcript streaming.
 - **Webhook Support**: Configurable webhooks for call events and notifications.
-- **Custom LLM Support**: Integrate with various LLM providers beyond OpenAI.
+- **Custom LLM Support**: Integrate with various LLM providers beyond the built-in options.
 - **Live Transcript API**: WebSocket endpoint for real-time transcript monitoring and analytics.
 
-<Callout type="info">
-For a full list of integrations and setup instructions, see the [Integrations](integrations) page.
-</Callout> 
+<Info>
+For a full list of integrations and setup instructions, see the [Integrations](/integrations) page.
+</Info>
+
+## Flexible Deployment Options
+
+<CardGroup cols={2}>
+  <Card title="Burki Cloud" icon="cloud">
+    **Fully managed platform**
+    
+    - No infrastructure to manage
+    - Automatic updates and scaling
+    - 24/7 monitoring and support
+    - Best for most use cases
+  </Card>
+  <Card title="BYO Mode" icon="key">
+    **Bring your own API keys**
+    
+    - Use your existing provider accounts
+    - Full control over costs
+    - Platform fees only
+    - Best for cost optimization
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+<CardGroup cols={3}>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Create your first assistant in 5 minutes
+  </Card>
+  <Card
+    title="Pricing"
+    icon="tag"
+    href="/pricing"
+  >
+    Simple, transparent pricing
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Full API documentation
+  </Card>
+</CardGroup>

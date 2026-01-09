@@ -1,0 +1,211 @@
+---
+title: Pricing
+description: "Simple, transparent pricing for voice AI"
+---
+
+# Simple, Transparent Pricing
+
+Burki offers straightforward pricing with no hidden fees. Pay only for what you use, with generous free trial credits to get started.
+
+---
+
+## Platform Fees
+
+Every customer pays a simple platform fee based on usage:
+
+| Service | Platform Fee |
+|---------|-------------|
+| **Voice Calls** | $0.03 per connected minute |
+| **SMS Messages** | $0.001 per segment |
+
+<Info>
+**Connected minutes** are billed only when a call is actually answered. If a call isn't connected, you're not charged.
+</Info>
+
+---
+
+## Two Ways to Use Burki
+
+<CardGroup cols={2}>
+  <Card title="Burki Cloud" icon="cloud">
+    **Fully managed** - We handle everything
+    
+    - Platform fee + pass-through costs + 15% managed fee
+    - No API keys to manage
+    - Automatic provider selection
+    - Best for: Teams who want simplicity
+  </Card>
+  <Card title="BYO (Bring Your Own)" icon="key">
+    **Use your own API keys**
+    
+    - Platform fees only
+    - You pay providers directly
+    - Full control over costs
+    - Best for: Teams with existing provider accounts
+  </Card>
+</CardGroup>
+
+---
+
+## Burki Cloud Pricing
+
+When using Burki Cloud, we manage all AI providers for you:
+
+| Component | How It's Billed |
+|-----------|-----------------|
+| Platform Fee | $0.03/min (voice), $0.001/segment (SMS) |
+| Carrier Costs | Pass-through at cost |
+| LLM (OpenAI, Anthropic, etc.) | Pass-through at cost |
+| STT (Deepgram, Azure) | Pass-through at cost |
+| TTS (Cartesia, ElevenLabs) | Pass-through at cost |
+| Managed Service Fee | +15% on all pass-through costs |
+| Phone Numbers | $1.00/month (prorated daily) |
+
+<Accordion title="Example: 5-minute Burki Cloud call">
+| Fee Type | Calculation | Amount |
+|----------|-------------|--------|
+| Platform Fee | 5 min × $0.03 | $0.15 |
+| Carrier Pass-through | Vonage cost | $0.10 |
+| LLM Pass-through | OpenAI cost | $0.10 |
+| STT Pass-through | Deepgram cost | $0.25 |
+| TTS Pass-through | Cartesia cost | $0.50 |
+| Managed Fee (15%) | ($0.10 + $0.10 + $0.25 + $0.50) × 15% | $0.14 |
+| **Total** | | **$1.24** |
+</Accordion>
+
+---
+
+## BYO (Bring Your Own) Pricing
+
+When you bring your own API keys, you only pay platform fees:
+
+| Component | How It's Billed |
+|-----------|-----------------|
+| Platform Fee | $0.03/min (voice), $0.001/segment (SMS) |
+| All AI Providers | You pay directly (not through Burki) |
+
+<Accordion title="Example: 5-minute BYO call">
+| Fee Type | Calculation | Amount |
+|----------|-------------|--------|
+| Platform Fee | 5 min × $0.03 | $0.15 |
+| LLM/STT/TTS/Carrier | Paid directly to providers | $0.00 |
+| **Total to Burki** | | **$0.15** |
+</Accordion>
+
+---
+
+## Hybrid Mode
+
+Mix and match! Use your own keys for some services while letting Burki manage others.
+
+<Accordion title="Example: BYO LLM + Managed STT/TTS (5-minute call)">
+| Fee Type | Calculation | Amount |
+|----------|-------------|--------|
+| Platform Fee | 5 min × $0.03 | $0.15 |
+| LLM (BYO) | User pays OpenAI directly | $0.00 |
+| STT Pass-through | Deepgram cost | $0.25 |
+| STT Managed Fee | $0.25 × 15% | $0.04 |
+| TTS Pass-through | Cartesia cost | $0.50 |
+| TTS Managed Fee | $0.50 × 15% | $0.08 |
+| **Total to Burki** | | **$1.02** |
+</Accordion>
+
+<Info>
+The 15% managed fee only applies to services that Burki manages. BYO services have no managed fee.
+</Info>
+
+---
+
+## Free Trial
+
+Start building immediately with generous free credits:
+
+<CardGroup cols={3}>
+  <Card title="200 Minutes" icon="clock">
+    Platform fee waived for your first 200 connected minutes
+  </Card>
+  <Card title="Carrier Subsidy" icon="phone">
+    200 carrier-free minutes on eligible routes (Burki Cloud)
+  </Card>
+  <Card title="Free Number" icon="hashtag">
+    Trial phone number free for 30 days
+  </Card>
+</CardGroup>
+
+### What's Included in Trial
+
+| Credit Type | Amount | Who Gets It |
+|-------------|--------|-------------|
+| Platform Minutes | 200 free minutes | Everyone |
+| Carrier Subsidy | 200 carrier-free minutes | Burki Cloud only |
+| Trial Phone Number | 30 days free | Burki Cloud only |
+
+<Info>
+During the free trial, Burki absorbs all managed AI costs (LLM, STT, TTS) for Burki Cloud users. You can test the full platform without any charges.
+</Info>
+
+---
+
+## Wallet & Payments
+
+Burki uses a prepaid wallet system:
+
+- **Add funds** via credit card (Stripe)
+- **Auto top-up** available to never run out of credits
+- **Real-time balance** visible in your dashboard
+- **Detailed usage** breakdown by call, assistant, and service
+
+### Minimum Balance Requirements
+
+| Mode | Minimum Balance to Make Calls |
+|------|------------------------------|
+| BYO | $0.03 (1 minute) |
+| Burki Cloud | $2.00 (accounts for AI costs) |
+
+---
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="How is voice call duration calculated?">
+    We bill based on **connected minutes** only. Time is calculated from when the call is answered until it ends, rounded up to the nearest minute. Unanswered calls are not billed.
+  </Accordion>
+  
+  <Accordion title="What counts as an SMS segment?">
+    A standard SMS segment is 160 characters. Messages longer than 160 characters are split into multiple segments. We use the carrier's reported segment count.
+  </Accordion>
+  
+  <Accordion title="Can I switch between BYO and Burki Cloud?">
+    Yes! You can change your configuration at any time from the dashboard. You can even use hybrid mode with some services on BYO and others on Burki Cloud.
+  </Accordion>
+  
+  <Accordion title="What happens when my trial ends?">
+    Your account continues to work - you'll just start being charged for usage. Add funds to your wallet before the trial ends to ensure uninterrupted service.
+  </Accordion>
+  
+  <Accordion title="Is there a monthly minimum or commitment?">
+    No. Burki is pure pay-as-you-go. No monthly minimums, no long-term contracts. Pay only for what you use.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Get Started
+
+<CardGroup cols={2}>
+  <Card
+    title="Sign Up Free"
+    icon="rocket"
+    href="https://burki.dev/signup"
+  >
+    Create your account and get 200 free minutes instantly
+  </Card>
+  <Card
+    title="Talk to Sales"
+    icon="comments"
+    href="mailto:sales@burki.dev"
+  >
+    Need custom pricing or enterprise features? Let's talk.
+  </Card>
+</CardGroup>
+

@@ -1,5 +1,6 @@
 ---
 title: Quickstart
+description: "Get your first AI-powered voice assistant up and running in minutes"
 ---
 
 <img src="/logo/light.svg" alt="Burki Voice AI" style={{ height: '40px', marginBottom: '1rem' }} />
@@ -8,124 +9,208 @@ Get your first AI-powered voice assistant up and running in minutes!
 
 ---
 
-## Prerequisites
+## Step 1: Create Your Account
 
-Before you begin, make sure you have:
-
-- A [Twilio](https://www.twilio.com/) account (for phone numbers and calls)
-- API keys for at least one provider in each category:
-  - **LLM (Language Model):** OpenAI, Anthropic, Gemini, xAI, or Groq
-  - **TTS (Text-to-Speech):** ElevenLabs, Deepgram, Inworld, or Resemble
-  - **STT (Speech-to-Text):** Deepgram
-- A phone number purchased in Twilio (recommended)
-- Python 3.9+ and Docker (for local setup)
-
-> **Tip:** You can start with free or trial accounts for most providers.
-
----
-
-## 1. Clone & Install
-
-```bash
-git clone https://github.com/meeran03/burki.git
-cd burki
-pip install -r requirements.txt
-```
-
-Or use Docker:
-
-```bash
-docker build -t burki-voice-ai .
-docker run -p 8000:8000 burki-voice-ai
-```
+<Steps>
+  <Step title="Sign Up">
+    Go to [burki.dev/signup](https://burki.dev/signup) and create your free account.
+    
+    You'll receive:
+    - **200 free platform minutes**
+    - **Trial phone number** (free for 30 days)
+    - **Full access** to all features
+  </Step>
+  
+  <Step title="Verify Your Email">
+    Check your inbox and click the verification link to activate your account.
+  </Step>
+  
+  <Step title="Access Your Dashboard">
+    Log in at [burki.dev/dashboard](https://burki.dev/dashboard) to access the main control panel.
+  </Step>
+</Steps>
 
 ---
 
-## 2. Set Up Environment Variables
+## Step 2: Choose Your Setup Mode
 
-Copy the example file and fill in your secrets:
+Before creating an assistant, decide how you want to handle AI providers:
 
-```bash
-cp .env.example .env
-# Edit .env with your API keys and Twilio credentials
-```
+<CardGroup cols={2}>
+  <Card title="Burki Cloud (Recommended)" icon="cloud">
+    **Easiest to get started**
+    
+    - No API keys needed
+    - We manage all providers
+    - Pay as you go
+    - Best for: Getting started quickly
+  </Card>
+  <Card title="BYO (Bring Your Own)" icon="key">
+    **Use your existing accounts**
+    
+    - Connect your own API keys
+    - You pay providers directly
+    - Platform fees only
+    - Best for: Cost optimization
+  </Card>
+</CardGroup>
+
+<Info>
+You can start with Burki Cloud and switch to BYO later, or use a hybrid approach with some services managed and others BYO.
+</Info>
 
 ---
 
-## 3. Run the App
+## Step 3: Create Your First Assistant
 
-```bash
-python app/main.py
-# or with Docker, as above
-```
-
-Visit [http://localhost:8000](http://localhost:8000) in your browser.
+<Steps>
+  <Step title="Click Create New Assistant">
+    From your dashboard, click the **"Create New Assistant"** button.
+  </Step>
+  
+  <Step title="Configure Basic Info">
+    - **Name:** Give your assistant a descriptive name (e.g., "Customer Support Bot")
+    - **Description:** Brief description of what this assistant does
+  </Step>
+  
+  <Step title="Set Up AI Configuration">
+    Configure the three AI components:
+    
+    **LLM (Language Model)** - The brain
+    - Choose a provider (OpenAI, Anthropic, Gemini, etc.)
+    - Select a model (GPT-4o recommended)
+    - Write a system prompt describing your assistant's personality and purpose
+    
+    **TTS (Text-to-Speech)** - The voice
+    - Choose a provider (ElevenLabs, Cartesia, Deepgram, etc.)
+    - Select a voice that matches your brand
+    
+    **STT (Speech-to-Text)** - The ears
+    - Deepgram Nova-3 is recommended for best accuracy
+    - Choose your primary language
+  </Step>
+  
+  <Step title="Assign a Phone Number">
+    Your trial phone number is automatically available. Assign it to your assistant to start receiving calls.
+  </Step>
+  
+  <Step title="Save and Test">
+    Click **"Create Assistant"** and call your phone number to test!
+  </Step>
+</Steps>
 
 ---
 
-## 4. Create Your First Assistant
+## Step 4: Test Your Assistant
 
-1. **Log in** (register if needed)
-2. Click **"Create New Assistant"**
-3. Fill in:
-   - **Basic Info:** Name, description
-   - **AI Configuration:**
-     - Pick your LLM, TTS, and STT providers
-     - Paste in your API keys
-     - Choose models and voices
-     - Set a greeting message
-   - **Integration:** Add your Twilio phone number
-   - (Optional) Configure RAG, call management, and tools
-4. Click **"Create Assistant"**
+Once your assistant is created:
 
-> **That's it!** Your assistant is ready to take calls.
+1. **Call the phone number** assigned to your assistant
+2. **Speak naturally** - the assistant will respond based on your configuration
+3. **Check the dashboard** for call logs, transcripts, and analytics
+
+<Tip>
+Use the **Live Transcript** feature in your dashboard to monitor calls in real-time and see exactly what's being said.
+</Tip>
+
+---
+
+## Step 5: Making API Calls
+
+Once your assistant is created, you can interact with it programmatically using the API.
+
+### Get Your API Key
+
+1. Click on your profile in the top right corner
+2. Navigate to **API Keys**
+3. Click **"Generate New API Key"**
+4. Copy the key immediately (you won't see it again)
+
+### Make Your First API Request
+
+<CodeGroup>
+```bash cURL
+curl -X GET "https://api.burki.dev/api/v1/assistants/" \
+     -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+api_key = "YOUR_API_KEY"
+headers = {"Authorization": f"Bearer {api_key}"}
+
+response = requests.get(
+    "https://api.burki.dev/api/v1/assistants/",
+    headers=headers
+)
+
+print(response.json())
+```
+
+```javascript Node.js
+const response = await fetch('https://api.burki.dev/api/v1/assistants/', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+</CodeGroup>
+
+<Warning>
+Treat your API keys like passwords! Never share them publicly or commit them to version control.
+</Warning>
 
 ---
 
 ## Minimal Example Configuration
 
-Here's what a minimal working setup looks like:
+Here's what a typical working setup looks like:
 
-- **LLM Provider:** OpenAI (GPT-4o)
-- **TTS Provider:** ElevenLabs (Flash v2.5, Rachel)
-- **STT Provider:** Deepgram (Nova-3, English)
-- **Twilio Number:** Your purchased number
+| Component | Recommended Choice |
+|-----------|-------------------|
+| **LLM Provider** | OpenAI (GPT-4o) |
+| **TTS Provider** | ElevenLabs or Cartesia |
+| **STT Provider** | Deepgram (Nova-3) |
+| **Language** | English (US) |
 
-You can always add more advanced features later!
-
----
-
-## 5. Making Your First API Call
-
-Once your assistant is created, you can interact with it using the API. All API requests must be authenticated using a Bearer Token.
-
-### A. Get Your API Key
-
-1.  From the web interface, click on your profile/organization name in the top right corner.
-2.  Navigate to **API Keys**.
-3.  Click **"Generate New API Key"**.
-4.  Give it a descriptive name and click **"Create"**.
-5.  **Copy the key immediately!** You won't be able to see it again for security reasons.
-
-### B. Authenticate Your Request
-
-To make an authenticated API call, include the API key in the `Authorization` header of your request, prefixed with `Bearer `.
-
-Here is an example using `curl` to list your assistants:
-
-```bash
-# Replace <YOUR_API_KEY> with the key you just copied
-curl -X GET "http://localhost:8000/api/v1/assistants/" \
-     -H "Authorization: Bearer <YOUR_API_KEY>" \
-     -H "Content-Type: application/json"
-```
-
-A successful request will return a JSON array of your assistants. Now you're ready to explore the full [API Reference](/api-reference/introduction)!
+You can always customize and add more advanced features later!
 
 ---
 
 ## Next Steps
 
-- [Installation & Setup](./installation)
-- [AI Configuration Deep Dive](./ai-configuration)
-- [Integrations](./integrations)
+<CardGroup cols={2}>
+  <Card
+    title="AI Configuration"
+    icon="brain"
+    href="/ai-configuration"
+  >
+    Deep dive into LLM, TTS, and STT settings
+  </Card>
+  <Card
+    title="Phone Numbers"
+    icon="phone"
+    href="/phone-number-management"
+  >
+    Purchase additional numbers or use your own
+  </Card>
+  <Card
+    title="Knowledge Base"
+    icon="book"
+    href="/rag"
+  >
+    Upload documents to make your assistant smarter
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Full API documentation for developers
+  </Card>
+</CardGroup>

@@ -1,72 +1,156 @@
 ---
 title: Configuration
-description: "Reference for Burki Voice AI environment variables and settings"
+description: "Configure your Burki Voice AI assistants and providers"
 ---
 
 # Configuration
 
-This page lists all key environment variables and configuration options for Burki Voice AI.
+This page covers the key configuration options for Burki Voice AI assistants and integrations.
 
-## Environment Variables
-Set these in your `.env` file or as environment variables in your deployment platform.
+---
 
-### Database
-- `DATABASE_URL` — PostgreSQL connection string (e.g., `postgresql://user:pass@host:5432/dbname`)
+## Provider Configuration
 
-### Telephony
-- `TWILIO_ACCOUNT_SID` — Twilio account SID (optional, can be set per-assistant)
-- `TWILIO_AUTH_TOKEN` — Twilio auth token (optional, can be set per-assistant)
-- `TELNYX_API_KEY` — Telnyx API key (optional, can be set per-assistant)
-- `TELNYX_CONNECTION_ID` — Telnyx Connection ID for Call Control Application (optional, can be set per-assistant)
+Burki supports two configuration modes for AI providers:
 
-### Speech-to-Text
-- `DEEPGRAM_API_KEY` — Deepgram API key
+### Burki Cloud (Managed)
 
-### Language Models
-- `OPENAI_API_KEY` — OpenAI API key
-- `ELEVENLABS_API_KEY` — ElevenLabs API key
-- `INWORLD_BEARER_TOKEN` — Inworld API token (optional)
-- `RESEMBLE_API_KEY` — Resemble API key (optional)
+When using Burki Cloud, no API keys are required. Simply:
+1. Select **Burki Cloud** mode in your assistant settings
+2. Choose your preferred providers and models
+3. Costs are automatically billed to your wallet
 
-### Storage
-- `S3_ACCESS_KEY_ID` — S3 access key (if using S3)
-- `S3_SECRET_ACCESS_KEY` — S3 secret key
-- `S3_BUCKET_NAME` — S3 bucket name
-- `S3_REGION` — S3 region
+### BYO (Bring Your Own)
 
-### Security & Auth
-- `SECRET_KEY` — Secret for session and JWT signing
-- `GOOGLE_CLIENT_ID` — Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET` — Google OAuth client secret
+When using your own API keys, configure them in **Settings** → **Provider Keys**:
 
-### Other
-- `AUDIO_DENOISING_METHOD` — (optional) `rnnoise`, `fallback`, or `auto`
-- `AUDIO_DENOISING_DEFAULT` — (optional) `true` or `false`
+| Provider | Key Required |
+|----------|-------------|
+| **OpenAI** | API Key |
+| **Anthropic** | API Key |
+| **ElevenLabs** | API Key |
+| **Cartesia** | API Key |
+| **Deepgram** | API Key |
+| **Twilio** | Account SID + Auth Token |
+| **Vonage** | API Key + API Secret |
+| **Telnyx** | API Key + Connection ID |
 
-## Example .env File
-```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/burki
+---
 
-# Telephony (choose one or both)
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=your_twilio_token
-TELNYX_API_KEY=KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TELNYX_CONNECTION_ID=1234567890
+## Assistant Configuration
 
-# AI Services
-DEEPGRAM_API_KEY=your_deepgram_key
-OPENAI_API_KEY=your_openai_key
-ELEVENLABS_API_KEY=your_elevenlabs_key
+Each assistant can be configured with:
 
-# Security
-SECRET_KEY=supersecretkey
+### Basic Settings
+- **Name** — Display name for the assistant
+- **Description** — Internal notes about the assistant's purpose
+- **Greeting Message** — First message spoken when a call connects
+
+### AI Configuration
+- **LLM Provider** — OpenAI, Anthropic, Gemini, Groq, or xAI
+- **LLM Model** — Specific model (e.g., gpt-4o, claude-3-sonnet)
+- **System Prompt** — Instructions defining the assistant's behavior
+- **Temperature** — Creativity level (0.0-1.0)
+
+### Voice Configuration
+- **TTS Provider** — ElevenLabs, Cartesia, Deepgram, or Resemble
+- **Voice** — Specific voice ID or name
+- **Speed** — Speaking rate adjustment
+- **Stability** — Voice consistency (provider-dependent)
+
+### Speech Recognition
+- **STT Provider** — Deepgram (recommended)
+- **Model** — Nova-3 or other available models
+- **Language** — Primary language for recognition
+- **Keywords** — Important terms for better recognition
+
+---
+
+## Call Management Settings
+
+### Recording
+- **Enable Recording** — Toggle call recording on/off
+- **Recording Format** — MP3 or WAV
+
+### Interruption Handling
+- **Allow Interruptions** — Let callers interrupt the assistant
+- **Interruption Threshold** — Sensitivity (0.0-1.0)
+
+### Timeouts
+- **Max Call Duration** — Maximum call length in minutes
+- **Silence Timeout** — End call after N seconds of silence
+
+---
+
+## API Configuration
+
+For API access, you'll need:
+
+| Setting | Value |
+|---------|-------|
+| **API Base URL** | `https://api.burki.dev` |
+| **API Key** | Generated in Dashboard → Settings → API Keys |
+
+### Example API Request
+
+```bash
+curl -X GET "https://api.burki.dev/api/v1/assistants/" \
+     -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-## Configuration Tips
-- Never commit your `.env` file or secrets to version control.
-- Use different secrets for development and production.
-- For cloud deployment, set environment variables in your platform's dashboard.
+---
 
-<Callout type="info">
-For advanced deployment and scaling, see the [Deployment](deployment) guide.
-</Callout> 
+## Webhook Configuration
+
+Configure webhooks in **Settings** → **Webhooks** to receive real-time notifications:
+
+| Event | Description |
+|-------|-------------|
+| `call.started` | Call connected |
+| `call.ended` | Call completed |
+| `call.recording.ready` | Recording available |
+| `message.sent` | SMS sent |
+| `message.received` | SMS received |
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Keep system prompts concise">
+    Shorter system prompts reduce latency. Focus on essential instructions and personality traits.
+  </Accordion>
+  
+  <Accordion title="Use appropriate models">
+    For simple tasks, faster models (GPT-4o-mini) may be better than more powerful ones.
+  </Accordion>
+  
+  <Accordion title="Configure fallbacks">
+    Set up backup providers for critical assistants to ensure reliability.
+  </Accordion>
+  
+  <Accordion title="Test before going live">
+    Use the test call feature to verify your configuration before assigning real phone numbers.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="AI Configuration"
+    icon="brain"
+    href="/ai-configuration"
+  >
+    Deep dive into LLM, TTS, and STT settings
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Full API documentation
+  </Card>
+</CardGroup>

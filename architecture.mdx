@@ -1,10 +1,11 @@
 ---
 title: Core Concepts & Architecture
+description: "Understanding how Burki Voice AI works"
 ---
 
-<Callout type="info">
-Understanding these basics will help you get the most out of Burki Voice AI!
-</Callout>
+<Info>
+Understanding these core concepts will help you get the most out of Burki Voice AI!
+</Info>
 
 ---
 
@@ -14,116 +15,193 @@ An **Assistant** is a virtual agent that can answer calls, talk to users, and pe
 
 - You can create multiple assistants for different use cases (e.g., sales, support, info lines).
 - Each assistant can have its own settings, phone number, and knowledge base.
+- Assistants can be updated in real-time without any downtime.
 
 ---
 
-## Multi-Tenancy & Modularity
+## Multi-Tenancy & Organizations
 
-- **Multi-Tenancy:** Manage multiple organizations and assistants from a single platform. Great for agencies, teams, or businesses with many brands.
-- **Modularity:** Swap out any AI provider (LLM, TTS, STT) at any time. Mix and match to get the best results for your needs.
+- **Organizations:** Group your assistants, team members, and resources under one account. Great for agencies, teams, or businesses with many brands.
+- **Role-Based Access:** Admins, members, and viewers each have different permissions.
+- **Resource Isolation:** Each organization's data is completely separate and secure.
 
-<Accordion title="Why Modularity Matters">
-- Try new AI models as they launch—no lock-in!
-- Use fallback providers for reliability
-- Optimize for speed, cost, or quality as needed
+---
+
+## Provider Modes
+
+Burki offers flexibility in how you connect to AI providers:
+
+<CardGroup cols={2}>
+  <Card title="Burki Cloud" icon="cloud">
+    We manage all provider connections. You select providers and models, we handle the rest.
+  </Card>
+  <Card title="BYO Mode" icon="key">
+    Connect your own API keys. You pay providers directly and maintain full control.
+  </Card>
+</CardGroup>
+
+<Accordion title="Why Flexibility Matters">
+- **Cost Control:** Use your existing enterprise pricing with BYO mode
+- **Try New Models:** Test new AI models as they launch
+- **Optimize:** Use Burki Cloud for convenience, BYO for specific needs
+- **Fallbacks:** Set up backup providers for reliability
 </Accordion>
 
 ---
 
 ## How a Call Flows Through the System
 
-<Mermaid>
-graph TD
-  A[User speaks on phone] --> B[Speech-to-Text (STT)]
-  B --> C[Language Model (LLM)]
-  C --> D[Text-to-Speech (TTS)]
-  D --> E[User hears AI response]
-  C -- "If LLM fails" --> F[Fallback LLM]
-  F --> D
-</Mermaid>
-
-- **STT:** Converts the caller's speech to text (e.g., Deepgram)
-- **LLM:** Understands and generates a response (e.g., OpenAI, Claude, Gemini, etc.)
-- **TTS:** Converts the AI's response back to speech (e.g., ElevenLabs, Deepgram, Inworld)
-- **Fallbacks:** If the main LLM fails, the system automatically tries your backup providers
-
-<Callout type="success">
-You can customize every step—choose your favorite providers, set up fallbacks, and fine-tune the experience!
-</Callout>
-
----
-
-## Configuration Sections Overview
-
-- **Basic Info:** Name, description, and branding
-- **AI Configuration:** Pick your LLM, TTS, and STT providers and models
-- **RAG (Knowledge Base):** Add custom knowledge for smarter answers
-- **Call Management:** Control call flow, interruptions, and recordings
-- **Integrations:** Connect Twilio, Deepgram, and more
-- **Advanced:** Fine-tune settings for power users
-
----
-
-# Architecture
-
-Burki Voice AI is designed with modularity, scalability, and extensibility in mind. This page provides a high-level overview of the system architecture and codebase structure.
-
-## System Overview
+When someone calls your Burki phone number, here's what happens:
 
 ```mermaid
-graph TD;
-    User((User))
-    Web[Web Dashboard]
-    API[REST API]
-    Twilio[Twilio]
-    Deepgram[Deepgram]
-    OpenAI[OpenAI/LLM]
-    ElevenLabs[ElevenLabs TTS]
-    DB[(PostgreSQL DB)]
-    S3[(S3 Storage)]
-    AudioDenoise[Audio Denoising]
-    
-    User-->|Browser|Web
-    User-->|Phone Call|Twilio
-    Web-->|API Calls|API
-    API-->|Call Events|Twilio
-    API-->|Speech|Deepgram
-    API-->|LLM|OpenAI
-    API-->|TTS|ElevenLabs
-    API-->|Audio|AudioDenoise
-    API-->|Data|DB
-    API-->|Recordings|S3
-    AudioDenoise-->|Processed Audio|API
+graph TD
+    A[Caller dials number] --> B[Telephony Provider]
+    B --> C[Burki Platform]
+    C --> D[STT: Speech to Text]
+    D --> E[LLM: Generate Response]
+    E --> F[TTS: Text to Speech]
+    F --> G[Caller hears response]
+    E -->|"If tool needed"| H[Execute Tool]
+    H --> E
+    E -->|"If primary fails"| I[Fallback LLM]
+    I --> F
 ```
 
-## Folder Structure
+### Component Breakdown
 
-```text
-app/
-  core/         # Core business logic and managers
-  services/     # Integrations (Twilio, Deepgram, TTS, etc.)
-  api/          # REST API endpoints and web routes
-  db/           # Database models and migrations
-  utils/        # Utility functions and helpers
-  templates/    # Web interface templates (HTML)
-  static/       # Static assets (CSS, images, etc.)
-  twilio/       # Twilio-specific logic
-  rag/          # Retrieval-Augmented Generation (RAG) modules
-  creator/      # Creator tools and services
-  tools/        # Custom tools and scripts
+| Component | What It Does | Providers |
+|-----------|-------------|-----------|
+| **Telephony** | Handles phone calls and audio streaming | Twilio, Vonage, Telnyx |
+| **STT** | Converts caller's speech to text | Deepgram |
+| **LLM** | Understands context and generates responses | OpenAI, Anthropic, Gemini, Groq, xAI |
+| **TTS** | Converts AI response back to speech | ElevenLabs, Cartesia, Deepgram, Resemble |
+| **Tools** | Executes actions (transfers, API calls, etc.) | Built-in + Custom |
+
+<Info>
+You can customize every step—choose your favorite providers, set up fallbacks, and fine-tune the experience!
+</Info>
+
+---
+
+## Configuration Sections
+
+When setting up an assistant, you'll configure these sections:
+
+| Section | What You Configure |
+|---------|-------------------|
+| **Basic Info** | Name, description, and greeting message |
+| **AI Configuration** | LLM, TTS, and STT providers and models |
+| **RAG (Knowledge Base)** | Documents and web pages for context |
+| **Call Management** | Interruptions, recordings, and call flow |
+| **Tools** | Actions your assistant can take |
+| **Phone Numbers** | Which numbers route to this assistant |
+
+---
+
+## System Architecture
+
+```mermaid
+graph TD
+    subgraph users [Users]
+        Web[Web Dashboard]
+        API[REST API]
+        Phone[Phone Calls]
+    end
+
+    subgraph platform [Burki Platform]
+        Gateway[API Gateway]
+        Core[Core Engine]
+        Audio[Audio Processing]
+        Tools[Tool Execution]
+    end
+
+    subgraph providers [AI Providers]
+        STT[Speech-to-Text]
+        LLM[Language Models]
+        TTS[Text-to-Speech]
+    end
+
+    subgraph telephony [Telephony]
+        Twilio[Twilio]
+        Vonage[Vonage]
+        Telnyx[Telnyx]
+    end
+
+    subgraph storage [Data]
+        DB[(Database)]
+        Files[(File Storage)]
+    end
+
+    Web --> Gateway
+    API --> Gateway
+    Phone --> telephony
+    telephony --> Gateway
+    Gateway --> Core
+    Core --> Audio
+    Core --> Tools
+    Audio --> STT
+    Audio --> TTS
+    Core --> LLM
+    Core --> DB
+    Core --> Files
 ```
 
-## Component Interaction
-- **Web Dashboard**: Allows users to manage assistants, view analytics, and configure settings via a modern UI.
-- **API Layer**: Handles all RESTful requests, authentication, and business logic.
-- **Telephony (Twilio)**: Receives and manages phone calls, streams audio to the backend.
-- **Speech-to-Text (Deepgram)**: Transcribes incoming audio in real time.
-- **LLM (OpenAI, etc.)**: Generates intelligent responses based on transcribed text.
-- **Text-to-Speech (ElevenLabs, etc.)**: Converts responses to natural-sounding speech.
-- **Audio Denoising**: Cleans up audio streams for better recognition and user experience.
-- **Database**: Stores user, assistant, call, and analytics data.
-- **S3 Storage**: Stores call recordings and large audio files.
+### Key Components
 
-<Callout type="info">
-For more details on each integration, see the [Integrations](integrations) page.
-</Callout> 
+- **API Gateway**: Handles authentication, rate limiting, and request routing
+- **Core Engine**: Manages conversation state, assistant configuration, and business logic
+- **Audio Processing**: Real-time audio streaming with noise reduction
+- **Tool Execution**: Secure execution environment for custom actions
+- **Storage**: Encrypted storage for conversations, recordings, and configuration
+
+---
+
+## Data Flow
+
+### Inbound Call
+
+1. **Call arrives** at your phone number via telephony provider
+2. **Audio streams** to Burki in real-time over WebSocket
+3. **STT converts** speech to text with sub-second latency
+4. **LLM generates** a contextual response
+5. **TTS converts** response to audio
+6. **Audio streams** back to the caller
+7. **Call data** is logged for analytics and transcripts
+
+### Outbound Call (API-Initiated)
+
+1. **API request** triggers an outbound call
+2. **Burki connects** via telephony provider
+3. **Same flow** as inbound once connected
+4. **Webhook** notifies your system of call status
+
+---
+
+## Security & Compliance
+
+- **Encryption**: All data encrypted at rest (AES-256) and in transit (TLS 1.3)
+- **API Key Security**: Keys are hashed and never stored in plain text
+- **Provider Isolation**: BYO keys are encrypted and only used for your requests
+- **Audit Logs**: Complete audit trail of all system access
+- **Data Retention**: Configurable retention policies for recordings and transcripts
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="AI Configuration"
+    icon="brain"
+    href="/ai-configuration"
+  >
+    Learn about LLM, TTS, and STT configuration options
+  </Card>
+  <Card
+    title="Integrations"
+    icon="plug"
+    href="/integrations"
+  >
+    Connect with external services and APIs
+  </Card>
+</CardGroup>

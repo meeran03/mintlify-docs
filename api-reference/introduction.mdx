@@ -7,19 +7,19 @@ The Burki Voice AI API allows you to programmatically manage assistants, calls, 
 
 This API is built on REST principles and uses standard HTTP response codes and authentication. All API responses are returned in JSON format.
 
-<Card
-  title="View the OpenAPI Specification"
-  icon="file-code"
-  href="/api-reference/openapi.json"
->
-  Our API is documented using the OpenAPI 3.1 standard. You can view the raw specification file to see all available endpoints, models, and security schemes.
-</Card>
+## Base URL
+
+All API requests should be made to:
+
+```
+https://api.burki.dev
+```
 
 ## Authentication
 
 All Burki API endpoints are protected and require a valid API key to be included in all requests. Authentication is performed by passing a **Bearer Token** in the `Authorization` header of your HTTP requests.
 
-You can generate and manage your API keys from the **API Keys** section in your organization's dashboard.
+You can generate and manage your API keys from the **API Keys** section in your organization's dashboard at [burki.dev/dashboard](https://burki.dev/dashboard).
 
 ### How to Use Your API Key
 
@@ -27,7 +27,7 @@ To authenticate an API request, you must include an `Authorization` header with 
 
 <CodeGroup>
 ```bash cURL
-curl "https://api.yourdomain.com/api/v1/assistants" \
+curl "https://api.burki.dev/api/v1/assistants" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -40,7 +40,7 @@ headers = {
 }
 
 response = requests.get(
-    "https://api.yourdomain.com/api/v1/assistants", 
+    "https://api.burki.dev/api/v1/assistants", 
     headers=headers
 )
 
@@ -52,7 +52,7 @@ const fetch = require('node-fetch');
 
 const apiKey = 'YOUR_API_KEY';
 
-fetch('https://api.yourdomain.com/api/v1/assistants', {
+fetch('https://api.burki.dev/api/v1/assistants', {
   headers: {
     'Authorization': `Bearer ${apiKey}`
   }
@@ -67,6 +67,106 @@ fetch('https://api.yourdomain.com/api/v1/assistants', {
   Treat your API keys like passwords! Do not share them publicly or commit them to version control.
 </Warning>
 
-### Error Codes
+## Response Format
 
-If your API key is missing, invalid, or expired, you will receive a `401 Unauthorized` HTTP response code.
+All responses are returned in JSON format with consistent structure:
+
+### Success Response
+
+```json
+{
+  "data": { ... },
+  "message": "Success"
+}
+```
+
+### Error Response
+
+```json
+{
+  "detail": "Error description",
+  "status_code": 400
+}
+```
+
+## Error Codes
+
+| Code | Description |
+|------|-------------|
+| `400` | Bad Request - Invalid parameters |
+| `401` | Unauthorized - Invalid or missing API key |
+| `403` | Forbidden - Insufficient permissions |
+| `404` | Not Found - Resource doesn't exist |
+| `429` | Too Many Requests - Rate limit exceeded |
+| `500` | Internal Server Error |
+
+## Rate Limits
+
+API requests are rate limited to ensure platform stability:
+
+| Tier | Requests per minute |
+|------|---------------------|
+| Free Trial | 60 |
+| Standard | 300 |
+| Enterprise | Custom |
+
+Rate limit headers are included in all responses:
+
+```
+X-RateLimit-Limit: 300
+X-RateLimit-Remaining: 299
+X-RateLimit-Reset: 1640000000
+```
+
+## Pagination
+
+List endpoints support pagination with the following query parameters:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `page` | Page number (1-indexed) | 1 |
+| `page_size` | Items per page | 20 |
+
+Paginated responses include metadata:
+
+```json
+{
+  "data": [...],
+  "total": 100,
+  "page": 1,
+  "page_size": 20,
+  "total_pages": 5
+}
+```
+
+## Webhooks
+
+Burki can send webhook notifications for various events. Configure webhooks in your dashboard under **Settings** → **Webhooks**.
+
+Supported events:
+- `call.started`
+- `call.ended`
+- `call.recording.ready`
+- `message.sent`
+- `message.received`
+
+## SDKs & Libraries
+
+Official SDKs are coming soon. In the meantime, you can use any HTTP client to interact with the API.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get started with Burki in 5 minutes
+  </Card>
+  <Card
+    title="Assistants API"
+    icon="robot"
+    href="/api-reference/assistants/create"
+  >
+    Create and manage AI assistants
+  </Card>
+</CardGroup>

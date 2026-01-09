@@ -3,55 +3,162 @@ title: Usage
 description: "How to use Burki Voice AI: dashboard, phone, and API"
 ---
 
+# Usage
+
 This page explains how to use Burki Voice AI as an end user, admin, or developer.
 
+---
+
 ## Web Dashboard
-The web dashboard is the main interface for managing assistants, viewing analytics, and configuring your system.
+
+The web dashboard at [burki.dev/dashboard](https://burki.dev/dashboard) is the main interface for managing your voice AI system.
 
 ### Common Tasks
-- **Log in** with your credentials or Google account.
-- **Create or edit assistants**: Set up personalities, assign phone numbers, and configure integrations.
-- **View call history**: Access transcripts, recordings, and analytics.
-- **Manage users and organizations**: Add team members, set roles, and manage permissions.
 
-<Callout type="info">
-The dashboard is available at [http://localhost:8000](http://localhost:8000) by default.
-</Callout>
+- **Log in** with your credentials or Google account
+- **Create or edit assistants**: Set up personalities, assign phone numbers, and configure integrations
+- **View call history**: Access transcripts, recordings, and analytics
+- **Manage billing**: Add funds, view usage, and configure auto top-up
+- **Manage team**: Add team members, set roles, and manage permissions
+
+---
 
 ## Phone Call Flow
-Burki can answer and manage real phone calls via Twilio.
 
-### Example Flow
-1. **Customer calls your Twilio number**.
-2. **Burki answers** and starts real-time transcription and processing.
-3. **AI assistant responds** using natural language and TTS.
-4. **Call is recorded** and available for review in the dashboard.
+Burki handles real phone calls through your configured telephony provider.
+
+### Inbound Call Flow
+
+1. **Customer calls your number** assigned to an assistant
+2. **Burki answers** and plays the greeting message
+3. **Real-time transcription** converts speech to text
+4. **AI generates response** based on the conversation context
+5. **Text-to-speech** converts the response to natural speech
+6. **Customer hears response** with sub-second latency
+7. **Call is recorded** and available in the dashboard
+
+### Outbound Call Flow
+
+1. **API request** triggers an outbound call
+2. **Burki dials** the target number
+3. **Same conversation flow** once connected
+4. **Webhook notification** sent with call status
+
+---
 
 ## API Usage
+
 Burki exposes a RESTful API for programmatic access.
 
-### Example: Get Call History
-```http
-GET /api/calls
-Authorization: Bearer <your_api_key>
+### Authentication
+
+All API requests require a Bearer token:
+
+```bash
+curl -X GET "https://api.burki.dev/api/v1/assistants/" \
+     -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-### Example: Create an Assistant
-```json
-{
-  "name": "SupportBot",
-  "llm_provider": "openai"
-}
-```
-*Add other assistant settings as needed.*
+### Common Operations
 
-For a full list of endpoints, see the [API Reference](api-reference/introduction).
+<AccordionGroup>
+  <Accordion title="List Assistants">
+    ```bash
+    GET /api/v1/assistants/
+    ```
+  </Accordion>
+  
+  <Accordion title="Create Assistant">
+    ```bash
+    POST /api/v1/assistants/
+    Content-Type: application/json
+    
+    {
+      "name": "Support Bot",
+      "llm_provider": "openai",
+      "llm_model": "gpt-4o"
+    }
+    ```
+  </Accordion>
+  
+  <Accordion title="Get Call History">
+    ```bash
+    GET /api/v1/calls/
+    ```
+  </Accordion>
+  
+  <Accordion title="Send SMS">
+    ```bash
+    POST /api/v1/messaging/sms/send
+    Content-Type: application/json
+    
+    {
+      "to": "+1234567890",
+      "from": "+0987654321",
+      "body": "Hello from Burki!"
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
 
-## User Flows
-- **Admin:** Set up organization, invite users, configure assistants, monitor analytics.
-- **Agent:** Review call transcripts, listen to recordings, update assistant settings.
-- **Developer:** Integrate Burki with other systems via API or webhooks.
+For the complete API reference, see [API Reference](/api-reference/introduction).
 
-<Callout type="success">
-For advanced usage, see the [Configuration](configuration) and [Deployment](deployment) guides. 
-</Callout>
+---
+
+## User Roles
+
+### Admin
+- Set up organization and billing
+- Invite and manage team members
+- Configure all assistants
+- Access all analytics and reports
+
+### Member
+- Create and manage assigned assistants
+- View call history and transcripts
+- Configure phone numbers
+
+### Viewer
+- View dashboards and analytics
+- Listen to call recordings
+- Read transcripts
+
+---
+
+## Live Monitoring
+
+### Live Transcript
+
+Watch calls in real-time:
+1. Go to **Calls** → **Live**
+2. Select an active call
+3. See transcript updates as they happen
+
+### Analytics Dashboard
+
+Monitor key metrics:
+- **Total calls** (today, this week, this month)
+- **Average call duration**
+- **Success rate**
+- **Cost breakdown**
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Configuration"
+    icon="gear"
+    href="/configuration"
+  >
+    Detailed configuration options
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Full API documentation
+  </Card>
+</CardGroup>

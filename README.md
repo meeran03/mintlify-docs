@@ -1,32 +1,37 @@
-# Mintlify Starter Kit
+# Burki Voice AI Documentation
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+This is the documentation site for Burki Voice AI, built with [Mintlify](https://mintlify.com).
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+## Local Development
 
-### Development
+Install the Mintlify CLI to preview documentation changes locally:
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview the documentation changes locally. To install, use the following command
-
-```
+```bash
 npm i -g mint
 ```
 
-Run the following command at the root of your documentation (where docs.json is)
+Run the development server:
 
-```
+```bash
+cd mintlify-docs
 mint dev
 ```
 
-### Publishing Changes
+The docs will be available at `http://localhost:3000`.
 
-Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard. 
+## Structure
 
-#### Troubleshooting
+- `docs.json` - Navigation and configuration
+- `*.mdx` - Documentation pages
+- `api-reference/` - API documentation
+- `tts-providers/` - TTS provider guides
+- `images/` - Images and assets
+- `logo/` - Logo files
 
-- If the dev environment isn't running - Run `mint update` to ensure you have the most recent version of the CLI.
-- Page loads as a 404 - Make sure you are running in a folder with `docs.json`
+## Deployment
+
+Changes to the `main` branch are automatically deployed via Mintlify's integration.
+
+## Support
+
+For documentation issues or suggestions, contact support@burki.dev.

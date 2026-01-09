@@ -1,0 +1,217 @@
+---
+title: Getting Started
+description: "Set up your Burki account and configure AI providers"
+---
+
+<Info>
+This guide covers account setup and provider configuration. If you haven't created an account yet, start with the [Quickstart](/quickstart) guide.
+</Info>
+
+---
+
+## Account Setup
+
+### Creating Your Organization
+
+When you sign up for Burki, an organization is automatically created for you. Organizations help you:
+
+- **Manage multiple assistants** under one account
+- **Invite team members** with different roles
+- **Track usage and billing** across all assistants
+- **Share resources** like phone numbers and knowledge bases
+
+### Adding Team Members
+
+1. Go to **Settings** → **Team**
+2. Click **"Invite Member"**
+3. Enter their email and select a role:
+   - **Admin:** Full access to all settings and billing
+   - **Member:** Can create and manage assistants
+   - **Viewer:** Read-only access to dashboards and analytics
+
+---
+
+## Provider Configuration
+
+Burki supports two modes for AI providers. You can use either mode or mix them.
+
+### Burki Cloud (Managed)
+
+With Burki Cloud, we handle all provider integrations:
+
+<Steps>
+  <Step title="Select Burki Cloud Mode">
+    When creating or editing an assistant, choose **"Burki Cloud"** for each provider section.
+  </Step>
+  
+  <Step title="Choose Your Providers">
+    Select from available options:
+    - **LLM:** OpenAI, Anthropic, Gemini, Groq, xAI
+    - **TTS:** ElevenLabs, Cartesia, Deepgram, Resemble
+    - **STT:** Deepgram
+  </Step>
+  
+  <Step title="Configure Settings">
+    Customize model selection, voice options, and language settings.
+  </Step>
+</Steps>
+
+<Info>
+Burki Cloud charges pass-through costs plus a 15% managed fee. Check the [Pricing](/pricing) page for details.
+</Info>
+
+### BYO (Bring Your Own Keys)
+
+Use your own API keys for full control over costs:
+
+<Steps>
+  <Step title="Get Your API Keys">
+    Sign up for accounts with your preferred providers:
+    
+    | Provider | Sign Up URL |
+    |----------|-------------|
+    | OpenAI | [platform.openai.com](https://platform.openai.com) |
+    | Anthropic | [console.anthropic.com](https://console.anthropic.com) |
+    | ElevenLabs | [elevenlabs.io](https://elevenlabs.io) |
+    | Deepgram | [deepgram.com](https://deepgram.com) |
+    | Cartesia | [cartesia.ai](https://cartesia.ai) |
+  </Step>
+  
+  <Step title="Add Keys to Burki">
+    Go to **Settings** → **API Keys** → **Provider Keys** and enter your credentials.
+  </Step>
+  
+  <Step title="Select BYO Mode">
+    When configuring an assistant, choose **"BYO"** and select your connected provider.
+  </Step>
+</Steps>
+
+<Warning>
+Your API keys are encrypted and stored securely. We never share them or use them for anything other than making API calls on your behalf.
+</Warning>
+
+### Hybrid Mode
+
+Mix BYO and Burki Cloud based on your needs:
+
+| Service | Example Configuration |
+|---------|----------------------|
+| LLM | BYO (OpenAI) - You have negotiated enterprise pricing |
+| TTS | Burki Cloud - Easier management of voice options |
+| STT | Burki Cloud - Deepgram is optimized for phone audio |
+
+---
+
+## Telephony Setup
+
+### Using Your Trial Number
+
+Every new account receives a trial phone number:
+
+- **Free for 30 days**
+- **Automatically configured** for voice calls
+- **US number** by default (other countries available on request)
+
+### Purchasing Additional Numbers
+
+1. Go to **Phone Numbers** → **Purchase**
+2. Search by country, area code, or pattern
+3. Compare prices across providers (Twilio, Vonage, Telnyx)
+4. Click **"Purchase"** to add to your account
+
+<Info>
+Phone numbers cost $1.00/month (prorated daily) and are billed to your wallet.
+</Info>
+
+### Bringing Your Own Numbers
+
+If you have existing phone numbers with Twilio, Vonage, or Telnyx:
+
+1. Go to **Settings** → **Provider Keys**
+2. Add your telephony provider credentials
+3. Go to **Phone Numbers** → **Sync**
+4. Your numbers will appear and can be assigned to assistants
+
+---
+
+## Wallet & Billing
+
+### Adding Funds
+
+1. Go to **Billing** → **Wallet**
+2. Click **"Add Funds"**
+3. Enter the amount and complete payment via Stripe
+
+### Setting Up Auto Top-up
+
+Never run out of credits:
+
+1. Go to **Billing** → **Auto Top-up**
+2. Set your **threshold** (e.g., when balance drops below $10)
+3. Set your **top-up amount** (e.g., add $50)
+4. Save your payment method
+
+<Tip>
+Auto top-up has a 5-minute cooldown to prevent duplicate charges during high-volume periods.
+</Tip>
+
+### Minimum Balance Requirements
+
+| Mode | Minimum to Make Calls |
+|------|----------------------|
+| BYO | $0.03 |
+| Burki Cloud | $2.00 |
+
+---
+
+## Environment Variables (API Users)
+
+If you're integrating via API, you'll need:
+
+| Variable | Description |
+|----------|-------------|
+| `BURKI_API_KEY` | Your API key from the dashboard |
+| `BURKI_API_URL` | `https://api.burki.dev` |
+
+Example `.env` file:
+
+```bash
+BURKI_API_KEY=bk_live_xxxxxxxxxxxx
+BURKI_API_URL=https://api.burki.dev
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="AI Configuration"
+    icon="brain"
+    href="/ai-configuration"
+  >
+    Deep dive into LLM, TTS, and STT settings
+  </Card>
+  <Card
+    title="Telephony Providers"
+    icon="phone"
+    href="/telephony-providers"
+  >
+    Configure Twilio, Vonage, or Telnyx
+  </Card>
+  <Card
+    title="Tools & Custom Actions"
+    icon="wrench"
+    href="/tools"
+  >
+    Add call transfers, CRM lookups, and more
+  </Card>
+  <Card
+    title="API Reference"
+    icon="code"
+    href="/api-reference/introduction"
+  >
+    Full API documentation
+  </Card>
+</CardGroup>
+

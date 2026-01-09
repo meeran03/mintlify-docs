@@ -1,31 +1,47 @@
 ---
 title: Changelog
+description: "What's new in Burki Voice AI"
 ---
 
-<Callout type="info">
+<Info>
 Stay up-to-date with the latest features, improvements, and bug fixes in Burki Voice AI. We're constantly improving the platform based on user feedback and emerging technologies.
-</Callout>
+</Info>
 
 ---
 
-## Version 1.0.0
-*Released: July 2025*
+## January 2026
 
-### 🚀 New Features
+### New Features
+- **Pricing & Billing System**: Complete prepaid wallet system with auto top-up
+- **Hybrid Mode**: Mix BYO and managed providers for maximum flexibility
+- **Free Trial**: 200 platform minutes + 200 carrier minutes + 30-day free number
+- **Vonage Integration**: Added Vonage as a telephony provider option
+- **Cartesia TTS**: New high-quality TTS provider option
+
+### Improvements
+- **Dashboard Redesign**: Cleaner, more intuitive assistant configuration
+- **Wallet UI**: Real-time balance tracking and usage breakdowns
+- **Provider Selection**: Easier switching between Burki Cloud and BYO modes
+
+---
+
+## December 2025
+
+### New Features
 - **Multi-Provider TTS Support**: Added support for Deepgram, Inworld, and Resemble TTS providers
 - **Enhanced STT Models**: Support for Deepgram Nova-3 with keyterms functionality
 - **Advanced Tools Configuration**: Improved end call and transfer call tools with custom scenarios
 - **Audio Denoising**: Real-time noise reduction using RNNoise for better transcription accuracy
 - **Background Sound Support**: Add ambient audio to create realistic call environments
 
-### ✨ Improvements
+### Improvements
 - **Provider Fallback System**: Automatic fallback to backup providers when primary fails
 - **Enhanced Voice Selection**: Expanded voice options across all TTS providers
 - **Improved Interruption Handling**: Better management of conversation flow and overlapping speech
 - **Recording Enhancements**: Support for MP3 format with quality improvements
 - **UI/UX Improvements**: Streamlined assistant configuration interface
 
-### 🐛 Bug Fixes
+### Bug Fixes
 - Fixed WebSocket connection stability issues
 - Resolved audio quality problems in noisy environments
 - Fixed provider switching edge cases
@@ -33,143 +49,97 @@ Stay up-to-date with the latest features, improvements, and bug fixes in Burki V
 
 ---
 
-## Version 2.0.0
-*Released: December 2023*
+## October 2025
 
-### 🚀 New Features
+### New Features
 - **Multi-Provider LLM Support**: Added support for Anthropic, Gemini, xAI, and Groq
 - **RAG (Knowledge Base)**: Upload documents and web pages for context-aware responses
 - **Data Extraction**: Automatically extract structured data from conversations
 - **Webhook Integration**: Real-time notifications for call events
 - **Outbound Calling**: AI-initiated calls with custom agendas
 
-### ✨ Improvements
-- **Modular Architecture**: Complete refactor for better scalability and maintainability
+### Improvements
 - **Enhanced Security**: Improved authentication and data protection
 - **Better Analytics**: More detailed call metrics and reporting
 - **Performance Optimizations**: Faster response times and reduced latency
 
-### 🐛 Bug Fixes
-- Multiple stability improvements
-- Enhanced error handling and logging
-- Fixed various edge cases in call management
-
 ---
 
-## Version 1.5.0
-*Released: October 2023*
+## August 2025
 
-### 🚀 New Features
+### New Features
 - **Multi-Tenant Support**: Isolated environments for multiple organizations
 - **Custom Voice Cloning**: Support for custom voice models
 - **Advanced Call Controls**: Improved call flow management
-- **Recording Storage**: S3 integration for call recordings
+- **S3 Integration**: Cloud storage for call recordings
 
-### ✨ Improvements
-- **UI Enhancements**: Redesigned dashboard and configuration interface
+### Improvements
+- **Dashboard Enhancements**: Redesigned configuration interface
 - **API Improvements**: More robust and comprehensive API endpoints
-- **Documentation**: Enhanced guides and examples
 
 ---
 
-## Version 1.0.0
-*Released: August 2023*
+## June 2025
 
-### 🚀 Initial Release
-- **Core Voice AI**: Basic voice assistant functionality
-- **Twilio Integration**: Phone call handling and media streaming
+### Initial Launch
+- **Core Voice AI**: Full voice assistant functionality
+- **Telephony Integration**: Twilio phone call handling and media streaming
 - **ElevenLabs TTS**: High-quality text-to-speech
 - **Deepgram STT**: Real-time speech-to-text transcription
 - **OpenAI Integration**: GPT-powered conversation handling
-- **Web Dashboard**: Basic configuration and monitoring interface
+- **Web Dashboard**: Configuration and monitoring interface
 
 ---
 
 ## Upcoming Features
 
-<Callout type="note">
+<Info>
 These features are in development and subject to change based on user feedback and technical considerations.
-</Callout>
+</Info>
 
-### 🔮 Coming Soon
+### Coming Soon
 - **Advanced Analytics Dashboard**: Real-time insights and performance metrics
 - **A/B Testing Framework**: Test different configurations and measure results
-- **Custom Integration Builder**: Visual tool for creating custom integrations
 - **Voice Biometrics**: Speaker identification and authentication
 - **Sentiment Analysis**: Real-time emotion detection during calls
-- **Multi-Language Support**: Expanded language options and automatic detection
+- **Additional Languages**: Expanded language support with automatic detection
 
-### 🛠️ Under Consideration
+### Under Consideration
 - **Video Calling Support**: Expand beyond voice to video interactions
-- **Advanced AI Models**: Integration with latest language models
 - **Edge Computing**: Reduced latency through edge deployment
 - **Advanced Compliance Tools**: Enhanced features for regulated industries
+- **Custom Model Fine-tuning**: Train models on your specific use cases
 
 ---
 
-## How to Update
+## Platform Updates
 
-<Accordion title="Self-Hosted Deployments">
-1. **Backup your data** before updating
-2. **Check compatibility** with your current configuration
-3. **Follow migration guides** for breaking changes
-4. **Test thoroughly** in staging environment
-5. **Deploy to production** with monitoring
-
-**Update Commands:**
-```bash
-git pull origin main
-pip install -r requirements.txt
-alembic upgrade head
-```
-</Accordion>
-
-<Accordion title="Cloud/Managed Deployments">
-Updates are handled automatically with:
+All platform updates are deployed automatically with:
 - **Zero-downtime deployments**
 - **Automatic rollback** on issues
-- **Advance notification** of major changes
-- **Staging environment** for testing
+- **Email notifications** for major changes
 
-Contact support for custom update schedules.
-</Accordion>
-
----
-
-## Breaking Changes
-
-<Callout type="warning">
-Major version updates may include breaking changes. Always review the migration guide before updating.
-</Callout>
-
-### Version 2.0.0 Breaking Changes
-- **Configuration Format**: Updated assistant configuration schema
-- **API Endpoints**: Some endpoints renamed or restructured
-- **Environment Variables**: New required environment variables
-- **Database Schema**: Migration required for existing installations
-
-### Migration Support
-- **Automated Migration**: Database schema updates handled automatically
-- **Configuration Converter**: Tool to convert old configurations
-- **Support**: Dedicated support for migration assistance
+<Info>
+Breaking changes are announced at least 2 weeks in advance via email. Check the dashboard for migration guides when needed.
+</Info>
 
 ---
 
 ## Feedback & Requests
 
-<Callout type="success">
-We value your feedback! Help us prioritize features and improvements.
-</Callout>
-
-**How to Submit Feedback:**
-- **GitHub Issues**: Report bugs and request features
-- **Community Forum**: Discuss ideas with other users
-- **Direct Contact**: Email support for urgent issues
-- **User Surveys**: Participate in periodic feedback surveys
-
-**Feature Request Process:**
-1. **Submit Request**: Describe the feature and use case
-2. **Community Voting**: Other users can vote on requests
-3. **Review Process**: Our team evaluates feasibility and impact
-4. **Development**: Approved features enter development pipeline
-5. **Beta Testing**: Early access for testing and feedback 
+<CardGroup cols={2}>
+  <Card
+    title="Feature Requests"
+    icon="lightbulb"
+    href="mailto:feedback@burki.dev"
+  >
+    Tell us what features you'd like to see
+  </Card>
+  <Card
+    title="Report Issues"
+    icon="bug"
+    href="mailto:support@burki.dev"
+  >
+    Report bugs or issues you encounter
+  </Card>
+</CardGroup>

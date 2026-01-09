@@ -1,51 +1,173 @@
 ---
 title: FAQ
-description: "Frequently asked questions and troubleshooting for Burki Voice AI"
+description: "Frequently asked questions about Burki Voice AI"
 ---
 
 # FAQ
 
-Find answers to common questions and troubleshooting tips for Burki Voice AI.
+Find answers to common questions about Burki Voice AI.
+
+---
 
 ## General
-**Q: What is Burki Voice AI?**
-A: An open-source, AI-powered voice assistant platform for handling customer calls.
 
-**Q: Who can use Burki?**
-A: Startups, enterprises, developers, and anyone needing advanced voice automation.
+<AccordionGroup>
+  <Accordion title="What is Burki Voice AI?">
+    Burki is a cloud-based voice AI platform for building intelligent phone assistants. It handles calls, transcribes speech, generates AI responses, and speaks naturally to callers - all with ultra-low latency.
+  </Accordion>
+  
+  <Accordion title="Who can use Burki?">
+    Burki is built for businesses of all sizes - from startups automating their first phone line to enterprises handling millions of calls. Developers, agencies, and anyone needing advanced voice automation will find Burki useful.
+  </Accordion>
+  
+  <Accordion title="How is Burki different from other voice AI platforms?">
+    Burki offers:
+    - **Ultra-low latency** (0.8-1.2 seconds) for natural conversations
+    - **Flexible pricing** with BYO and managed options
+    - **Multi-provider support** so you're never locked in
+    - **Beautiful dashboard** that makes configuration intuitive
+  </Accordion>
+</AccordionGroup>
 
-## Setup & Installation
-**Q: I get a database connection error.**
-A: Check your `DATABASE_URL` and ensure PostgreSQL is running and accessible.
+---
 
-**Q: The app can't find my API keys.**
-A: Make sure your `.env` file is present, filled out, and loaded by your process manager or deployment platform.
+## Pricing & Billing
 
-**Q: How do I enable audio denoising?**
-A: Run `./scripts/build_rnnoise.sh` and set `AUDIO_DENOISING_METHOD=rnnoise` in your `.env`.
+<AccordionGroup>
+  <Accordion title="How does pricing work?">
+    Burki charges a simple platform fee:
+    - **Voice:** $0.03 per connected minute
+    - **SMS:** $0.001 per segment
+    
+    With Burki Cloud, you also pay pass-through provider costs plus a 15% managed fee. With BYO mode, you only pay platform fees.
+    
+    See our [Pricing](/pricing) page for full details.
+  </Accordion>
+  
+  <Accordion title="What's included in the free trial?">
+    Every new account gets:
+    - 200 free platform minutes
+    - 200 carrier-free minutes (Burki Cloud)
+    - Trial phone number free for 30 days
+  </Accordion>
+  
+  <Accordion title="What's the difference between BYO and Burki Cloud?">
+    - **BYO (Bring Your Own):** You provide your own API keys for AI providers. You pay them directly. Burki only charges platform fees.
+    - **Burki Cloud:** We manage all providers for you. You pay pass-through costs plus 15% managed fee.
+    - **Hybrid:** Mix both - use your own keys for some services, let us manage others.
+  </Accordion>
+  
+  <Accordion title="How do I add funds to my account?">
+    Go to **Billing** → **Wallet** in your dashboard and click **Add Funds**. You can also set up auto top-up to automatically add funds when your balance gets low.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Setup & Configuration
+
+<AccordionGroup>
+  <Accordion title="How do I create my first assistant?">
+    1. Sign up at [burki.dev/signup](https://burki.dev/signup)
+    2. Go to your dashboard and click **Create New Assistant**
+    3. Configure your AI providers (LLM, TTS, STT)
+    4. Assign a phone number
+    5. Call the number to test!
+    
+    See our [Quickstart](/quickstart) guide for detailed steps.
+  </Accordion>
+  
+  <Accordion title="How do I add my own API keys (BYO mode)?">
+    Go to **Settings** → **Provider Keys** in your dashboard. Enter your API keys for OpenAI, Anthropic, ElevenLabs, Deepgram, or any other supported provider. Then select **BYO** when configuring your assistant.
+  </Accordion>
+  
+  <Accordion title="Can I use my existing phone numbers?">
+    Yes! If you have phone numbers with Twilio, Vonage, or Telnyx:
+    1. Add your provider credentials in **Settings** → **Provider Keys**
+    2. Go to **Phone Numbers** → **Sync**
+    3. Your numbers will appear and can be assigned to assistants
+  </Accordion>
+  
+  <Accordion title="How do I configure fallback providers?">
+    When editing your assistant, expand the **Fallback Configuration** section. You can add backup LLM, TTS, or STT providers that will be used automatically if your primary provider fails.
+  </Accordion>
+</AccordionGroup>
+
+---
 
 ## Usage
-**Q: How do I add a new assistant?**
-A: Use the web dashboard or POST to `/api/assistants` with the required fields.
 
-**Q: Where can I find call recordings and transcripts?**
-A: In the dashboard under call history, or in your S3 bucket if configured.
+<AccordionGroup>
+  <Accordion title="Where can I find call recordings and transcripts?">
+    In your dashboard, go to **Calls** to see call history. Click on any call to view its transcript and download the recording.
+  </Accordion>
+  
+  <Accordion title="How do I monitor calls in real-time?">
+    Use the **Live Transcript** feature in your dashboard. You can watch transcripts appear in real-time as calls happen.
+  </Accordion>
+  
+  <Accordion title="Can I make outbound calls?">
+    Yes! Use the API to initiate outbound calls. The assistant will call the specified number and follow your configured conversation flow.
+  </Accordion>
+  
+  <Accordion title="How do I upload documents for my assistant?">
+    Go to your assistant's **Knowledge Base** section and upload PDFs, Word docs, or paste URLs. The assistant will use this information to answer questions.
+  </Accordion>
+</AccordionGroup>
 
-**Q: How do I reset my password?**
-A: Use the password reset link on the login page or contact your admin.
-
-## Deployment
-**Q: How do I deploy to production?**
-A: See the [Deployment](deployment) guide for Docker, Railway, and manual options.
-
-**Q: How do I set environment variables in Railway or Docker?**
-A: Use the platform's dashboard or the `--env-file` option for Docker.
+---
 
 ## Troubleshooting
-**Q: I see a parsing error in the docs.**
-A: Check for unclosed tags or invalid syntax in your MDX files.
 
-**Q: The app crashes on startup.**
-A: Check logs for missing dependencies, invalid config, or port conflicts.
+<AccordionGroup>
+  <Accordion title="My assistant isn't responding on calls">
+    Check:
+    1. Your wallet has sufficient balance
+    2. The phone number is assigned to an assistant
+    3. AI provider credentials are valid
+    4. Check the call logs for error messages
+  </Accordion>
+  
+  <Accordion title="The response latency is high">
+    Try:
+    1. Use a faster LLM model (GPT-4o-mini vs GPT-4o)
+    2. Use ElevenLabs or Cartesia for TTS (fastest options)
+    3. Keep system prompts concise
+    4. Check if provider services have any outages
+  </Accordion>
+  
+  <Accordion title="Audio quality is poor">
+    Burki has built-in audio denoising. If quality is still poor:
+    1. Check caller's phone connection
+    2. Ensure the call isn't being recorded by both parties
+    3. Try a different TTS voice
+  </Accordion>
+  
+  <Accordion title="API requests return 401 Unauthorized">
+    Your API key may be invalid or expired:
+    1. Generate a new key in **Settings** → **API Keys**
+    2. Ensure you're using `Bearer YOUR_KEY` in the Authorization header
+    3. Check that the key has the required permissions
+  </Accordion>
+</AccordionGroup>
 
-For more help, open an issue on [GitHub](https://github.com/meeran03/burki/issues). 
+---
+
+## Need More Help?
+
+<CardGroup cols={2}>
+  <Card
+    title="Contact Support"
+    icon="envelope"
+    href="mailto:support@burki.dev"
+  >
+    Email our support team for assistance
+  </Card>
+  <Card
+    title="Join Discord"
+    icon="discord"
+    href="https://discord.gg/burki"
+  >
+    Chat with the community and team
+  </Card>
+</CardGroup>

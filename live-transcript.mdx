@@ -179,7 +179,7 @@ Request the current call status on demand.
 ```javascript Basic Connection
 const callSid = 'CA123abc...';
 const apiKey = 'burki_your_api_key_here';
-const wsUrl = `ws://localhost:8000/live-transcript/${callSid}?token=${apiKey}`;
+const wsUrl = `wss://api.burki.dev/live-transcript/${callSid}?token=${apiKey}`;
 const websocket = new WebSocket(wsUrl);
 
 websocket.onopen = function(event) {
@@ -223,7 +223,7 @@ class LiveTranscriptClient {
     }
 
     connect() {
-        const wsUrl = `ws://localhost:8000/live-transcript/${this.callSid}?token=${this.apiKey}`;
+        const wsUrl = `wss://api.burki.dev/live-transcript/${this.callSid}?token=${this.apiKey}`;
         this.websocket = new WebSocket(wsUrl);
 
         this.websocket.onopen = () => {
@@ -299,7 +299,7 @@ import websockets
 import json
 
 async def listen_to_transcript(call_sid, api_key):
-    uri = f"ws://localhost:8000/live-transcript/{call_sid}?token={api_key}"
+    uri = f"wss://api.burki.dev/live-transcript/{call_sid}?token={api_key}"
     
     async with websockets.connect(uri) as websocket:
         print(f"Connected to live transcript for call {call_sid}")
@@ -333,7 +333,7 @@ class LiveTranscriptClient:
         self, 
         call_sid: str,
         api_key: str,
-        host: str = "localhost:8000",
+        host: str = "api.burki.dev",
         on_transcript: Optional[Callable] = None,
         on_status: Optional[Callable] = None,
         on_error: Optional[Callable] = None
@@ -432,7 +432,7 @@ const WebSocket = require('ws');
 
 const callSid = 'CA123abc...';
 const apiKey = 'burki_your_api_key_here';
-const ws = new WebSocket(`ws://localhost:8000/live-transcript/${callSid}?token=${apiKey}`);
+const ws = new WebSocket(`wss://api.burki.dev/live-transcript/${callSid}?token=${apiKey}`);
 
 ws.on('open', function open() {
     console.log('Connected to live transcript stream');
@@ -464,7 +464,7 @@ const WebSocket = require('ws');
 const EventEmitter = require('events');
 
 class LiveTranscriptClient extends EventEmitter {
-    constructor(callSid, apiKey, host = 'localhost:8000') {
+    constructor(callSid, apiKey, host = 'api.burki.dev') {
         super();
         this.callSid = callSid;
         this.apiKey = apiKey;
@@ -744,6 +744,6 @@ class LiveCaptionService {
 **Production Considerations**: In production environments, consider implementing authentication, rate limiting, and monitoring for the WebSocket endpoint to ensure security and reliability.
 </Warning>
 
-<Card title="🔧 Complete Implementation" icon="code" href="https://github.com/meeran03/burki/blob/main/live_transcript_client.html">
-  View the complete HTML test client implementation on GitHub
+<Card title="Need Help?" icon="question" href="mailto:support@burki.dev">
+  Contact support for assistance with live transcript implementation
 </Card> 
