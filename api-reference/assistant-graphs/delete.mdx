@@ -1,0 +1,113 @@
+---
+title: 'Delete Graph'
+api: 'DELETE /api/v1/assistant-graphs/{graph_id}'
+description: 'Permanently delete an assistant graph and all related data'
+---
+
+Permanently delete an assistant graph along with all its nodes, edges, and conversation session data. This action cannot be undone.
+
+## Path Parameters
+
+<ParamField path="graph_id" type="integer" required>
+  The unique identifier of the graph to delete.
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the deletion was successful.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Confirmation message with the deleted graph name.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl -X DELETE https://api.burki.dev/api/v1/assistant-graphs/1 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.delete(
+    "https://api.burki.dev/api/v1/assistant-graphs/1",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+result = response.json()
+if result['success']:
+    print(result['message'])
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.burki.dev/api/v1/assistant-graphs/1', {
+  method: 'DELETE',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log(result.message);
+}
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Assistant graph 'Customer Service Router' deleted successfully"
+}
+```
+</ResponseExample>
+
+## Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - Invalid or missing API key |
+| 404 | Graph not found in your organization |
+| 500 | Server error deleting the graph |
+
+## Side Effects
+
+When you delete a graph:
+
+<Warning>
+**The following data is permanently deleted:**
+- All nodes in the graph
+- All edges in the graph
+- All conversation session records
+- All intent detection logs for those sessions
+</Warning>
+
+<Note>
+**The following data is NOT deleted:**
+- The underlying assistants (they remain available for other graphs or direct use)
+- Phone numbers (they are unassigned from the graph but not deleted)
+- Call records (they remain for billing and analytics purposes)
+</Note>
+
+## Best Practices
+
+<Steps>
+  <Step title="Check Active Calls">
+    Before deleting a graph, ensure there are no active calls using it. Deleting a graph during active calls may cause unexpected behavior.
+  </Step>
+  
+  <Step title="Unassign Phone Numbers First">
+    Consider explicitly unassigning phone numbers before deletion to ensure they're properly reconfigured.
+  </Step>
+  
+  <Step title="Export Data If Needed">
+    If you need conversation session data for analytics, export it before deletion using the sessions endpoint.
+  </Step>
+  
+  <Step title="Consider Deactivation">
+    If you may need the graph later, consider setting `is_active: false` instead of deleting.
+  </Step>
+</Steps>

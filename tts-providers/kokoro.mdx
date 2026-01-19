@@ -1,0 +1,537 @@
+---
+title: "Kokoro TTS"
+description: "Self-hosted, open-source text-to-speech for privacy-sensitive and on-premise deployments"
+---
+
+<Card title="🏠 Kokoro: Self-Hosted TTS" icon="server">
+  Open-source TTS microservice that runs on your own infrastructure. Perfect for privacy-sensitive deployments, on-premise requirements, or eliminating API costs. Supports 9 languages including Arabic.
+</Card>
+
+## Why Self-Hosted TTS?
+
+<CardGroup cols={2}>
+  <Card title="🔒 Data Privacy" icon="shield-halved">
+    **Text stays on your servers**
+    
+    No data sent to third-party APIs
+  </Card>
+  
+  <Card title="💰 No API Costs" icon="piggy-bank">
+    **Unlimited usage**
+    
+    No per-character or per-request fees
+  </Card>
+  
+  <Card title="🚫 No Rate Limits" icon="infinity">
+    **Scale freely**
+    
+    Process unlimited requests based on your hardware
+  </Card>
+  
+  <Card title="🌐 Offline Capable" icon="wifi-slash">
+    **Works without internet**
+    
+    Run completely air-gapped if needed
+  </Card>
+</CardGroup>
+
+## Architecture
+
+```
+┌─────────────────┐    HTTP API    ┌─────────────────┐
+│   Burki App     │ ─────────────→ │   Kokoro TTS    │
+│   (Main)        │                │   Microservice  │
+│                 │ ←───────────── │                 │
+└─────────────────┘   Audio Stream └─────────────────┘
+```
+
+Kokoro runs as a separate containerized service that communicates with your main Burki application via HTTP.
+
+## Quick Setup
+
+<Steps>
+  <Step title="Deploy Kokoro Service">
+    Choose your deployment method based on available hardware:
+    
+    **Option A: Docker Compose (Recommended)**
+    ```bash
+    cd kokoro && docker-compose -f docker-compose.kokoro.yml up -d
+    ```
+    
+    **Option B: Docker with GPU**
+    ```bash
+    docker run --gpus all -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    ```
+    
+    **Option C: Docker CPU-only**
+    ```bash
+    docker run -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    ```
+  </Step>
+  <Step title="Verify Deployment">
+    ```bash
+    curl http://localhost:8880/health
+    # Expected: {"status": "healthy", "model": "kokoro-82m"}
+    ```
+  </Step>
+  <Step title="Configure in Burki">
+    Add to your `.env` file:
+    ```bash
+    KOKORO_BASE_URL=http://localhost:8880
+    ```
+    
+    Then in the UI:
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **Kokoro TTS** as provider
+    3. Server URL will auto-populate from environment
+  </Step>
+</Steps>
+
+<Callout type="warning">
+**GPU Recommended**: For production use, a GPU significantly improves latency. CPU-only mode works but will be slower.
+</Callout>
+
+## Available Models
+
+<CardGroup cols={3}>
+  <Card title="🎯 kokoro" icon="bullseye">
+    **Main Model**
+    
+    Default Kokoro TTS model
+    
+    **Quality**: High
+    **Best for**: General use
+  </Card>
+  
+  <Card title="📢 tts-1" icon="volume-high">
+    **Standard Quality**
+    
+    OpenAI-compatible endpoint
+    
+    **Quality**: Good
+    **Best for**: API compatibility
+  </Card>
+  
+  <Card title="🎵 tts-1-hd" icon="music">
+    **High Definition**
+    
+    Enhanced audio quality
+    
+    **Quality**: Premium
+    **Best for**: High-quality needs
+  </Card>
+</CardGroup>
+
+## Available Voices
+
+### Multilingual Voices (Arabic Support)
+
+<Callout type="info">
+**Arabic Support**: Use multilingual voices (`af_alloy`, `am_echo`, `af_nova`) for Arabic and other non-English languages.
+</Callout>
+
+<CardGroup cols={3}>
+  <Card title="af_alloy" icon="user">
+    **Female - Multilingual**
+    
+    Clear and natural voice
+    
+    Supports: Arabic, English, and more
+  </Card>
+  
+  <Card title="am_echo" icon="user">
+    **Male - Multilingual**
+    
+    Warm and friendly voice
+    
+    Supports: Arabic, English, and more
+  </Card>
+  
+  <Card title="af_nova" icon="user">
+    **Female - Multilingual**
+    
+    Professional voice
+    
+    Supports: Arabic, English, and more
+  </Card>
+</CardGroup>
+
+### English-Only Voices
+
+<CardGroup cols={3}>
+  <Card title="af_heart" icon="user">
+    **Female**
+    
+    Warm and expressive
+  </Card>
+  
+  <Card title="af_bella" icon="user">
+    **Female**
+    
+    Clear and natural
+  </Card>
+  
+  <Card title="af_sarah" icon="user">
+    **Female**
+    
+    Professional
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="am_adam" icon="user">
+    **Male**
+    
+    Clear and confident
+  </Card>
+  
+  <Card title="am_michael" icon="user">
+    **Male**
+    
+    Warm and friendly
+  </Card>
+</CardGroup>
+
+<Accordion title="All Available Voices">
+| Voice | Gender | Languages | Description |
+|-------|--------|-----------|-------------|
+| **af_alloy** | Female | Multilingual | Clear and natural (supports Arabic) |
+| **am_echo** | Male | Multilingual | Warm and friendly (supports Arabic) |
+| **af_nova** | Female | Multilingual | Professional (supports Arabic) |
+| **af_heart** | Female | English | Warm and expressive |
+| **af_bella** | Female | English | Clear and natural |
+| **af_sarah** | Female | English | Professional |
+| **am_adam** | Male | English | Clear and confident |
+| **am_michael** | Male | English | Warm and friendly |
+</Accordion>
+
+## Language Support
+
+Kokoro supports 9 languages:
+
+<CardGroup cols={3}>
+  <Card title="🇺🇸 English" icon="flag">`en`</Card>
+  <Card title="🇸🇦 Arabic" icon="flag">`ar`</Card>
+  <Card title="🇪🇸 Spanish" icon="flag">`es`</Card>
+  <Card title="🇫🇷 French" icon="flag">`fr`</Card>
+  <Card title="🇮🇳 Hindi" icon="flag">`hi`</Card>
+  <Card title="🇮🇹 Italian" icon="flag">`it`</Card>
+  <Card title="🇯🇵 Japanese" icon="flag">`ja`</Card>
+  <Card title="🇧🇷 Portuguese" icon="flag">`pt`</Card>
+  <Card title="🇨🇳 Chinese" icon="flag">`zh`</Card>
+</CardGroup>
+
+<Callout type="tip">
+**For Arabic**: Use multilingual voices (`af_alloy`, `am_echo`, `af_nova`) with language code `ar`.
+</Callout>
+
+## Deployment Guide
+
+### Docker Compose (Recommended)
+
+```yaml
+# docker-compose.kokoro.yml
+version: '3.8'
+services:
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    ports:
+      - "8880:8880"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kokoro-tts
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kokoro-tts
+  template:
+    metadata:
+      labels:
+        app: kokoro-tts
+    spec:
+      containers:
+      - name: kokoro-tts
+        image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+        ports:
+        - containerPort: 8880
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+            memory: "4Gi"
+          requests:
+            memory: "2Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kokoro-tts
+spec:
+  selector:
+    app: kokoro-tts
+  ports:
+  - port: 8880
+    targetPort: 8880
+```
+
+### Resource Requirements
+
+| Mode | CPU | RAM | GPU | Latency |
+|------|-----|-----|-----|---------|
+| **GPU (Recommended)** | 2+ cores | 4GB | NVIDIA GPU (4GB+ VRAM) | ~100-200ms |
+| **CPU-only** | 4+ cores | 8GB | None | ~500-1000ms |
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Main application .env
+KOKORO_BASE_URL=http://localhost:8880
+
+# Kokoro service configuration (optional)
+KOKORO_CACHE_SIZE=1000      # Cache up to 1000 requests
+KOKORO_CACHE_TTL=3600       # Cache for 1 hour
+LOG_LEVEL=INFO              # Set to DEBUG for troubleshooting
+```
+
+### Speed Control
+
+Adjust speech speed with the `speed` parameter (0.5 to 2.0):
+
+```python
+tts = KokoroTTSService(
+    call_sid="call_123",
+    voice_id="af_alloy",
+    language="ar",
+    speed=1.0  # Normal speed
+)
+```
+
+## API Integration
+
+<CodeGroup>
+
+```python Python
+from app.services.tts_kokoro import KokoroTTSService
+
+# Create Kokoro TTS instance
+tts = KokoroTTSService(
+    call_sid="unique_call_id",
+    voice_id="af_alloy",
+    model_id="kokoro",
+    language="ar",
+    speed=1.0,
+    kokoro_base_url="http://localhost:8880"
+)
+
+# Start session
+await tts.start_session(audio_callback=your_callback)
+
+# Process Arabic text
+await tts.process_text("مرحباً بك في نظام الذكاء الاصطناعي")
+
+# End session
+await tts.end_session()
+```
+
+```bash cURL
+# Test Arabic TTS
+curl -X POST "http://localhost:8880/v1/audio/speech" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "kokoro",
+    "input": "مرحبا بك في نظام الذكاء الاصطناعي",
+    "voice": "af_alloy",
+    "response_format": "mp3",
+    "lang_code": "a",
+    "speed": 1.0
+  }' \
+  --output test_arabic.mp3
+```
+
+```bash Health Check
+# Verify service is running
+curl http://localhost:8880/health
+
+# Expected response:
+# {"status": "healthy", "model": "kokoro-82m"}
+```
+
+</CodeGroup>
+
+## Monitoring
+
+### Health Check Endpoint
+
+```bash
+curl http://localhost:8880/health
+```
+
+### Metrics Endpoint (Prometheus)
+
+```bash
+curl http://localhost:8880/metrics
+```
+
+### Key Metrics to Monitor
+
+- Request latency
+- Queue length
+- GPU memory usage (if applicable)
+- Cache hit rate
+
+### View Logs
+
+```bash
+docker logs kokoro-tts -f
+```
+
+## Scaling
+
+### Load Balancing Multiple Instances
+
+```nginx
+upstream kokoro_cluster {
+    server kokoro-tts-1:8880;
+    server kokoro-tts-2:8880;
+    server kokoro-tts-3:8880;
+}
+
+server {
+    location /tts {
+        proxy_pass http://kokoro_cluster;
+    }
+}
+```
+
+### Performance Optimization
+
+<Accordion title="Warm Up the Model">
+Send a test request on startup to load the model into memory:
+```bash
+curl -X POST "http://localhost:8880/v1/audio/speech" \
+  -d '{"model": "kokoro", "input": "warmup", "voice": "af_alloy"}' > /dev/null
+```
+</Accordion>
+
+<Accordion title="Enable Caching">
+Configure caching in docker-compose:
+```yaml
+environment:
+  - KOKORO_CACHE_SIZE=1000
+  - KOKORO_CACHE_TTL=3600
+```
+</Accordion>
+
+## Limitations
+
+<Cards>
+  <Card title="🏠 Self-Hosted Only" icon="server">
+    No cloud-hosted option - you must manage your own infrastructure
+  </Card>
+  <Card title="🎙️ Limited Voices" icon="microphone">
+    8 voices compared to 500+ in cloud providers like Azure
+  </Card>
+  <Card title="🔧 Infrastructure Required" icon="wrench">
+    Requires Docker, GPU management, and operational expertise
+  </Card>
+  <Card title="🌍 Fewer Languages" icon="globe">
+    9 languages vs 40+ in Cartesia or 100+ in Azure
+  </Card>
+</Cards>
+
+## Common Issues & Solutions
+
+<Accordion title="Container Won't Start">
+**Problem**: Docker container fails to start
+
+**Solutions**:
+```bash
+# Check GPU availability
+nvidia-smi
+
+# If no GPU, use CPU version
+docker run -p 8880:8880 ghcr.io/remsky/kokoro-fastapi-cpu:latest
+```
+</Accordion>
+
+<Accordion title="High Latency">
+**Problem**: TTS response is slow
+
+**Solutions**:
+- Ensure GPU is being used (check with `nvidia-smi`)
+- Warm up the model on startup
+- Enable caching for repeated phrases
+- Scale horizontally with multiple instances
+</Accordion>
+
+<Accordion title="Arabic Text Not Working">
+**Problem**: Arabic synthesis fails or sounds wrong
+
+**Solutions**:
+- Use multilingual voices: `af_alloy`, `am_echo`, or `af_nova`
+- Set language code to `ar`
+```bash
+curl -X POST "http://localhost:8880/v1/audio/speech" \
+  -d '{
+    "input": "اختبار",
+    "voice": "af_alloy",
+    "lang_code": "a"
+  }'
+```
+</Accordion>
+
+<Accordion title="Connection Refused">
+**Problem**: Cannot connect to Kokoro service
+
+**Solutions**:
+- Verify container is running: `docker ps`
+- Check port mapping: `docker port kokoro-tts`
+- Verify `KOKORO_BASE_URL` in your `.env` file
+- Check firewall rules if running on separate machines
+</Accordion>
+
+## See Also
+
+<CardGroup cols={3}>
+  <Card title="☁️ Cloud Alternative?" href="/tts-providers/azure">
+    **Azure Speech** - Enterprise cloud TTS with 500+ voices
+  </Card>
+  
+  <Card title="🎯 More Languages?" href="/tts-providers/cartesia">
+    **Cartesia** - 42 languages with voice cloning
+  </Card>
+  
+  <Card title="⚡ Lower Latency?" href="/tts-providers/deepgram">
+    **Deepgram** - Ultra-low ~75ms latency
+  </Card>
+</CardGroup>
+
+<Card title="🔗 Additional Resources" icon="link">
+  **Kokoro GitHub**: [github.com/hexgrad/kokoro](https://github.com/hexgrad/kokoro)
+  
+  **FastAPI Wrapper**: [github.com/remsky/Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI)
+  
+  **Docker Images**: [ghcr.io/remsky/kokoro-fastapi-gpu](https://ghcr.io/remsky/kokoro-fastapi-gpu)
+</Card>
+
+---
+
+<Card title="🚀 Ready to Deploy Kokoro?" icon="rocket">
+  Deploy Kokoro TTS for complete data privacy and unlimited usage, then configure it in your [assistant settings](/ai-configuration)!
+</Card>

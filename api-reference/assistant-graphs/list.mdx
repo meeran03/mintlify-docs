@@ -1,0 +1,161 @@
+---
+title: 'List Graphs'
+api: 'GET /api/v1/assistant-graphs'
+description: 'List all assistant graphs in your organization'
+---
+
+Retrieve a list of all assistant graphs belonging to your organization, with optional filtering by status.
+
+## Query Parameters
+
+<ParamField query="skip" type="integer" default="0">
+  Number of items to skip for pagination.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="100">
+  Maximum number of items to return. Must be between 1 and 1000.
+</ParamField>
+
+<ParamField query="active_only" type="boolean" default="true">
+  When `true`, only returns active graphs. Set to `false` to include inactive graphs.
+</ParamField>
+
+## Response
+
+Returns an array of graph objects. For list views, nodes and edges arrays are empty but `total_nodes` and `total_edges` counts are accurate.
+
+<ResponseField name="[]" type="array">
+  Array of assistant graphs.
+
+  <Expandable title="Graph properties">
+    <ResponseField name="id" type="integer">
+      Unique identifier for the graph.
+    </ResponseField>
+
+    <ResponseField name="organization_id" type="integer">
+      Organization that owns this graph.
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Name of the graph.
+    </ResponseField>
+
+    <ResponseField name="description" type="string">
+      Description of the graph.
+    </ResponseField>
+
+    <ResponseField name="is_active" type="boolean">
+      Whether the graph is active.
+    </ResponseField>
+
+    <ResponseField name="total_nodes" type="integer">
+      Total number of nodes in the graph.
+    </ResponseField>
+
+    <ResponseField name="total_edges" type="integer">
+      Total number of edges in the graph.
+    </ResponseField>
+
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of creation.
+    </ResponseField>
+
+    <ResponseField name="updated_at" type="string">
+      ISO 8601 timestamp of last update.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl https://api.burki.dev/api/v1/assistant-graphs \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```bash cURL (with filters)
+curl "https://api.burki.dev/api/v1/assistant-graphs?skip=0&limit=10&active_only=true" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.burki.dev/api/v1/assistant-graphs",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    params={"skip": 0, "limit": 10, "active_only": True}
+)
+
+graphs = response.json()
+for graph in graphs:
+    print(f"{graph['name']}: {graph['total_nodes']} nodes, {graph['total_edges']} edges")
+```
+
+```javascript JavaScript
+const params = new URLSearchParams({
+  skip: '0',
+  limit: '10',
+  active_only: 'true'
+});
+
+const response = await fetch(
+  `https://api.burki.dev/api/v1/assistant-graphs?${params}`,
+  {
+    headers: {
+      'Authorization': 'Bearer YOUR_API_KEY'
+    }
+  }
+);
+
+const graphs = await response.json();
+graphs.forEach(graph => {
+  console.log(`${graph.name}: ${graph.total_nodes} nodes, ${graph.total_edges} edges`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 1,
+    "organization_id": 1,
+    "name": "Customer Service Router",
+    "description": "Routes customers to the appropriate department",
+    "is_active": true,
+    "configuration": {},
+    "nodes": [],
+    "edges": [],
+    "total_nodes": 4,
+    "total_edges": 3,
+    "created_at": "2025-01-15T10:00:00Z",
+    "updated_at": "2025-01-19T14:30:00Z"
+  },
+  {
+    "id": 2,
+    "organization_id": 1,
+    "name": "Language Router",
+    "description": "Routes calls based on detected language",
+    "is_active": true,
+    "configuration": {},
+    "nodes": [],
+    "edges": [],
+    "total_nodes": 4,
+    "total_edges": 3,
+    "created_at": "2025-01-10T08:00:00Z",
+    "updated_at": "2025-01-18T11:00:00Z"
+  }
+]
+```
+</ResponseExample>
+
+## Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - Invalid or missing API key |
+| 500 | Server error listing graphs |
+
+<Info>
+To get full node and edge details for a specific graph, use the [Get Graph](/api-reference/assistant-graphs/get) endpoint.
+</Info>

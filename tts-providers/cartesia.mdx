@@ -1,0 +1,367 @@
+---
+title: "Cartesia Sonic 3 TTS"
+description: "Multilingual text-to-speech with 42 languages, voice cloning, and low latency streaming"
+---
+
+<Card title="🎯 Cartesia Sonic 3: Multilingual Excellence" icon="bullseye">
+  High-quality, low-latency TTS with support for 42 languages, voice cloning from ~5 second samples, and WebSocket streaming. Perfect for global deployments and multilingual voice agents.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Get API Key">
+    1. Visit [Cartesia.ai](https://cartesia.ai) and create an account
+    2. Navigate to your API settings
+    3. Copy your API key
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **Cartesia Sonic 3** as provider
+    3. Paste your API key in the **TTS API Key** field
+  </Step>
+  <Step title="Choose Voice & Model">
+    Select your preferred model and voice from the dropdowns
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Pricing**: Cartesia charges approximately $0.015 per 1,000 characters. Check their website for current pricing details.
+</Callout>
+
+## Available Models
+
+<CardGroup cols={2}>
+  <Card title="⚡ sonic-3" icon="bolt">
+    **Latest Model (Auto-updates)**
+    
+    Always uses the newest Sonic 3 improvements
+    
+    **Languages**: 42 languages
+    **Best for**: Most applications, staying current
+  </Card>
+  
+  <Card title="📌 sonic-3-2025-10-27" icon="thumbtack">
+    **Stable Snapshot**
+    
+    Fixed version for consistent behavior
+    
+    **Languages**: 42 languages
+    **Best for**: Production stability, testing
+  </Card>
+</CardGroup>
+
+<Callout type="tip">
+**Recommendation**: Use **sonic-3** for development and most use cases. Use the dated snapshot for production if you need guaranteed consistency.
+</Callout>
+
+## Available Voices
+
+### Preset Voices
+
+<Accordion title="Female Voices">
+<CardGroup cols={3}>
+  <Card title="Katie" icon="user">
+    **Stable & Realistic**
+    
+    Perfect for voice agents
+    
+    `Voice ID: f786b574-daa5-4673-aa0c-cbe3e8534c02`
+  </Card>
+  
+  <Card title="Tessa" icon="user">
+    **Emotive & Expressive**
+    
+    Great for engaging conversations
+    
+    `Voice ID: 6ccbfb76-1fc6-48f7-b71d-91ac6298247b`
+  </Card>
+  
+  <Card title="Sarah" icon="user">
+    **Clear & Professional**
+    
+    Ideal for business applications
+    
+    `Voice ID: a0e99841-438c-4a64-b679-ae501e7d6091`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="Male Voices">
+<CardGroup cols={2}>
+  <Card title="Kiefer" icon="user">
+    **Stable & Realistic**
+    
+    Perfect for voice agents
+    
+    `Voice ID: 228fca29-3a0a-435c-8728-5cb483251068`
+  </Card>
+  
+  <Card title="Kyle" icon="user">
+    **Emotive & Expressive**
+    
+    Great for dynamic interactions
+    
+    `Voice ID: c961b81c-a935-4c17-bfb3-ba2239de8c2f`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="All Available Voices">
+| Voice | Gender | Style | Voice ID | Best For |
+|-------|--------|-------|----------|----------|
+| **Katie** | Female | Stable, Realistic | `f786b574-daa5-4673-aa0c-cbe3e8534c02` | Voice agents |
+| **Kiefer** | Male | Stable, Realistic | `228fca29-3a0a-435c-8728-5cb483251068` | Voice agents |
+| **Tessa** | Female | Emotive, Expressive | `6ccbfb76-1fc6-48f7-b71d-91ac6298247b` | Characters |
+| **Kyle** | Male | Emotive, Expressive | `c961b81c-a935-4c17-bfb3-ba2239de8c2f` | Characters |
+| **Sarah** | Female | Clear, Professional | `a0e99841-438c-4a64-b679-ae501e7d6091` | Business |
+</Accordion>
+
+## Language Support
+
+<Callout type="info">
+**42 Languages Supported**: Cartesia Sonic 3 offers extensive multilingual support, making it ideal for global deployments.
+</Callout>
+
+<Accordion title="Supported Languages">
+<CardGroup cols={4}>
+  <Card title="🇺🇸 English" icon="flag">`en`</Card>
+  <Card title="🇪🇸 Spanish" icon="flag">`es`</Card>
+  <Card title="🇫🇷 French" icon="flag">`fr`</Card>
+  <Card title="🇩🇪 German" icon="flag">`de`</Card>
+  <Card title="🇮🇹 Italian" icon="flag">`it`</Card>
+  <Card title="🇵🇹 Portuguese" icon="flag">`pt`</Card>
+  <Card title="🇨🇳 Chinese" icon="flag">`zh`</Card>
+  <Card title="🇯🇵 Japanese" icon="flag">`ja`</Card>
+  <Card title="🇰🇷 Korean" icon="flag">`ko`</Card>
+  <Card title="🇮🇳 Hindi" icon="flag">`hi`</Card>
+  <Card title="🇸🇦 Arabic" icon="flag">`ar`</Card>
+  <Card title="🇷🇺 Russian" icon="flag">`ru`</Card>
+</CardGroup>
+
+**Additional Languages**: Dutch (`nl`), Polish (`pl`), Swedish (`sv`), Turkish (`tr`), Tagalog (`tl`), Bulgarian (`bg`), Romanian (`ro`), Czech (`cs`), Greek (`el`), Finnish (`fi`), Croatian (`hr`), Malay (`ms`), Slovak (`sk`), Danish (`da`), Tamil (`ta`), Ukrainian (`uk`), Hungarian (`hu`), Norwegian (`no`), Vietnamese (`vi`), Bengali (`bn`), Thai (`th`), Hebrew (`he`), Georgian (`ka`), Indonesian (`id`), Telugu (`te`), Gujarati (`gu`), Kannada (`kn`), Malayalam (`ml`), Marathi (`mr`), Punjabi (`pa`)
+</Accordion>
+
+## Voice Cloning
+
+Cartesia supports creating custom voices from audio samples.
+
+<Callout type="info">
+**Quick Cloning**: Create a custom voice from just ~5 seconds of clean audio.
+</Callout>
+
+### Requirements
+
+| Requirement | Value |
+|-------------|-------|
+| **Audio Duration** | ~5 seconds (recommended) |
+| **Formats** | MP3, WAV, FLAC, M4A, OGG |
+| **Max File Size** | 10MB |
+| **Sample Rate** | 16kHz minimum recommended |
+| **Channels** | Mono preferred |
+| **Quality** | Clean audio without background noise |
+
+### Clone a Voice
+
+<Steps>
+  <Step title="Prepare Audio Sample">
+    Record or select ~5 seconds of clear speech from the target voice
+  </Step>
+  <Step title="Upload via UI">
+    1. Go to **Voice Configuration** in assistant settings
+    2. Select **Cartesia** as provider
+    3. Click **Clone Voice** button
+    4. Upload your audio sample
+  </Step>
+  <Step title="Use Cloned Voice">
+    The cloned voice appears in your voice dropdown and can be selected for your assistant
+  </Step>
+</Steps>
+
+### Voice Cloning Tips
+
+<Cards>
+  <Card title="🎙️ Audio Quality" icon="microphone">
+    Use clean audio without background noise - any noise will be reproduced in the clone
+  </Card>
+  <Card title="⏱️ Duration" icon="clock">
+    ~5 seconds is ideal. Too short = poor quality, too long = unnecessary
+  </Card>
+  <Card title="👤 Single Speaker" icon="user">
+    Audio should contain only one person speaking
+  </Card>
+  <Card title="🗣️ Natural Speech" icon="comments">
+    Use conversational tone, not reading or acting
+  </Card>
+</Cards>
+
+## Configuration Options
+
+### Context Continuation
+
+Cartesia maintains natural prosody across sentences using context continuation:
+
+```python
+# First sentence starts new context
+message = {
+    "context_id": "ctx_0",
+    "continue": False,  # New context
+    "transcript": "Hello, welcome to our service."
+}
+
+# Subsequent sentences continue the context
+message = {
+    "context_id": "ctx_0", 
+    "continue": True,  # Continue same context
+    "transcript": "How can I help you today?"
+}
+```
+
+### Flush Tags
+
+Force immediate speech mid-sentence using the `<flush/>` tag:
+
+```python
+# Text with flush tag
+text = "Please hold<flush/> while I check your account."
+# "Please hold" speaks immediately, then "while I check..." follows
+```
+
+### Audio Format
+
+Cartesia automatically outputs the appropriate format for your telephony provider:
+- **Twilio/Telnyx**: PCM μ-law @ 8kHz
+- **Vonage**: PCM 16-bit @ 16kHz
+
+## API Integration
+
+<CodeGroup>
+
+```python Python
+from app.services.tts_cartesia import CartesiaTTSService
+
+# Create Cartesia TTS instance
+tts = CartesiaTTSService(
+    call_sid="unique_call_id",
+    api_key="your_cartesia_api_key",
+    voice_id="f786b574-daa5-4673-aa0c-cbe3e8534c02",  # Katie
+    model_id="sonic-3",
+    language="en"
+)
+
+# Start session
+await tts.start_session(audio_callback=your_callback)
+
+# Process text
+await tts.process_text("Hello, this is a test.")
+
+# End session
+await tts.end_session()
+```
+
+```javascript JavaScript
+const response = await fetch("wss://api.cartesia.ai/tts/websocket", {
+  headers: {
+    "Authorization": `Bearer ${apiKey}`,
+  }
+});
+
+// Send TTS request
+const message = {
+  model_id: "sonic-3",
+  transcript: "Hello, this is a test.",
+  voice: {
+    mode: "id",
+    id: "f786b574-daa5-4673-aa0c-cbe3e8534c02"
+  },
+  language: "en",
+  output_format: {
+    container: "raw",
+    encoding: "pcm_mulaw",
+    sample_rate: 8000
+  }
+};
+
+ws.send(JSON.stringify(message));
+```
+
+```curl cURL
+# Clone a voice
+curl -X POST "https://api.cartesia.ai/voices/clone" \
+  -H "Authorization: Bearer your_api_key" \
+  -H "Cartesia-Version: 2025-04-16" \
+  -F "clip=@voice_sample.mp3" \
+  -F "name=My Custom Voice" \
+  -F "language=en"
+```
+
+</CodeGroup>
+
+## Performance Comparison
+
+| Feature | Cartesia Sonic 3 | ElevenLabs | Deepgram Aura |
+|---------|------------------|------------|---------------|
+| **Latency** | ~150ms | ~250ms | ~75ms |
+| **Languages** | 42 | 70+ | English + Spanish |
+| **Voice Quality** | High | Premium | Good |
+| **Voice Cloning** | Yes (~5 sec) | Yes (1-25 min) | No |
+| **Best For** | Multilingual agents | Premium quality | Speed-focused |
+
+## Common Issues & Solutions
+
+<Accordion title="Connection Issues">
+**Problem**: WebSocket connection fails
+
+**Solutions**:
+- Verify your `CARTESIA_API_KEY` is set correctly
+- Check network connectivity to api.cartesia.ai
+- Ensure API key has sufficient credits
+</Accordion>
+
+<Accordion title="Voice Not Found">
+**Problem**: Selected voice doesn't work
+
+**Solutions**:
+- Verify you're using a valid voice ID (UUID format)
+- If using a custom cloned voice, ensure it exists in your Cartesia account
+- Try one of the preset voices to test connectivity
+</Accordion>
+
+<Accordion title="Audio Quality Issues">
+**Problem**: Output sounds distorted or unclear
+
+**Solutions**:
+- Cartesia outputs 8kHz μ-law for Twilio compatibility
+- For higher quality, ensure you're using the correct output format for your use case
+- Check that your telephony provider supports the audio format
+</Accordion>
+
+## See Also
+
+<CardGroup cols={3}>
+  <Card title="⚡ Need Speed?" href="/tts-providers/deepgram">
+    **Deepgram Aura** - Ultra-low ~75ms latency for real-time calls
+  </Card>
+  
+  <Card title="🎭 Premium Quality?" href="/tts-providers/elevenlabs">
+    **ElevenLabs** - Industry-leading voice quality with 70+ languages
+  </Card>
+  
+  <Card title="🏠 Self-Hosted?" href="/tts-providers/kokoro">
+    **Kokoro** - On-premise TTS for privacy-sensitive deployments
+  </Card>
+</CardGroup>
+
+<Card title="🔗 Additional Resources" icon="link">
+  **Official Documentation**: [Cartesia Docs](https://docs.cartesia.ai)
+  
+  **Voice Cloning**: [Clone API Reference](https://docs.cartesia.ai/api-reference/voices/clone)
+  
+  **WebSocket API**: [TTS WebSocket Guide](https://docs.cartesia.ai/api-reference/tts/websocket)
+</Card>
+
+---
+
+<Card title="🚀 Ready to Use Cartesia?" icon="rocket">
+  Head back to your [assistant configuration](/ai-configuration) and set up Cartesia Sonic 3 for multilingual voice experiences!
+</Card>

@@ -1,0 +1,455 @@
+---
+title: "Azure Speech TTS"
+description: "Enterprise-grade text-to-speech with 500+ neural voices, 100+ languages, and Microsoft ecosystem integration"
+---
+
+<Card title="☁️ Azure Speech: Enterprise Scale" icon="cloud">
+  Microsoft's neural TTS service with 500+ voices across 100+ languages. Seamless integration with Azure ecosystem, SSML support, and enterprise-grade reliability. Perfect for organizations already using Microsoft services.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Create Azure Speech Resource">
+    1. Go to [Azure Portal](https://portal.azure.com)
+    2. Create a new **Speech** resource
+    3. Select your subscription, resource group, and region
+    4. Note your **Key** and **Region** from the resource's Keys and Endpoint page
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **TTS** tab
+    2. Select **Azure Speech** as provider
+    3. Enter your **API Key** and **Region** (e.g., `eastus`, `westus2`)
+  </Step>
+  <Step title="Choose Voice & Model">
+    Select your preferred neural voice from the dropdown
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Free Tier**: Azure offers 500,000 characters per month free. Neural voices are available on all tiers.
+</Callout>
+
+## Available Models
+
+<CardGroup cols={2}>
+  <Card title="🧠 Neural" icon="brain">
+    **High-Quality Neural Voices**
+    
+    Natural intonation and human-like speech
+    
+    **Quality**: Premium
+    **Best for**: All production applications
+  </Card>
+  
+  <Card title="📢 Standard" icon="volume-high">
+    **Standard TTS Voices**
+    
+    Basic text-to-speech synthesis
+    
+    **Quality**: Good
+    **Best for**: Legacy compatibility
+  </Card>
+</CardGroup>
+
+<Callout type="tip">
+**Recommendation**: Always use **Neural** voices for the best quality. Standard voices are legacy and should only be used for specific compatibility needs.
+</Callout>
+
+## Available Voices
+
+### English Voices
+
+<Accordion title="American English (en-US)">
+<CardGroup cols={3}>
+  <Card title="Jenny" icon="user">
+    **Clear & Professional**
+    
+    Perfect for business applications
+    
+    `Voice ID: en-US-JennyNeural`
+  </Card>
+  
+  <Card title="Aria" icon="user">
+    **Warm & Natural**
+    
+    Great for friendly interactions
+    
+    `Voice ID: en-US-AriaNeural`
+  </Card>
+  
+  <Card title="Guy" icon="user">
+    **Natural & Confident**
+    
+    Strong, authoritative voice
+    
+    `Voice ID: en-US-GuyNeural`
+  </Card>
+  
+  <Card title="Davis" icon="user">
+    **Friendly & Approachable**
+    
+    Ideal for customer service
+    
+    `Voice ID: en-US-DavisNeural`
+  </Card>
+  
+  <Card title="Jane" icon="user">
+    **Professional**
+    
+    Clear business voice
+    
+    `Voice ID: en-US-JaneNeural`
+  </Card>
+  
+  <Card title="Jason" icon="user">
+    **Clear**
+    
+    Reliable male voice
+    
+    `Voice ID: en-US-JasonNeural`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="British English (en-GB)">
+<CardGroup cols={2}>
+  <Card title="Sonia" icon="user">
+    **Clear & Professional**
+    
+    British female voice
+    
+    `Voice ID: en-GB-SoniaNeural`
+  </Card>
+  
+  <Card title="Ryan" icon="user">
+    **Warm**
+    
+    British male voice
+    
+    `Voice ID: en-GB-RyanNeural`
+  </Card>
+</CardGroup>
+</Accordion>
+
+### Other Languages
+
+<Accordion title="Spanish (es-ES)">
+<CardGroup cols={2}>
+  <Card title="Elvira" icon="user">
+    **Natural**
+    
+    Spanish female voice
+    
+    `Voice ID: es-ES-ElviraNeural`
+  </Card>
+  
+  <Card title="Alvaro" icon="user">
+    **Clear**
+    
+    Spanish male voice
+    
+    `Voice ID: es-ES-AlvaroNeural`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="French (fr-FR)">
+<CardGroup cols={2}>
+  <Card title="Denise" icon="user">
+    **Natural**
+    
+    French female voice
+    
+    `Voice ID: fr-FR-DeniseNeural`
+  </Card>
+  
+  <Card title="Henri" icon="user">
+    **Clear**
+    
+    French male voice
+    
+    `Voice ID: fr-FR-HenriNeural`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="Arabic (ar-SA)">
+<CardGroup cols={2}>
+  <Card title="Salma" icon="user">
+    **Natural**
+    
+    Arabic female voice
+    
+    `Voice ID: ar-SA-SalmaNeural`
+  </Card>
+  
+  <Card title="Hamed" icon="user">
+    **Clear**
+    
+    Arabic male voice
+    
+    `Voice ID: ar-SA-HamedNeural`
+  </Card>
+</CardGroup>
+</Accordion>
+
+<Accordion title="All Configured Voices">
+| Voice | Language | Gender | Voice ID | Description |
+|-------|----------|--------|----------|-------------|
+| **Jenny** | en-US | Female | `en-US-JennyNeural` | Clear and professional |
+| **Aria** | en-US | Female | `en-US-AriaNeural` | Warm and natural |
+| **Guy** | en-US | Male | `en-US-GuyNeural` | Natural and confident |
+| **Davis** | en-US | Male | `en-US-DavisNeural` | Friendly and approachable |
+| **Jane** | en-US | Female | `en-US-JaneNeural` | Professional |
+| **Jason** | en-US | Male | `en-US-JasonNeural` | Clear |
+| **Sonia** | en-GB | Female | `en-GB-SoniaNeural` | Clear and professional |
+| **Ryan** | en-GB | Male | `en-GB-RyanNeural` | Warm |
+| **Elvira** | es-ES | Female | `es-ES-ElviraNeural` | Natural |
+| **Alvaro** | es-ES | Male | `es-ES-AlvaroNeural` | Clear |
+| **Denise** | fr-FR | Female | `fr-FR-DeniseNeural` | Natural |
+| **Henri** | fr-FR | Male | `fr-FR-HenriNeural` | Clear |
+| **Salma** | ar-SA | Female | `ar-SA-SalmaNeural` | Natural |
+| **Hamed** | ar-SA | Male | `ar-SA-HamedNeural` | Clear |
+</Accordion>
+
+<Callout type="info">
+**500+ More Voices**: Azure offers hundreds of additional voices. Visit the [Azure Voice Gallery](https://speech.microsoft.com/portal/voicegallery) for the complete list.
+</Callout>
+
+## Voice Controls
+
+Azure Speech provides advanced voice customization through SSML:
+
+<Tabs>
+  <Tab title="Speaking Rate">
+    **Controls speech speed** (Range: 0.5 - 2.0)
+    
+    - **0.5**: Half speed (very slow)
+    - **1.0**: ✅ **Normal speed (Recommended)**
+    - **2.0**: Double speed (very fast)
+    
+    ```xml
+    <prosody rate="+20%">
+      Speaking slightly faster than normal.
+    </prosody>
+    ```
+  </Tab>
+  
+  <Tab title="Pitch">
+    **Controls voice pitch** (Range: 0.5 - 2.0)
+    
+    - **0.5**: Very low pitch
+    - **1.0**: ✅ **Normal pitch (Recommended)**
+    - **2.0**: Very high pitch
+    
+    ```xml
+    <prosody pitch="+10%">
+      Speaking with slightly higher pitch.
+    </prosody>
+    ```
+  </Tab>
+  
+  <Tab title="SSML Support">
+    **Full SSML markup for advanced control**
+    
+    ```xml
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+      <voice name="en-US-JennyNeural">
+        <prosody rate="+10%" pitch="+5%">
+          Hello! How can I help you today?
+        </prosody>
+      </voice>
+    </speak>
+    ```
+  </Tab>
+</Tabs>
+
+## Configuration Options
+
+### Environment Variables
+
+```bash
+# Required Azure Speech credentials
+AZURE_SPEECH_KEY=your_azure_speech_key
+AZURE_SPEECH_REGION=eastus  # or westus2, westeurope, etc.
+```
+
+### Audio Format
+
+Azure Speech automatically outputs the appropriate format for your telephony provider:
+- **Twilio/Telnyx**: PCM μ-law @ 8kHz (`Raw8Khz8BitMonoMULaw`)
+- **Vonage**: PCM 16-bit @ 16kHz (`Raw16Khz16BitMonoPcm`)
+
+## API Integration
+
+<CodeGroup>
+
+```python Python
+from app.services.tts_azure import AzureTTSService
+
+# Create Azure TTS instance
+tts = AzureTTSService(
+    call_sid="unique_call_id",
+    api_key="your_azure_speech_key",
+    region="eastus",
+    voice_id="en-US-JennyNeural",
+    model_id="neural",
+    language="en-US",
+    rate=1.0,
+    pitch=1.0
+)
+
+# Start session
+await tts.start_session(audio_callback=your_callback)
+
+# Process text
+await tts.process_text("Hello, this is a test.")
+
+# End session
+await tts.end_session()
+```
+
+```python Python (SSML)
+# Using SSML for advanced control
+ssml_text = """
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+    <voice name="en-US-JennyNeural">
+        <prosody rate="+10%" pitch="+5%">
+            Welcome to our service!
+        </prosody>
+        <break time="500ms"/>
+        How can I assist you today?
+    </voice>
+</speak>
+"""
+
+# The service handles SSML automatically when processing text
+await tts.process_text("Welcome to our service!")
+```
+
+```bash Azure CLI
+# Test Azure Speech with CLI
+az cognitiveservices account keys list \
+  --name your-speech-resource \
+  --resource-group your-resource-group
+
+# List available voices
+curl -X GET \
+  "https://eastus.tts.speech.microsoft.com/cognitiveservices/voices/list" \
+  -H "Ocp-Apim-Subscription-Key: your_api_key"
+```
+
+</CodeGroup>
+
+## Regional Selection
+
+<Callout type="tip">
+**Latency Optimization**: Choose the Azure region closest to your deployment for optimal latency.
+</Callout>
+
+| Region | Location | Best For |
+|--------|----------|----------|
+| `eastus` | East US | North America (East) |
+| `westus2` | West US 2 | North America (West) |
+| `westeurope` | Netherlands | Europe |
+| `southeastasia` | Singapore | Asia-Pacific |
+| `australiaeast` | Australia East | Australia/Oceania |
+
+## Pricing Overview
+
+| Tier | Characters/Month | Neural Voices | Price |
+|------|------------------|---------------|-------|
+| **Free** | 500,000 | Yes | $0 |
+| **Standard** | Pay-as-you-go | Yes | $16 per 1M chars |
+
+<Callout type="info">
+**Enterprise**: Contact Azure for custom pricing on high-volume usage and reserved capacity.
+</Callout>
+
+## Common Issues & Solutions
+
+<Accordion title="Authentication Failed">
+**Problem**: API returns 401 Unauthorized
+
+**Solutions**:
+- Verify `AZURE_SPEECH_KEY` is correct
+- Ensure the key is from your Speech resource (not another Azure service)
+- Check that the region matches your Speech resource's region
+</Accordion>
+
+<Accordion title="Voice Not Available">
+**Problem**: Selected voice doesn't work
+
+**Solutions**:
+- Verify the voice ID format (e.g., `en-US-JennyNeural`)
+- Check that the voice is available in your region
+- Ensure your subscription tier supports the selected voice
+</Accordion>
+
+<Accordion title="High Latency">
+**Problem**: TTS response is slow
+
+**Solutions**:
+- Select an Azure region closer to your servers
+- Use streaming synthesis instead of waiting for complete audio
+- Consider caching common phrases
+</Accordion>
+
+<Accordion title="SDK Not Installed">
+**Problem**: Azure Speech SDK import fails
+
+**Solution**:
+```bash
+pip install azure-cognitiveservices-speech
+```
+</Accordion>
+
+## Best Practices
+
+<Cards>
+  <Card title="🌍 Regional Selection" icon="globe">
+    Deploy in the Azure region closest to your users for minimal latency
+  </Card>
+  <Card title="🔧 SSML for Control" icon="sliders">
+    Use SSML markup for precise control over pronunciation, pauses, and emphasis
+  </Card>
+  <Card title="🎯 Voice Consistency" icon="check">
+    Stick to one voice per assistant for a consistent user experience
+  </Card>
+  <Card title="💰 Cost Monitoring" icon="chart-line">
+    Monitor usage in Azure Portal to stay within budget
+  </Card>
+</Cards>
+
+## See Also
+
+<CardGroup cols={3}>
+  <Card title="🎯 Multilingual?" href="/tts-providers/cartesia">
+    **Cartesia Sonic 3** - 42 languages with voice cloning
+  </Card>
+  
+  <Card title="⚡ Need Speed?" href="/tts-providers/deepgram">
+    **Deepgram Aura** - Ultra-low ~75ms latency
+  </Card>
+  
+  <Card title="🏠 Self-Hosted?" href="/tts-providers/kokoro">
+    **Kokoro** - On-premise for privacy-sensitive deployments
+  </Card>
+</CardGroup>
+
+<Card title="🔗 Additional Resources" icon="link">
+  **Azure Portal**: [portal.azure.com](https://portal.azure.com)
+  
+  **Voice Gallery**: [Azure Voice Gallery](https://speech.microsoft.com/portal/voicegallery)
+  
+  **Documentation**: [Azure Speech Service Docs](https://docs.microsoft.com/azure/cognitive-services/speech-service/)
+  
+  **Pricing**: [Azure Speech Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/speech-services/)
+</Card>
+
+---
+
+<Card title="🚀 Ready to Use Azure Speech?" icon="rocket">
+  Head back to your [assistant configuration](/ai-configuration) and set up Azure Speech for enterprise-grade TTS!
+</Card>

@@ -26,6 +26,30 @@ description: "Choose the perfect voice for your AI assistant from our comprehens
     *Best for: Real-time conversations*
   </Card>
   
+  <Card title="🎯 Cartesia Sonic 3" icon="bullseye" href="/tts-providers/cartesia">
+    **Multilingual Excellence**
+    
+    42 languages, voice cloning, low latency
+    
+    *Best for: Multilingual agents, global deployments*
+  </Card>
+  
+  <Card title="☁️ Azure Speech" icon="cloud" href="/tts-providers/azure">
+    **Enterprise Scale**
+    
+    500+ neural voices, 100+ languages
+    
+    *Best for: Enterprise, Azure ecosystem*
+  </Card>
+  
+  <Card title="🏠 Kokoro" icon="server" href="/tts-providers/kokoro">
+    **Self-Hosted**
+    
+    On-premise, privacy-focused, open source
+    
+    *Best for: Privacy-sensitive, on-premise deployments*
+  </Card>
+  
   <Card title="🎭 Inworld.ai" icon="masks-theater" href="/tts-providers/inworld">
     **AI-Powered Emotions**
     
@@ -34,7 +58,7 @@ description: "Choose the perfect voice for your AI assistant from our comprehens
     *Best for: Expressive, contextual responses*
   </Card>
   
-  <Card title="🎯 Resemble AI" icon="bullseye" href="/tts-providers/resemble">
+  <Card title="🎙️ Resemble AI" icon="microphone" href="/tts-providers/resemble">
     **Custom Voice Creation**
     
     WebSocket streaming, personalized voices
@@ -49,11 +73,14 @@ description: "Choose the perfect voice for your AI assistant from our comprehens
 |----------|---------|-----------|---------------|-----------|----------|
 | **ElevenLabs** | ~250ms | 70+ | ✅ Advanced | WebSocket | Premium quality |
 | **Deepgram** | ~75ms | English | ❌ | WebSocket | Speed & phone calls |
+| **Cartesia** | ~150ms | 42 | ✅ Yes | WebSocket | Multilingual |
+| **Azure** | ~200ms | 100+ | ❌ | HTTP | Enterprise |
+| **Kokoro** | Varies | 9 | ❌ | HTTP | Self-hosted |
 | **Inworld** | ~200ms | 11 | ✅ Zero-shot | HTTP/WS | Emotional expression |
 | **Resemble** | ~300ms | English | ✅ Custom | WebSocket | Brand voices |
 
 <Callout type="info">
-**New to TTS?** Start with **ElevenLabs** for the best balance of quality and features, or **Deepgram** if speed is your priority.
+**New to TTS?** Start with **ElevenLabs** for the best balance of quality and features, **Deepgram** if speed is your priority, or **Cartesia** for multilingual support.
 </Callout>
 
 ## Setup Overview
@@ -98,6 +125,36 @@ All providers follow the same basic setup pattern:
     → [Complete Deepgram Guide](/tts-providers/deepgram)
   </Card>
   
+  <Card title="🎯 Cartesia Sonic 3 - Multilingual Excellence" href="/tts-providers/cartesia">
+    **Latest Models**: sonic-3 (latest), sonic-3-2025-10-27 (stable)
+    
+    **Key Features**: 42 languages, voice cloning from ~5 sec, low latency WebSocket
+    
+    **Perfect For**: Global deployments, multilingual voice agents
+    
+    → [Complete Cartesia Guide](/tts-providers/cartesia)
+  </Card>
+  
+  <Card title="☁️ Azure Speech - Enterprise Scale" href="/tts-providers/azure">
+    **Latest Models**: Neural (high-quality), Standard (basic)
+    
+    **Key Features**: 500+ voices, 100+ languages, SSML support, Microsoft integration
+    
+    **Perfect For**: Enterprise applications, Azure ecosystem users
+    
+    → [Complete Azure Guide](/tts-providers/azure)
+  </Card>
+  
+  <Card title="🏠 Kokoro - Self-Hosted TTS" href="/tts-providers/kokoro">
+    **Latest Models**: kokoro, tts-1, tts-1-hd
+    
+    **Key Features**: On-premise deployment, no API costs, privacy-focused, Arabic support
+    
+    **Perfect For**: Privacy-sensitive, air-gapped, cost-conscious deployments
+    
+    → [Complete Kokoro Guide](/tts-providers/kokoro)
+  </Card>
+  
   <Card title="🎪 Inworld.ai - AI-Powered Expression" href="/tts-providers/inworld">
     **Latest Models**: TTS-1 (flagship), TTS-1-Max (experimental)
     
@@ -108,7 +165,7 @@ All providers follow the same basic setup pattern:
     → [Complete Inworld Guide](/tts-providers/inworld)
   </Card>
   
-  <Card title="🎯 Resemble AI - Custom Brand Voices" href="/tts-providers/resemble">
+  <Card title="🎙️ Resemble AI - Custom Brand Voices" href="/tts-providers/resemble">
     **Key Features**: WebSocket streaming, unlimited voice creation, business plans
     
     **Perfect For**: Brand consistency, personalized experiences, enterprise
@@ -164,10 +221,26 @@ All providers follow the same basic setup pattern:
   
   <Tab title="Multilingual">
     **Recommended Setup:**
-    - **Provider**: ElevenLabs or Inworld
-    - **Model**: v3 or TTS-1
-    - **Voice**: Language-specific
-    - **Settings**: Enable language detection
+    - **Provider**: Cartesia Sonic 3
+    - **Model**: sonic-3
+    - **Voice**: Katie (female) or Kiefer (male)
+    - **Settings**: Language-specific code (42 languages)
+  </Tab>
+  
+  <Tab title="Enterprise">
+    **Recommended Setup:**
+    - **Provider**: Azure Speech
+    - **Model**: Neural
+    - **Voice**: Jenny (en-US) or region-specific
+    - **Settings**: SSML for fine control, closest Azure region
+  </Tab>
+  
+  <Tab title="Self-Hosted">
+    **Recommended Setup:**
+    - **Provider**: Kokoro
+    - **Model**: kokoro or tts-1-hd
+    - **Voice**: af_alloy (multilingual) or af_heart (English)
+    - **Settings**: GPU for speed, Docker deployment
   </Tab>
   
   <Tab title="Real-time Apps">

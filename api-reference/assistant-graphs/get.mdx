@@ -1,0 +1,235 @@
+---
+title: 'Get Graph'
+api: 'GET /api/v1/assistant-graphs/{graph_id}'
+description: 'Retrieve a specific assistant graph with full node and edge details'
+---
+
+Get the complete details of a specific assistant graph, including all nodes, edges, and configuration.
+
+## Path Parameters
+
+<ParamField path="graph_id" type="integer" required>
+  The unique identifier of the graph to retrieve.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the graph.
+</ResponseField>
+
+<ResponseField name="organization_id" type="integer">
+  Organization that owns this graph.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name of the graph.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Description of the graph.
+</ResponseField>
+
+<ResponseField name="is_active" type="boolean">
+  Whether the graph is active.
+</ResponseField>
+
+<ResponseField name="configuration" type="object">
+  Graph-level configuration settings.
+</ResponseField>
+
+<ResponseField name="nodes" type="array">
+  Array of nodes with full details.
+
+  <Expandable title="Node properties">
+    <ResponseField name="id" type="integer">Node ID</ResponseField>
+    <ResponseField name="graph_id" type="integer">Parent graph ID</ResponseField>
+    <ResponseField name="assistant_id" type="integer">Associated assistant ID</ResponseField>
+    <ResponseField name="node_type" type="string">Type: entry, standard, exit, escalation</ResponseField>
+    <ResponseField name="position" type="object">UI position {x, y}</ResponseField>
+    <ResponseField name="configuration" type="object">Node configuration</ResponseField>
+    <ResponseField name="created_at" type="string">Creation timestamp</ResponseField>
+    <ResponseField name="assistant_name" type="string">Name of the associated assistant</ResponseField>
+    <ResponseField name="assistant_description" type="string">Description of the associated assistant</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="edges" type="array">
+  Array of edges with full details.
+
+  <Expandable title="Edge properties">
+    <ResponseField name="id" type="integer">Edge ID</ResponseField>
+    <ResponseField name="graph_id" type="integer">Parent graph ID</ResponseField>
+    <ResponseField name="from_node_id" type="integer">Source node ID</ResponseField>
+    <ResponseField name="to_node_id" type="integer">Target node ID</ResponseField>
+    <ResponseField name="condition_type" type="string">Condition type</ResponseField>
+    <ResponseField name="intent_pattern" type="string">Intent keywords (comma-separated)</ResponseField>
+    <ResponseField name="natural_language_trigger" type="string">NL condition description</ResponseField>
+    <ResponseField name="mathematical_expression" type="string">Math expression</ResponseField>
+    <ResponseField name="state_variable_condition" type="object">State variable condition</ResponseField>
+    <ResponseField name="condition_logic" type="string">AND/OR logic</ResponseField>
+    <ResponseField name="priority" type="integer">Evaluation priority</ResponseField>
+    <ResponseField name="is_active" type="boolean">Whether edge is active</ResponseField>
+    <ResponseField name="handoff_sentence" type="string">Message spoken during transition</ResponseField>
+    <ResponseField name="description" type="string">Human-readable description</ResponseField>
+    <ResponseField name="created_at" type="string">Creation timestamp</ResponseField>
+    <ResponseField name="updated_at" type="string">Last update timestamp</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="total_nodes" type="integer">
+  Total number of nodes in the graph.
+</ResponseField>
+
+<ResponseField name="total_edges" type="integer">
+  Total number of edges in the graph.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of creation.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  ISO 8601 timestamp of last update.
+</ResponseField>
+
+<RequestExample>
+```bash cURL
+curl https://api.burki.dev/api/v1/assistant-graphs/1 \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.burki.dev/api/v1/assistant-graphs/1",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+graph = response.json()
+print(f"Graph: {graph['name']}")
+print(f"Nodes: {graph['total_nodes']}")
+print(f"Edges: {graph['total_edges']}")
+
+# Print node structure
+for node in graph['nodes']:
+    print(f"  - {node['node_type']}: {node['assistant_name']}")
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.burki.dev/api/v1/assistant-graphs/1', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const graph = await response.json();
+console.log(`Graph: ${graph.name}`);
+console.log(`Nodes: ${graph.total_nodes}`);
+console.log(`Edges: ${graph.total_edges}`);
+
+// Print node structure
+graph.nodes.forEach(node => {
+  console.log(`  - ${node.node_type}: ${node.assistant_name}`);
+});
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "id": 1,
+  "organization_id": 1,
+  "name": "Customer Service Router",
+  "description": "Routes customers to the appropriate department",
+  "is_active": true,
+  "configuration": {},
+  "nodes": [
+    {
+      "id": 101,
+      "graph_id": 1,
+      "assistant_id": 1,
+      "node_type": "entry",
+      "position": {"x": 0, "y": 0},
+      "configuration": {},
+      "created_at": "2025-01-19T10:00:00Z",
+      "assistant_name": "Receptionist",
+      "assistant_description": "Greets callers and routes to departments"
+    },
+    {
+      "id": 102,
+      "graph_id": 1,
+      "assistant_id": 2,
+      "node_type": "standard",
+      "position": {"x": 200, "y": -100},
+      "configuration": {},
+      "created_at": "2025-01-19T10:00:00Z",
+      "assistant_name": "Sales Specialist",
+      "assistant_description": "Handles sales inquiries"
+    },
+    {
+      "id": 103,
+      "graph_id": 1,
+      "assistant_id": 3,
+      "node_type": "standard",
+      "position": {"x": 200, "y": 100},
+      "configuration": {},
+      "created_at": "2025-01-19T10:00:00Z",
+      "assistant_name": "Support Agent",
+      "assistant_description": "Handles support requests"
+    }
+  ],
+  "edges": [
+    {
+      "id": 201,
+      "graph_id": 1,
+      "from_node_id": 101,
+      "to_node_id": 102,
+      "condition_type": "intent",
+      "intent_pattern": "sales,purchase,buy",
+      "natural_language_trigger": null,
+      "mathematical_expression": null,
+      "state_variable_condition": null,
+      "condition_logic": "AND",
+      "priority": 1,
+      "is_active": true,
+      "handoff_sentence": "Let me connect you with our sales team.",
+      "description": "Route to sales on purchase intent",
+      "created_at": "2025-01-19T10:00:00Z",
+      "updated_at": "2025-01-19T10:00:00Z"
+    },
+    {
+      "id": 202,
+      "graph_id": 1,
+      "from_node_id": 101,
+      "to_node_id": 103,
+      "condition_type": "intent",
+      "intent_pattern": "support,help,issue,problem",
+      "natural_language_trigger": null,
+      "mathematical_expression": null,
+      "state_variable_condition": null,
+      "condition_logic": "AND",
+      "priority": 1,
+      "is_active": true,
+      "handoff_sentence": "I will transfer you to our support team.",
+      "description": "Route to support on help intent",
+      "created_at": "2025-01-19T10:00:00Z",
+      "updated_at": "2025-01-19T10:00:00Z"
+    }
+  ],
+  "total_nodes": 3,
+  "total_edges": 2,
+  "created_at": "2025-01-19T10:00:00Z",
+  "updated_at": "2025-01-19T10:00:00Z"
+}
+```
+</ResponseExample>
+
+## Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 401 | Unauthorized - Invalid or missing API key |
+| 404 | Graph not found in your organization |
+| 500 | Server error retrieving the graph |

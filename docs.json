@@ -41,6 +41,9 @@
                   "tts-providers",
                   "tts-providers/elevenlabs",
                   "tts-providers/deepgram",
+                  "tts-providers/cartesia",
+                  "tts-providers/azure",
+                  "tts-providers/kokoro",
                   "tts-providers/inworld",
                   "tts-providers/resemble",
                   "tts-providers/openai",
@@ -61,6 +64,7 @@
               "messaging",
               "phone-number-management",
               "campaigns",
+              "assistant-graphs",
               "rag",
               "call-management",
               "tools",
@@ -237,6 +241,21 @@
               "api-reference/tools/get-by-id",
               "api-reference/tools/assign",
               "api-reference/tools/discover-lambda"
+            ]
+          },
+          {
+            "group": "Assistant Graphs",
+            "pages": [
+              "api-reference/assistant-graphs/create",
+              "api-reference/assistant-graphs/list",
+              "api-reference/assistant-graphs/get",
+              "api-reference/assistant-graphs/update",
+              "api-reference/assistant-graphs/structure",
+              "api-reference/assistant-graphs/delete",
+              "api-reference/assistant-graphs/sessions",
+              "api-reference/assistant-graphs/phone-numbers",
+              "api-reference/assistant-graphs/analytics",
+              "api-reference/assistant-graphs/test"
             ]
           }
         ]

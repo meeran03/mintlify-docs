@@ -1,0 +1,445 @@
+---
+title: 'Assistant Graphs'
+description: 'Route conversations between multiple specialized assistants with intelligent orchestration'
+icon: 'diagram-project'
+---
+
+## Overview
+
+Assistant Graphs enable multi-assistant orchestration, allowing you to route conversations between different specialized assistants based on various conditions. This powerful feature lets you build complex conversational workflows where each assistant handles their area of expertise.
+
+<Frame>
+  <img src="/images/assistant-graph-overview.svg" alt="Assistant Graph Overview" />
+</Frame>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Department Routing" icon="building">
+    Route sales inquiries to sales bots, support requests to support bots, and billing questions to billing specialists.
+  </Card>
+  <Card title="Escalation Paths" icon="arrow-up-right">
+    Automatically escalate frustrated customers or complex issues to human agents.
+  </Card>
+  <Card title="Language-Based Routing" icon="language">
+    Detect the caller's language and route to the appropriate language-specific assistant.
+  </Card>
+  <Card title="Skill-Based Handling" icon="star">
+    Route technical questions to technical specialists and general queries to generalists.
+  </Card>
+</CardGroup>
+
+## Benefits Over Single-Assistant Approach
+
+| Feature | Single Assistant | Assistant Graph |
+|---------|-----------------|-----------------|
+| Specialization | One assistant handles everything | Each assistant specializes in their domain |
+| System Prompts | Single, complex prompt | Focused prompts per assistant |
+| Knowledge Base | Shared across all topics | Targeted knowledge per assistant |
+| Voice & Personality | Same throughout | Can vary per assistant |
+| Scalability | Limited by prompt complexity | Scales with workflow needs |
+
+---
+
+## Core Concepts
+
+### Graphs
+
+A **Graph** is a container that holds nodes (assistants) and edges (transitions). Each graph belongs to an organization and can be assigned to phone numbers for inbound call handling.
+
+```json
+{
+  "id": 1,
+  "name": "Customer Service Router",
+  "description": "Routes customers to the appropriate department",
+  "is_active": true,
+  "nodes": [...],
+  "edges": [...]
+}
+```
+
+### Nodes
+
+**Nodes** represent individual assistants positioned within the graph. Each node wraps an existing assistant and defines its role in the conversation flow.
+
+<AccordionGroup>
+  <Accordion title="Entry Node" icon="play">
+    The starting point of every conversation. When a call comes in on a phone number assigned to this graph, the conversation begins at the entry node.
+    
+    - Only one entry node per graph
+    - Typically a receptionist or router assistant
+    - Required for the graph to function
+  </Accordion>
+  
+  <Accordion title="Standard Node" icon="circle">
+    Regular assistant nodes that handle specific topics or departments.
+    
+    - Can have multiple standard nodes
+    - Each wraps a specialized assistant
+    - Connected via edges to other nodes
+  </Accordion>
+  
+  <Accordion title="Exit Node" icon="flag-checkered">
+    Marks conversation end points.
+    
+    - Triggers call termination
+    - Can have multiple exit nodes for different outcomes
+    - Optional - calls can also end naturally
+  </Accordion>
+  
+  <Accordion title="Escalation Node" icon="user-headset">
+    Triggers human transfer.
+    
+    - Routes to human agents
+    - Preserves conversation context for handoff
+    - Configurable transfer destinations
+  </Accordion>
+</AccordionGroup>
+
+```json Node Example
+{
+  "id": 101,
+  "assistant_id": 5,
+  "node_type": "standard",
+  "position": {"x": 200, "y": 100},
+  "configuration": {},
+  "assistant_name": "Sales Specialist",
+  "assistant_description": "Handles sales inquiries and product questions"
+}
+```
+
+### Edges
+
+**Edges** define transitions between nodes. Each edge has conditions that determine when the transition should occur.
+
+```json Edge Example
+{
+  "id": 201,
+  "from_node_id": 101,
+  "to_node_id": 102,
+  "condition_type": "intent",
+  "intent_pattern": "sales,purchase,buy,pricing",
+  "priority": 1,
+  "handoff_sentence": "Let me connect you with our sales team.",
+  "description": "Route to sales when customer shows purchase intent"
+}
+```
+
+---
+
+## Transition Conditions
+
+Edges support multiple condition types to determine when transitions should occur.
+
+### Intent-Based Conditions
+
+Trigger transitions when specific intents are detected in the user's message.
+
+```json
+{
+  "condition_type": "intent",
+  "intent_pattern": "sales,purchase,buy,pricing"
+}
+```
+
+<Info>
+Intent patterns are comma-separated keywords. If any keyword matches the detected intent, the transition triggers.
+</Info>
+
+### Natural Language Conditions
+
+Use LLM evaluation to assess complex conditions described in natural language.
+
+```json
+{
+  "condition_type": "natural_language",
+  "natural_language_trigger": "User is frustrated, angry, or expressing dissatisfaction with the service"
+}
+```
+
+<Tip>
+Natural language conditions are more flexible but slightly slower than intent-based conditions. Use them for nuanced scenarios.
+</Tip>
+
+### Mathematical Conditions
+
+Expression-based conditions that evaluate numerical values.
+
+```json
+{
+  "condition_type": "mathematical",
+  "mathematical_expression": "call_duration > 300"
+}
+```
+
+Supported variables include:
+- `call_duration` - Call length in seconds
+- `turn_count` - Number of conversation turns
+- Custom state variables
+
+### State Variable Conditions
+
+Check conversation state variables for specific values.
+
+```json
+{
+  "condition_type": "state_variable",
+  "state_variable_condition": {
+    "variable": "department",
+    "operator": "equals",
+    "value": "billing"
+  }
+}
+```
+
+---
+
+## Building a Graph
+
+### Step 1: Create Your Assistants
+
+Before building a graph, create the specialized assistants you'll use as nodes.
+
+```bash
+# Create a receptionist assistant
+curl -X POST https://api.burki.dev/api/v1/assistants \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Receptionist",
+    "description": "Initial greeting and routing",
+    "system_prompt": "You are a friendly receptionist. Greet callers and determine their needs."
+  }'
+```
+
+### Step 2: Create the Graph
+
+Create an empty graph or one with initial structure.
+
+```bash
+curl -X POST https://api.burki.dev/api/v1/assistant-graphs \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Customer Service Router",
+    "description": "Routes customers to appropriate departments",
+    "nodes": [
+      {
+        "assistant_id": 1,
+        "node_type": "entry",
+        "position": {"x": 0, "y": 0}
+      },
+      {
+        "assistant_id": 2,
+        "node_type": "standard",
+        "position": {"x": 200, "y": -100}
+      }
+    ],
+    "edges": [
+      {
+        "from_node_id": 0,
+        "to_node_id": 1,
+        "condition_type": "intent",
+        "intent_pattern": "sales,purchase,buy",
+        "priority": 1,
+        "handoff_sentence": "Connecting you with sales..."
+      }
+    ]
+  }'
+```
+
+### Step 3: Use the Visual Graph Builder
+
+The Burki dashboard includes a visual graph builder for creating and editing graphs:
+
+1. Navigate to **Assistants → Graphs** in the dashboard
+2. Click **Create New Graph**
+3. Drag assistants from the sidebar onto the canvas
+4. Connect nodes by clicking and dragging between them
+5. Click on edges to configure transition conditions
+6. Save your graph
+
+### Step 4: Test the Graph
+
+Use the test endpoint to simulate conversations through your graph.
+
+```bash
+curl -X POST https://api.burki.dev/api/v1/assistant-graphs/1/test \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '["I want to buy a product", "How much does it cost?"]'
+```
+
+### Step 5: Assign to Phone Number
+
+Connect your graph to a phone number to start receiving calls.
+
+```bash
+curl -X POST https://api.burki.dev/api/v1/assistant-graphs/1/phone-numbers/1/assign \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+---
+
+## Handoff Behavior
+
+When a transition occurs, the following happens:
+
+1. **Handoff Sentence**: If configured, the current assistant speaks the handoff sentence
+2. **Context Sharing**: Conversation context is passed to the new assistant
+3. **History Preservation**: The new assistant has access to conversation history
+4. **Seamless Continuation**: The user experiences a smooth transition
+
+```json
+{
+  "handoff_sentence": "I'll transfer you to our billing department who can help with that."
+}
+```
+
+<Warning>
+If no handoff sentence is configured, the transition occurs silently. Consider always including a handoff sentence for better user experience.
+</Warning>
+
+---
+
+## Phone Number Assignment
+
+### Assigning a Graph to a Phone Number
+
+When you assign a phone number to a graph (instead of an individual assistant), incoming calls are routed through the graph's entry node.
+
+```bash
+# Assign phone number to graph
+curl -X POST https://api.burki.dev/api/v1/assistant-graphs/1/phone-numbers/5/assign \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Behavior Differences
+
+| Scenario | Individual Assistant | Assistant Graph |
+|----------|---------------------|-----------------|
+| Inbound Call | Routes to single assistant | Routes to graph's entry node |
+| Outbound Call | Uses assigned assistant | Uses entry node assistant |
+| Phone Assignment | `assistant_id` on phone number | `assistant_graph_id` on phone number |
+
+<Note>
+A phone number can be assigned to either an individual assistant OR a graph, but not both. Assigning to a graph overrides any previous assistant assignment.
+</Note>
+
+---
+
+## Best Practices
+
+<Steps>
+  <Step title="Start Simple">
+    Begin with 2-3 assistants and add complexity as needed. A basic receptionist → specialist pattern works well for most use cases.
+  </Step>
+  
+  <Step title="Use Clear Conditions">
+    Write transition conditions that are unambiguous. Test edge cases to ensure routing works as expected.
+  </Step>
+  
+  <Step title="Include Handoff Sentences">
+    Always configure handoff sentences for a smooth user experience. Users should understand why they're being transferred.
+  </Step>
+  
+  <Step title="Set Priorities">
+    When multiple edges could match, use priorities to ensure deterministic routing. Lower numbers = higher priority.
+  </Step>
+  
+  <Step title="Test All Paths">
+    Use the test endpoint to verify all conversation paths work correctly before going live.
+  </Step>
+  
+  <Step title="Monitor Analytics">
+    Review transition analytics to identify bottlenecks and optimize routing.
+  </Step>
+</Steps>
+
+---
+
+## Example Graphs
+
+### Customer Service Router
+
+A typical customer service setup with department routing:
+
+```
+                    ┌─────────────┐
+                    │ Receptionist│
+                    │   (Entry)   │
+                    └──────┬──────┘
+           ┌───────────────┼───────────────┐
+           ▼               ▼               ▼
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │    Sales    │ │   Support   │ │   Billing   │
+    │  Assistant  │ │  Assistant  │ │  Assistant  │
+    └─────────────┘ └─────────────┘ └──────┬──────┘
+                           │               │
+                           ▼               ▼
+                    ┌─────────────┐ ┌─────────────┐
+                    │ Escalation  │ │ Escalation  │
+                    │   (Human)   │ │   (Human)   │
+                    └─────────────┘ └─────────────┘
+```
+
+**Edge Conditions:**
+- Receptionist → Sales: `intent: "sales,purchase,buy,pricing"`
+- Receptionist → Support: `intent: "help,problem,issue,broken"`
+- Receptionist → Billing: `intent: "bill,payment,invoice,charge"`
+- Support → Escalation: `natural_language: "user is frustrated or issue not resolved"`
+- Billing → Escalation: `mathematical: "call_duration > 600"`
+
+### Language Router
+
+Route calls based on detected language:
+
+```
+                    ┌─────────────┐
+                    │  Language   │
+                    │  Detector   │
+                    │   (Entry)   │
+                    └──────┬──────┘
+           ┌───────────────┼───────────────┐
+           ▼               ▼               ▼
+    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+    │   English   │ │   Spanish   │ │   French    │
+    │  Assistant  │ │  Assistant  │ │  Assistant  │
+    └─────────────┘ └─────────────┘ └─────────────┘
+```
+
+**Edge Conditions:**
+- Detector → English: `state_variable: language == "en"`
+- Detector → Spanish: `state_variable: language == "es"`
+- Detector → French: `state_variable: language == "fr"`
+
+---
+
+## API Reference
+
+<CardGroup cols={2}>
+  <Card title="Create Graph" icon="plus" href="/api-reference/assistant-graphs/create">
+    Create a new assistant graph with nodes and edges
+  </Card>
+  <Card title="List Graphs" icon="list" href="/api-reference/assistant-graphs/list">
+    List all graphs in your organization
+  </Card>
+  <Card title="Get Graph" icon="eye" href="/api-reference/assistant-graphs/get">
+    Retrieve a specific graph with full details
+  </Card>
+  <Card title="Update Graph" icon="pen" href="/api-reference/assistant-graphs/update">
+    Update graph metadata
+  </Card>
+  <Card title="Update Structure" icon="diagram-project" href="/api-reference/assistant-graphs/structure">
+    Update nodes and edges
+  </Card>
+  <Card title="Delete Graph" icon="trash" href="/api-reference/assistant-graphs/delete">
+    Delete a graph and all related data
+  </Card>
+  <Card title="Sessions" icon="message" href="/api-reference/assistant-graphs/sessions">
+    View conversation sessions
+  </Card>
+  <Card title="Phone Numbers" icon="phone" href="/api-reference/assistant-graphs/phone-numbers">
+    Manage phone number assignments
+  </Card>
+</CardGroup>

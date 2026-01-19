@@ -8,17 +8,17 @@ The current documentation is significantly outdated. These plans identify 9 sepa
 
 ## Plans Summary
 
-| # | Plan | File | Estimated Hours | Priority |
-|---|------|------|-----------------|----------|
-| 1 | SDK Documentation | [01-sdk-documentation.md](./01-sdk-documentation.md) | 9 hours | HIGH |
-| 2 | Campaign Management | [02-campaign-management.md](./02-campaign-management.md) | 9 hours | HIGH |
-| 3 | API Reference Updates | [03-api-reference-updates.md](./03-api-reference-updates.md) | 5 hours | HIGH |
-| 4 | New TTS Providers | [04-tts-providers.md](./04-tts-providers.md) | 6.5 hours | MEDIUM |
-| 5 | Vonage Telephony | [05-vonage-telephony.md](./05-vonage-telephony.md) | 2.5 hours | MEDIUM |
-| 6 | Assistant Graphs | [06-assistant-graphs.md](./06-assistant-graphs.md) | 7.5 hours | MEDIUM |
-| 7 | Azure STT | [07-azure-stt.md](./07-azure-stt.md) | 3 hours | LOW |
-| 8 | Advanced Features | [08-advanced-features.md](./08-advanced-features.md) | 8.5 hours | LOW |
-| 9 | Navigation Restructure | [09-navigation-restructure.md](./09-navigation-restructure.md) | 2.5 hours | LAST |
+| # | Plan | File | Estimated Hours | Priority | Status |
+|---|------|------|-----------------|----------|--------|
+| 1 | SDK Documentation | [01-sdk-documentation.md](./01-sdk-documentation.md) | 9 hours | HIGH | |
+| 2 | Campaign Management | [02-campaign-management.md](./02-campaign-management.md) | 9 hours | HIGH | |
+| 3 | API Reference Updates | [03-api-reference-updates.md](./03-api-reference-updates.md) | 5 hours | HIGH | |
+| 4 | New TTS Providers | [04-tts-providers.md](./04-tts-providers.md) | 6.5 hours | MEDIUM | |
+| 5 | Vonage Telephony | [05-vonage-telephony.md](./05-vonage-telephony.md) | 2.5 hours | MEDIUM | ✅ DONE |
+| 6 | Assistant Graphs | [06-assistant-graphs.md](./06-assistant-graphs.md) | 7.5 hours | MEDIUM | |
+| 7 | Azure STT | [07-azure-stt.md](./07-azure-stt.md) | 3 hours | LOW | |
+| 8 | Advanced Features | [08-advanced-features.md](./08-advanced-features.md) | 8.5 hours | LOW | |
+| 9 | Navigation Restructure | [09-navigation-restructure.md](./09-navigation-restructure.md) | 2.5 hours | LAST | |
 
 **Total Estimated Effort: ~53 hours**
 
