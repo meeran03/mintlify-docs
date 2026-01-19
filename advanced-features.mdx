@@ -3,8 +3,54 @@ title: Advanced Features
 ---
 
 <Callout type="info">
-Burki Voice AI includes powerful advanced features for complex use cases—from data extraction and webhooks to multi-tenant management and outbound calling.
+Burki Voice AI includes powerful advanced features for complex use cases—from IVR conversion and intelligent memory to spam protection and flexible API key management.
 </Callout>
+
+---
+
+## Featured Advanced Capabilities
+
+<CardGroup cols={2}>
+  <Card title="IVR Explorer" icon="sitemap" href="/ivr-explorer">
+    **Map and convert existing IVR systems**
+    
+    Automatically explore any IVR phone tree, visualize the menu structure, and convert it to an AI-powered assistant with one click.
+    
+    - Map competitor IVRs
+    - Document legacy systems
+    - One-click AI conversion
+  </Card>
+  
+  <Card title="Learning & Memory" icon="brain" href="/learning-memory">
+    **Personalized, context-aware conversations**
+    
+    Enable your assistants to remember information across calls, manage prompt versions with A/B testing, and evaluate changes before deployment.
+    
+    - Persistent caller memory
+    - Prompt versioning & canary rollouts
+    - Evaluation datasets
+  </Card>
+  
+  <Card title="Spam Detection" icon="shield-halved" href="/spam-detection">
+    **AI-powered call protection**
+    
+    Automatically detect and terminate spam, scam, and unwanted calls in real-time using configurable LLM-based evaluation.
+    
+    - Custom spam scenarios
+    - Allowlist legitimate patterns
+    - Fail-open safety design
+  </Card>
+  
+  <Card title="BYO API Keys" icon="key" href="/byo-api-keys">
+    **Bring your own provider accounts**
+    
+    Use your own API keys for TTS, STT, and LLM providers. Control costs directly and leverage enterprise agreements.
+    
+    - Per-assistant configuration
+    - Enterprise-grade encryption
+    - Mix managed and BYO
+  </Card>
+</CardGroup>
 
 ---
 
@@ -83,7 +129,7 @@ Start with essential fields only. You can always add more later as you refine yo
 {
   "event": "call_ended",
   "call_sid": "CA123456789",
-  "timestamp": "2024-01-15T10:30:00Z",
+  "timestamp": "2026-01-15T10:30:00Z",
   "duration": 180,
   "extracted_data": {
     "name": "John Doe",
@@ -93,48 +139,7 @@ Start with essential fields only. You can always add more later as you refine yo
 ```
 
 <Callout type="warning">
-Ensure your webhook endpoint can handle the expected volume of calls and responds quickly (< 3 seconds).
-</Callout>
-</Accordion>
-
----
-
-## Multi-Tenant Management
-
-<Accordion title="Multi-Tenancy Overview">
-**What is multi-tenancy?** Support multiple organizations or clients with isolated data and configurations.
-
-**Benefits:**
-- Separate assistants per client
-- Isolated data and settings
-- Custom branding per tenant
-- Centralized management
-- Scalable pricing models
-
-**Use Cases:**
-- Agency serving multiple clients
-- SaaS platform with voice features
-- Enterprise with multiple departments
-- White-label solutions
-</Accordion>
-
-<Accordion title="Tenant Configuration">
-**Setup Steps:**
-1. Create tenant accounts
-2. Assign phone numbers to tenants
-3. Configure tenant-specific assistants
-4. Set up isolated data storage
-5. Manage billing and usage
-
-**Tenant Isolation:**
-- Separate databases/schemas
-- Isolated API keys
-- Custom domain support
-- Tenant-specific analytics
-- Independent scaling
-
-<Callout type="note">
-Multi-tenancy requires careful planning of data architecture and security. Consult with your development team for implementation.
+Ensure your webhook endpoint can handle the expected volume of calls and responds quickly (less than 3 seconds).
 </Callout>
 </Accordion>
 
@@ -206,30 +211,8 @@ Too sensitive = choppy conversations. Too insensitive = poor user experience. Te
 - **Custom Scripts:** Tailored messages per campaign
 - **Scheduling:** When to make calls
 - **Compliance:** Do-not-call list management
-</Accordion>
 
-<Accordion title="Outbound Call Setup">
-**Steps:**
-1. Upload contact lists
-2. Configure call scripts/agendas
-3. Set calling schedules
-4. Configure compliance settings
-5. Monitor campaign performance
-
-**API Integration:**
-```python
-# Example outbound call API
-response = burki_api.create_outbound_call(
-    to_phone="+1234567890",
-    assistant_id=123,
-    agenda="Appointment reminder for tomorrow",
-    custom_message="Hi, this is a reminder about your appointment..."
-)
-```
-
-<Callout type="warning">
-Outbound calling requires compliance with local regulations (TCPA, GDPR, etc.). Ensure you have proper consent and follow all applicable laws.
-</Callout>
+See [Campaigns](/campaigns) for full documentation on outbound calling campaigns.
 </Accordion>
 
 ---
@@ -279,8 +262,7 @@ Advanced features often require technical expertise. Consider working with your 
 </Callout>
 
 **Resources:**
-- API documentation
-- Developer guides
-- Community forums
-- Professional services
-- Technical support 
+- [API Documentation](/api-reference/introduction)
+- [SDK Documentation](/sdks/overview)
+- [FAQ](/faq)
+- [Support](mailto:info@burki.dev)

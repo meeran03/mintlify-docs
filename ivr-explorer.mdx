@@ -1,0 +1,260 @@
+---
+title: IVR Explorer
+---
+
+<Callout type="info">
+IVR Explorer is a unique feature that automatically maps existing IVR phone trees and converts them into AI-powered assistants. Understand competitor systems, document legacy phone menus, or modernize your own IVR with one click.
+</Callout>
+
+---
+
+## What is IVR Explorer?
+
+IVR Explorer automatically calls and navigates Interactive Voice Response (IVR) systems to build a complete map of all menu options, then converts that map into a working AI assistant.
+
+<CardGroup cols={3}>
+  <Card title="Map Competitor IVRs" icon="map">
+    Understand how competitors structure their phone support and identify opportunities.
+  </Card>
+  
+  <Card title="Document Legacy Systems" icon="file-lines">
+    Create visual documentation of complex phone trees for training or compliance.
+  </Card>
+  
+  <Card title="Convert to AI" icon="robot">
+    Transform any IVR into an intelligent AI assistant with one click.
+  </Card>
+</CardGroup>
+
+---
+
+## How It Works
+
+The exploration process follows five automated steps:
+
+```mermaid
+flowchart LR
+    A[Provide Phone Number] --> B[System Calls IVR]
+    B --> C[Navigate & Record]
+    C --> D[Build Tree Map]
+    D --> E[AI Summarizes]
+```
+
+<Steps>
+  <Step title="Provide Target Phone Number">
+    Enter the phone number of the IVR system you want to explore in E.164 format (e.g., `+18005551234`).
+  </Step>
+  <Step title="Automated Calling">
+    Burki calls the number and begins interacting with the IVR system automatically.
+  </Step>
+  <Step title="Navigate & Record">
+    The system explores menu options by pressing keys (DTMF) or speaking, recording all prompts and responses.
+  </Step>
+  <Step title="Build Tree Map">
+    A visual tree structure is created showing all discovered paths, menus, and terminal actions.
+  </Step>
+  <Step title="AI Analysis">
+    Each menu option is analyzed and summarized by AI for easy understanding.
+  </Step>
+</Steps>
+
+---
+
+## Exploration Strategies
+
+Choose the strategy that best fits your target IVR:
+
+| Strategy | Description | Best For |
+|----------|-------------|----------|
+| **LLM-Driven** | AI decides the navigation path based on prompts | Complex IVRs with voice recognition |
+| **DTMF-Only** | Systematic keypad exploration (1-9, *, #) | Simple numeric menus |
+| **Hybrid** | Combines AI decisions with systematic DTMF | Most use cases (recommended) |
+
+<Callout type="tip">
+Start with the **LLM-Driven** strategy for most explorations. Switch to **DTMF-Only** if the IVR uses simple numeric menus without voice commands.
+</Callout>
+
+---
+
+## Starting an Exploration
+
+<Tabs>
+  <Tab title="Dashboard">
+    1. Navigate to **IVR Explorer** in your dashboard
+    2. Enter the target phone number
+    3. Optionally provide a friendly name (e.g., "Acme Corp Support")
+    4. Select your exploration strategy
+    5. Set maximum depth (how many menu levels to explore)
+    6. Click **Start Exploration**
+    
+    The exploration typically takes 3-10 minutes depending on IVR complexity.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -X POST "https://api.burki.dev/api/v1/ivr/explore" \
+      -H "Authorization: Bearer YOUR_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "target_phone_number": "+18005551234",
+        "target_name": "Acme Corp Support",
+        "max_depth": 3,
+        "exploration_strategy": "llm_driven",
+        "language": "en"
+      }'
+    ```
+    
+    **Parameters:**
+    
+    | Parameter | Type | Required | Description |
+    |-----------|------|----------|-------------|
+    | `target_phone_number` | string | Yes | Phone number in E.164 format |
+    | `target_name` | string | No | Friendly name for the IVR |
+    | `max_depth` | integer | No | Max menu depth to explore (1-10, default: 3) |
+    | `exploration_strategy` | string | No | `llm_driven`, `dtmf_only`, or `hybrid` |
+    | `language` | string | No | Expected IVR language (default: `en`) |
+  </Tab>
+</Tabs>
+
+---
+
+## IVR Tree Visualization
+
+After exploration, you'll see an interactive tree view of the discovered IVR structure.
+
+### Node Types
+
+| Node Type | Icon | Description |
+|-----------|------|-------------|
+| **Root** | Entry point of the IVR system |
+| **Menu** | Options menu with multiple choices |
+| **Submenu** | Nested menu within another menu |
+| **Action** | Terminal action (e.g., "Your balance is...") |
+| **Transfer** | Transfers to a human agent |
+| **Hold** | Hold state with music or messages |
+| **Loop** | Returns to a previous menu |
+| **Dead End** | No further options available |
+
+### Tree Information
+
+Each node displays:
+- **Prompt text**: What the IVR says at this point
+- **AI summary**: Plain-language description of the option
+- **Input to reach**: Key press or voice command needed
+- **Detected options**: Available choices from this menu
+
+<Callout type="note">
+You can manually edit nodes to correct transcription errors or add notes before converting to an assistant.
+</Callout>
+
+---
+
+## Converting IVR to AI Assistant
+
+Once your IVR tree is mapped, convert it to a working AI assistant with one click.
+
+<Accordion title="Conversion Options">
+**Single Assistant (Simple IVRs)**
+
+For IVRs with straightforward menus, Burki creates a single AI assistant that handles all paths intelligently.
+
+**Assistant Graph (Complex IVRs)**
+
+For IVRs with specialized departments or complex routing, Burki creates a multi-assistant graph where each major branch becomes its own specialized assistant with intelligent handoffs.
+
+**What Gets Created:**
+- System prompt based on IVR prompts and AI summaries
+- Transfer scenarios matching IVR transfer points
+- End call scenarios matching terminal actions
+- Optional: Tool integrations for dynamic responses
+</Accordion>
+
+<Accordion title="Before Converting">
+1. **Review the tree**: Verify prompts are transcribed correctly
+2. **Edit nodes**: Fix any errors or add clarifying notes
+3. **Mark as approved**: Submit the tree for review
+4. **Configure voice**: Choose TTS provider and voice for your assistant
+5. **Set LLM settings**: Select the AI model to power responses
+</Accordion>
+
+<Accordion title="After Converting">
+- Test your new assistant with sample calls
+- Assign a phone number
+- Fine-tune the system prompt if needed
+- Monitor call analytics
+</Accordion>
+
+---
+
+## API Reference
+
+### Exploration Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/ivr/explore` | Start a new exploration |
+| `GET` | `/api/v1/ivr/sessions` | List all exploration sessions |
+| `GET` | `/api/v1/ivr/sessions/{id}` | Get exploration status and results |
+| `PUT` | `/api/v1/ivr/sessions/{id}/pause` | Pause an active exploration |
+| `PUT` | `/api/v1/ivr/sessions/{id}/resume` | Resume a paused exploration |
+| `DELETE` | `/api/v1/ivr/sessions/{id}` | Delete an exploration session |
+
+### Tree Management Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/v1/ivr/trees/{id}` | Get complete IVR tree |
+| `PUT` | `/api/v1/ivr/trees/{id}/nodes/{node_id}` | Update a tree node |
+| `POST` | `/api/v1/ivr/trees/{id}/nodes` | Add a node manually |
+| `DELETE` | `/api/v1/ivr/trees/{id}/nodes/{node_id}` | Delete a node |
+| `POST` | `/api/v1/ivr/trees/{id}/review` | Submit tree for review |
+| `POST` | `/api/v1/ivr/trees/{id}/convert` | Convert tree to assistant |
+
+---
+
+## Public Exploration (Free Tier)
+
+Try IVR Explorer without an account:
+
+1. Visit the IVR Explorer page
+2. Enter a phone number and your email
+3. Receive results when exploration completes
+
+<Callout type="warning">
+Public explorations are limited to:
+- 1 exploration per email address
+- Maximum depth of 2 levels
+- No conversion to assistant (requires signup)
+</Callout>
+
+---
+
+## Limitations
+
+<Accordion title="Technical Limitations">
+- **Voice-only IVRs**: Speech recognition may have reduced accuracy for complex voice commands
+- **Anti-bot measures**: Some IVRs detect automated systems and may behave differently
+- **Long hold times**: Explorations may timeout if IVR has extended hold periods
+- **International numbers**: Best results with US/Canada numbers; international coverage varies
+</Accordion>
+
+<Accordion title="Cost Considerations">
+IVR explorations incur telephony costs:
+- Each exploration makes outbound calls to the target number
+- Complex IVRs with many branches require more calls
+- Costs are charged to your Burki wallet at standard outbound rates
+- Typical exploration: 5-15 calls depending on complexity
+</Accordion>
+
+---
+
+## Best Practices
+
+- **Start shallow**: Begin with `max_depth: 2` to get an overview, then increase for full mapping
+- **Use descriptive names**: Name explorations clearly (e.g., "Competitor XYZ Support Line - Jan 2026")
+- **Review before converting**: Always verify transcriptions and edit errors before creating assistants
+- **Test thoroughly**: After conversion, test all major paths to ensure the AI handles them correctly
+- **Document changes**: If the original IVR changes, re-explore and compare trees
+
+<Callout type="success">
+IVR Explorer is particularly valuable for businesses replacing legacy phone systems with AI. Map your existing IVR, convert it, and gradually improve the AI version based on real call data.
+</Callout>
