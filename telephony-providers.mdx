@@ -1,40 +1,40 @@
 ---
 title: Telephony Providers
-description: "Configure Twilio, Telnyx, Vonage, or BYO SIP Trunk for your voice AI assistants"
+description: "Configure Twilio, Telnyx, or Vonage for your voice AI assistants"
 ---
 
 <Callout type="info">
-Burki Voice AI supports Twilio, Telnyx, Vonage, and BYO (Bring Your Own) SIP Trunk as telephony providers. You can use different providers for different assistants, enabling cost optimization, global coverage, and redundancy.
+Burki Voice AI supports Twilio, Telnyx, and Vonage as telephony providers. You can use different providers for different assistants, enabling cost optimization, global coverage, and redundancy.
 </Callout>
 
 ---
 
 ## Provider Comparison
 
-<CardGroup cols={4}>
-  <Card title="🏢 Twilio" icon="phone">
-    **Traditional Leader**
+Choose the provider that best fits your needs:
+
+<CardGroup cols={3}>
+  <Card title="Twilio" icon="phone">
+    **Established Platform**
     
-    - Mature, feature-rich platform
     - Global presence and reliability
-    - Extensive documentation and community
-    - Higher pricing on calls
+    - Extensive documentation
     - Media Streams for real-time audio
     - SMS/MMS messaging support
+    - Wide range of phone numbers
   </Card>
   
-  <Card title="⚡ Telnyx" icon="lightning">
-    **Modern Alternative**
+  <Card title="Telnyx" icon="bolt">
+    **Developer-Focused**
     
-    - Competitive pricing (often 50%+ savings)
-    - Call Control API for advanced features
-    - Developer-friendly modern APIs
+    - Call Control API
+    - Competitive pricing
     - SMS/MMS messaging support
     - Global carrier-grade network
     - WebRTC and SIP support
   </Card>
   
-  <Card title="📱 Vonage" icon="mobile">
+  <Card title="Vonage" icon="globe">
     **Global Communications**
     
     - Part of Ericsson ecosystem
@@ -42,752 +42,259 @@ Burki Voice AI supports Twilio, Telnyx, Vonage, and BYO (Bring Your Own) SIP Tru
     - WebSocket audio streaming
     - SMS/MMS messaging support
     - 10DLC compliance tools
-    - Competitive pricing
-  </Card>
-  
-  <Card title="🔧 BYO SIP Trunk" icon="network-wired">
-    **Maximum Flexibility**
-    
-    - Use any SIP provider (Zadarma, VoIP.ms, etc.)
-    - Potentially lowest costs
-    - Full control over infrastructure
-    - Supports SIP REFER for call transfers
-    - Voice calls only (no SMS typically)
-    - Requires SIP provider configuration
+    - Regional API endpoints (EU, APAC)
   </Card>
 </CardGroup>
 
 ---
 
-## Provider Selection Logic
+## Feature Comparison
 
-The system automatically determines which provider to use based on this priority:
+| Feature | Twilio | Telnyx | Vonage |
+|---------|--------|--------|--------|
+| **Voice Calls** | Yes | Yes | Yes |
+| **SMS/MMS** | Yes | Yes | Yes |
+| **Call Recording** | Yes | Yes | Yes |
+| **Call Transfer** | Yes | Yes | Yes |
+| **Real-time Audio** | Media Streams | Call Control | WebSocket |
+| **Global Numbers** | Yes | Yes | Yes |
+| **Regional Compliance** | - | - | EU, APAC endpoints |
+| **10DLC Support** | Yes | Yes | Yes |
+
+---
+
+## Setting Up Telephony
+
+### Using Burki Cloud
+
+The easiest way to get started:
 
 <Steps>
-  <Step title="Assistant-Level Credentials">
-    Check if the assistant has `vonage_config`, `telnyx_config`, or `twilio_config` configured
-    
-    **Priority:** Telnyx > Vonage > Twilio if multiple are present
+  <Step title="Purchase a Number">
+    Go to **Phone Numbers** → **Purchase** in your dashboard. Search by country, area code, or pattern.
   </Step>
   
-  <Step title="Organization-Level Credentials">
-    Fallback to organization-level telephony credentials
-    
-    **Priority:** Telnyx > Vonage > Twilio if multiple are present
+  <Step title="Assign to Assistant">
+    Select the number and assign it to an assistant. Burki handles all webhook configuration automatically.
   </Step>
   
-  <Step title="Environment Variables">
-    Use system-wide environment variables as last resort
-    
-    **Priority:** Telnyx > Vonage > Twilio if multiple are present
+  <Step title="Start Receiving Calls">
+    Your assistant is ready! Calls to the number will be handled by your AI assistant.
+  </Step>
+</Steps>
+
+### Using Your Own Provider Account (BYO)
+
+If you have existing Twilio, Telnyx, or Vonage accounts:
+
+<Steps>
+  <Step title="Add Credentials">
+    Go to **Settings** → **Provider Keys** → **Telephony** and enter your provider credentials.
+  </Step>
+  
+  <Step title="Sync Your Numbers">
+    Go to **Phone Numbers** → **Sync** to import your existing numbers from the provider.
+  </Step>
+  
+  <Step title="Assign to Assistants">
+    Your synced numbers can now be assigned to assistants just like Burki-purchased numbers.
   </Step>
 </Steps>
 
 ---
 
-## Twilio Setup
-
-<Accordion title="Twilio Configuration">
-
-### 1. Account Setup
-- Sign up at [Twilio Console](https://console.twilio.com/)
-- Purchase a phone number
-- Enable Media Streams on your account
-
-### 2. Webhook Configuration
-Set your Twilio webhook URL to:
-```
-https://yourdomain.com/twiml
-```
-
-### 3. Credentials
-**Environment Variables (Global):**
-```env
-TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-```
-
-**Per-Assistant (API):**
-```json
-{
-  "twilio_config": {
-    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "auth_token": "your_twilio_auth_token"
-  }
-}
-```
-
-### 4. Features
-- ✅ Inbound/Outbound calls
-- ✅ Call recording
-- ✅ Call transfer
-- ✅ Real-time audio streaming
-- ✅ SMS capabilities
-- ✅ Global phone numbers
-
-</Accordion>
-
----
-
-## Telnyx Setup
-
-<Accordion title="Telnyx Configuration">
-
-### 1. Account Setup
-- Sign up at [Telnyx Portal](https://portal.telnyx.com/)
-- Purchase a phone number
-- Create a Call Control Application
-
-### 2. Call Control Application
-1. Go to **Call Control > Applications**
-2. Create a new application
-3. Set webhook URL to:
-   ```
-   https://yourdomain.com/telnyx-webhook
-   ```
-4. Enable **Answering Machine Detection** (optional)
-5. Save and note the **Connection ID**
-
-### 3. Credentials
-**Environment Variables (Global):**
-```env
-TELNYX_API_KEY=KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TELNYX_CONNECTION_ID=1234567890
-```
-
-**Per-Assistant (API):**
-```json
-{
-  "telnyx_config": {
-    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "connection_id": "1234567890"
-  }
-}
-```
-
-### 4. Features
-- ✅ Inbound/Outbound calls
-- ✅ Call recording
-- ✅ Call transfer
-- ✅ WebRTC support
-- ✅ SMS capabilities
-- ✅ Competitive pricing
-- ⚠️ WebSocket audio streaming (planned)
-
-</Accordion>
-
----
-
-## Vonage Setup
-
-<Accordion title="Vonage Configuration">
-
-### 1. Account Setup
-- Sign up at [Vonage Dashboard](https://dashboard.vonage.com/)
-- Purchase a phone number
-- Create an application for voice/messaging
-
-### 2. Application Configuration
-1. Go to **Applications** in Vonage Dashboard
-2. Create a new application
-3. Enable **Voice** capability
-4. Set webhook URLs:
-   - Answer URL: `https://yourdomain.com/vonage-webhook`
-   - Event URL: `https://yourdomain.com/vonage-webhook`
-5. Enable **Messages** capability for SMS
-6. Note your **Application ID** and download the **Private Key**
-
-<Note>
-Burki can automatically configure your Vonage Application webhooks when you save credentials in Organization Settings. The webhooks will be set to point to your Burki instance.
-</Note>
-
-### 3. Credentials
-**Environment Variables (Global):**
-```env
-VONAGE_API_KEY=your_vonage_api_key
-VONAGE_API_SECRET=your_vonage_api_secret
-VONAGE_APPLICATION_ID=your_application_id
-VONAGE_PRIVATE_KEY=/path/to/private.key
-```
-
-**Per-Organization (Dashboard):**
-Configure in Organization Settings:
-- Vonage API Key
-- Vonage API Secret
-- Vonage Application ID
-- Vonage Private Key (paste the full PEM content)
-
-**Per-Assistant (API):**
-```json
-{
-  "vonage_config": {
-    "api_key": "your_vonage_api_key",
-    "api_secret": "your_vonage_api_secret",
-    "application_id": "your_application_id",
-    "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-  }
-}
-```
-
-### 4. Credential Priority
-Vonage credentials are resolved in this order:
-1. Organization's own Vonage credentials (BYO)
-2. Burki managed credentials (`BURKI_MANAGED_VONAGE_*`)
-3. Legacy environment variables (`VONAGE_*`)
-
-### 5. Regional Configuration
-Vonage supports regional API endpoints for data residency compliance:
-
-```json
-{
-  "vonage_config": {
-    "api_key": "...",
-    "api_secret": "...",
-    "api_region": "api-eu"
-  }
-}
-```
-
-| Region | Endpoint | Use Case |
-|--------|----------|----------|
-| `api` | US (default) | North America |
-| `api-eu` | Europe | EU data residency |
-| `api-ap` | Asia Pacific | APAC compliance |
-
-<Note>
-If no region is specified, Burki defaults to `api-eu` (Europe) for compliance with GDPR requirements.
-</Note>
-
-### 6. Features
-- ✅ Inbound/Outbound calls
-- ✅ Call recording
-- ✅ Call transfer (blind transfer via NCCO)
-- ✅ WebSocket audio streaming
-- ✅ SMS/MMS capabilities
-- ✅ 10DLC compliance support
-- ✅ Voicemail detection (AMD)
-- ✅ DTMF tone sending
-- ✅ Global phone numbers
-- ✅ Automatic webhook configuration
-
-### 7. 10DLC Compliance (US)
-Vonage provides built-in 10DLC registration for US SMS compliance:
-
-1. Register your brand in Vonage Dashboard under **10DLC** section
-2. Create a campaign for your use case (marketing, customer service, etc.)
-3. Associate phone numbers with the campaign
-
-**Configure in Organization Settings:**
-- Vonage 10DLC Brand ID
-- Vonage 10DLC Campaign ID
-
-Burki will automatically link newly purchased Vonage numbers to your 10DLC campaign.
-
-```bash
-# Check compliance status via API
-curl -X GET "https://yourdomain.com/api/v1/sms/compliance/status" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-### 8. Phone Number Management
-
-**Search available numbers:**
-```bash
-curl -X GET "https://yourdomain.com/api/v1/phone-numbers/search?country=US&provider=vonage" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-**Purchase a number:**
-```bash
-curl -X POST "https://yourdomain.com/api/v1/phone-numbers/purchase" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone_number": "+15551234567",
-    "provider": "vonage",
-    "country_code": "US"
-  }'
-```
-
-The number will be automatically linked to your Vonage Application for voice calls.
-
-</Accordion>
-
----
-
-## BYO SIP Trunk Setup
-
-<Accordion title="BYO SIP Trunk Configuration">
-
-### 1. Overview
-Bring Your Own (BYO) SIP Trunk allows you to integrate any SIP-based telephony provider with Burki Voice AI. This is ideal for:
-- Cost optimization with existing SIP provider relationships
-- Regional/specialized SIP providers (Zadarma, VoIP.ms, etc.)
-- Full control over telephony infrastructure
-- Integration with on-premise PBX systems
-
-### 2. Prerequisites
-Before setting up BYO SIP trunk:
-- Purchase phone numbers from your SIP provider
-- Obtain SIP gateway address (e.g., `sip.zadarma.com`, `sip.voip.ms`)
-- Get SIP authentication credentials (username/password) or configure IP authentication
-- Configure your provider to forward calls to Burki
-
-### 3. Network Requirements
-Ensure your SIP provider allows traffic to/from these IPs:
-```
-44.229.228.186/32
-44.238.177.138/32
-```
-
-<Warning>
-IP-based authentication can cause routing issues on shared infrastructure. Use credential-based authentication when possible.
-</Warning>
-
-### 4. Organization-Level Configuration
-
-**Environment Variables (Global):**
-```env
-SIP_GATEWAY=sip.zadarma.com
-SIP_USERNAME=15551234567
-SIP_PASSWORD=your_sip_password
-```
-
-**API Configuration:**
-```bash
-curl -X PUT "https://yourdomain.com/api/v1/organizations/{org_id}" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "sip_gateway": "sip.zadarma.com",
-    "sip_username": "15551234567",
-    "sip_password": "your_sip_password",
-    "sip_trunk_config": {
-      "sip_domain": "zadarma.com",
-      "inbound_enabled": true,
-      "outbound_leading_plus_enabled": true,
-      "auth_plan": {
-        "type": "credentials",
-        "username": "15551234567",
-        "password": "your_sip_password"
-      }
-    }
-  }'
-```
-
-### 5. Register Phone Numbers
-
-Register your existing SIP phone numbers with Burki:
-
-```bash
-curl -X POST "https://yourdomain.com/api/v1/phone-numbers/purchase" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone_number": "+15551234567",
-    "provider": "byo-sip-trunk",
-    "friendly_name": "My SIP Number",
-    "assistant_id": 123
-  }'
-```
-
-### 6. Configure Provider Webhooks
-
-Configure your SIP provider to forward inbound calls to:
-```
-https://yourdomain.com/sip-webhook
-```
-
-For specific SIP URI format (varies by provider):
-```
-sip:{phone_number}@{your-burki-domain}.com
-```
-
-### 7. Outbound Calls
-
-Initiate outbound calls through your SIP trunk:
-
-```bash
-curl -X POST "https://yourdomain.com/api/v1/calls/initiate" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "to_phone_number": "+15557654321",
-    "from_phone_number": "+15551234567",
-    "assistant_id": 123
-  }'
-```
-
-### 8. Call Transfers (SIP REFER)
-
-For call transfers, configure the transfer tool with SIP URI format:
-
-```json
-{
-  "type": "transferCall",
-  "destinations": [
-    {
-      "type": "sip",
-      "sipUri": "sip:+15557654321@sip.zadarma.com"
-    }
-  ]
-}
-```
-
-<Note>
-Some providers require E.164 formatting with the `+` prefix: `sip:+15557654321@sip.provider.com`
-</Note>
-
-### 9. Provider-Specific Examples
+## Provider Setup Guides
 
 <Tabs>
-  <Tab title="Zadarma">
-    ```json
-    {
-      "sip_gateway": "sip.zadarma.com",
-      "sip_username": "YOUR_SIP_NUMBER",
-      "sip_password": "YOUR_SIP_PASSWORD",
-      "sip_trunk_config": {
-        "inbound_enabled": false,
-        "outbound_leading_plus_enabled": true,
-        "auth_plan": {
-          "type": "credentials"
-        }
-      }
-    }
-    ```
+  <Tab title="Twilio">
+    ### Twilio Setup
+    
+    **1. Get Your Credentials**
+    - Sign up at [Twilio Console](https://console.twilio.com/)
+    - Find your **Account SID** and **Auth Token** in the dashboard
+    
+    **2. Add to Burki**
+    - Go to **Settings** → **Provider Keys** → **Telephony**
+    - Select **Twilio** and enter your credentials
+    - Click **Save**
+    
+    **3. Sync Numbers**
+    - Go to **Phone Numbers** → **Sync**
+    - Your Twilio numbers will appear and can be assigned to assistants
+    
+    <Note>
+    Burki automatically configures Twilio webhooks when you sync numbers. No manual webhook setup required.
+    </Note>
+    
+    ### Twilio Features
+    - Inbound/Outbound calls
+    - Call recording
+    - Call transfer
+    - Real-time audio streaming
+    - SMS/MMS capabilities
+    - Global phone numbers
   </Tab>
   
-  <Tab title="VoIP.ms">
-    ```json
-    {
-      "sip_gateway": "sip.voip.ms",
-      "sip_username": "your_account",
-      "sip_password": "your_password",
-      "sip_trunk_config": {
-        "inbound_enabled": true,
-        "outbound_leading_plus_enabled": true,
-        "auth_plan": {
-          "type": "credentials"
-        }
-      }
-    }
-    ```
+  <Tab title="Telnyx">
+    ### Telnyx Setup
+    
+    **1. Get Your Credentials**
+    - Sign up at [Telnyx Portal](https://portal.telnyx.com/)
+    - Create a **Call Control Application** and note the **Connection ID**
+    - Find your **API Key** in the API Keys section
+    
+    **2. Add to Burki**
+    - Go to **Settings** → **Provider Keys** → **Telephony**
+    - Select **Telnyx** and enter your API Key and Connection ID
+    - Click **Save**
+    
+    **3. Sync Numbers**
+    - Go to **Phone Numbers** → **Sync**
+    - Your Telnyx numbers will appear and can be assigned to assistants
+    
+    <Note>
+    Burki automatically configures Telnyx webhooks when you sync numbers.
+    </Note>
+    
+    ### Telnyx Features
+    - Inbound/Outbound calls
+    - Call recording
+    - Call transfer
+    - WebRTC support
+    - SMS/MMS capabilities
+    - Competitive pricing
   </Tab>
   
-  <Tab title="Generic SIP">
-    ```json
-    {
-      "sip_gateway": "sip.yourprovider.com",
-      "sip_username": "your_username",
-      "sip_password": "your_password",
-      "sip_trunk_config": {
-        "sip_domain": "yourprovider.com",
-        "inbound_enabled": true,
-        "outbound_leading_plus_enabled": true,
-        "gateways": [
-          {
-            "ip": "sip.yourprovider.com",
-            "inbound_enabled": true,
-            "port": 5060
-          }
-        ],
-        "auth_plan": {
-          "type": "credentials",
-          "username": "your_username",
-          "password": "your_password"
-        }
-      }
-    }
-    ```
+  <Tab title="Vonage">
+    ### Vonage Setup
+    
+    **1. Get Your Credentials**
+    - Sign up at [Vonage Dashboard](https://dashboard.vonage.com/)
+    - Create an application with **Voice** capability enabled
+    - Note your **API Key**, **API Secret**, **Application ID**, and download the **Private Key**
+    
+    **2. Add to Burki**
+    - Go to **Settings** → **Provider Keys** → **Telephony**
+    - Select **Vonage** and enter your credentials
+    - Paste the full private key content (including BEGIN/END markers)
+    - Click **Save**
+    
+    **3. Sync Numbers**
+    - Go to **Phone Numbers** → **Sync**
+    - Your Vonage numbers will appear and can be assigned to assistants
+    
+    <Note>
+    Burki automatically configures Vonage webhooks when you save credentials. Your Vonage Application will be updated to point to Burki.
+    </Note>
+    
+    ### Vonage Features
+    - Inbound/Outbound calls
+    - Call recording
+    - Call transfer (blind transfer)
+    - WebSocket audio streaming
+    - SMS/MMS capabilities
+    - 10DLC compliance support
+    - Voicemail detection (AMD)
+    - DTMF tone sending
+    - Global phone numbers
+    
+    ### Regional Configuration
+    
+    Vonage supports regional API endpoints for data residency compliance. Configure in your organization settings:
+    
+    | Region | Use Case |
+    |--------|----------|
+    | US (default) | North America |
+    | Europe | EU data residency, GDPR |
+    | Asia Pacific | APAC compliance |
+    
+    ### 10DLC Compliance (US)
+    
+    For US SMS messaging, you need 10DLC registration:
+    
+    1. Register your brand in Vonage Dashboard under **10DLC**
+    2. Create a campaign for your use case
+    3. Add your Brand ID and Campaign ID in **Organization Settings**
+    
+    Burki will automatically link newly purchased Vonage numbers to your 10DLC campaign.
   </Tab>
 </Tabs>
 
-### 10. Features & Limitations
+---
 
-**Supported:**
-- ✅ Inbound calls (with provider webhook configuration)
-- ✅ Outbound calls
-- ✅ Call transfers (SIP REFER)
-- ✅ Call recording (application-level)
-- ✅ Credential-based and IP-based authentication
+## Per-Assistant Configuration
 
-**Not Supported:**
-- ❌ SMS/MMS (most SIP trunks are voice-only)
-- ❌ Phone number search/purchase via API (use provider portal)
-- ❌ Automatic webhook configuration (manual setup required)
+Each assistant can use different telephony credentials:
 
-### 11. Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="401 Unauthorized Errors">
-    - Verify SIP credentials are correct
-    - Ensure all signaling IP addresses are whitelisted
-    - Check if IP-based auth is properly configured
-  </Accordion>
+<Steps>
+  <Step title="Edit Assistant">
+    Go to your assistant's settings page.
+  </Step>
   
-  <Accordion title="Calls Not Routing">
-    - Confirm webhook URL is accessible from your provider
-    - Check SIP URI format matches provider requirements
-    - Verify phone number is registered in Burki database
-  </Accordion>
+  <Step title="Configure Telephony">
+    In the **Telephony** section, you can:
+    - Use organization defaults (recommended)
+    - Override with assistant-specific credentials
+  </Step>
   
-  <Accordion title="Transfer Not Working">
-    - Enable SIP REFER on your provider
-    - Verify transfer destination format (some providers require E.164)
-    - Check provider supports blind transfers
-  </Accordion>
-</AccordionGroup>
+  <Step title="Assign Numbers">
+    Assign phone numbers that use the appropriate provider credentials.
+  </Step>
+</Steps>
 
-</Accordion>
+<Tip>
+**Best Practice:** Use organization-level credentials as defaults, and only override at the assistant level when you have specific requirements (e.g., different regions, different billing accounts).
+</Tip>
 
 ---
 
-## Mixed Environment Examples
+## Mixed Provider Setup
 
-### Use Case 1: Cost Optimization
-```json
-// High-volume sales assistant - use BYO SIP for lowest costs
-{
-  "name": "Sales Dialer Bot",
-  "phone_numbers": [
-    {
-      "phone_number": "+15551234567",
-      "provider": "byo-sip-trunk"
-    }
-  ]
-}
+You can use different providers for different use cases:
 
-// Standard support - use Telnyx for good balance
-{
-  "name": "Support Bot",
-  "phone_numbers": [
-    {
-      "phone_number": "+15559876543",
-      "provider": "telnyx"
-    }
-  ]
-}
-
-// International support - use Vonage for global coverage
-{
-  "name": "Global Support Bot",
-  "vonage_config": {
-    "api_key": "...",
-    "application_id": "..."
-  }
-}
-
-// Premium support assistant - use Twilio for reliability
-{
-  "name": "VIP Support Bot", 
-  "phone_numbers": [
-    {
-      "phone_number": "+15555555555",
-      "provider": "twilio"
-    }
-  ]
-}
-```
-
-### Use Case 2: Geographic Optimization
-```json
-// US/Canada assistant - use Telnyx for better rates
-{
-  "name": "North America Bot",
-  "telnyx_config": {
-    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "connection_id": "1234567890"
-  }
-}
-
-// EU customers - use Vonage with EU region for data residency
-{
-  "name": "EU Support Bot",
-  "vonage_config": {
-    "api_key": "...",
-    "api_secret": "...",
-    "api_region": "api-eu"
-  }
-}
-
-// International assistant - use Twilio for global coverage
-{
-  "name": "Global Support Bot",
-  "twilio_config": {
-    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", 
-    "auth_token": "your_twilio_auth_token"
-  }
-}
-```
-
-### Use Case 3: Compliance-First
-```json
-// EU customers - use Vonage with EU region for GDPR compliance
-{
-  "name": "EU GDPR Bot",
-  "vonage_config": {
-    "api_key": "...",
-    "api_secret": "...",
-    "application_id": "...",
-    "api_region": "api-eu"
-  }
-}
-
-// APAC customers - use Vonage with AP region
-{
-  "name": "APAC Bot",
-  "vonage_config": {
-    "api_key": "...",
-    "api_secret": "...",
-    "api_region": "api-ap"
-  }
-}
-```
-
----
-
-## Provider Migration
-
-### Gradual Migration
-You can migrate assistants from one provider to another without downtime:
-
-<CodeGroup>
-```json Before (Twilio Only)
-{
-  "name": "Customer Service Bot",
-  "twilio_config": {
-    "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "auth_token": "your_twilio_auth_token"
-  }
-}
-```
-
-```json After (Switch to Telnyx)  
-{
-  "name": "Customer Service Bot",
-  "telnyx_config": {
-    "api_key": "KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "connection_id": "1234567890"
-  },
-  "twilio_config": {
-    "account_sid": null,
-    "auth_token": null
-  }
-}
-```
-</CodeGroup>
-
-### Migrating to Vonage
-
-<CodeGroup>
-```json Before (Twilio)
-{
-  "name": "Support Bot",
-  "twilio_config": {
-    "account_sid": "ACxxx",
-    "auth_token": "xxx"
-  }
-}
-```
-
-```json After (Vonage)
-{
-  "name": "Support Bot",
-  "vonage_config": {
-    "api_key": "xxx",
-    "api_secret": "xxx",
-    "application_id": "xxx",
-    "private_key": "-----BEGIN PRIVATE KEY-----\n..."
-  },
-  "twilio_config": null
-}
-```
-</CodeGroup>
-
-### Bulk Migration
-Use the API to migrate multiple assistants:
-
-```python
-import requests
-
-# List all assistants
-assistants = requests.get("/api/v1/assistants").json()
-
-# Migrate each one to Vonage
-for assistant in assistants:
-    requests.put(f"/api/v1/assistants/{assistant['id']}", json={
-        "vonage_config": {
-            "api_key": "your_vonage_api_key",
-            "api_secret": "your_vonage_api_secret",
-            "application_id": "your_application_id"
-        },
-        "twilio_config": None,
-        "telnyx_config": None
-    })
-```
+| Use Case | Recommended Approach |
+|----------|---------------------|
+| **US/Canada focus** | Any provider works well |
+| **EU data residency** | Vonage with Europe region |
+| **APAC compliance** | Vonage with Asia Pacific region |
+| **Cost optimization** | Compare pricing for your call volumes |
+| **Existing relationship** | Use your current provider with BYO |
 
 ---
 
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="Call Not Connecting">
+  <Accordion title="Calls Not Connecting">
     **Check:**
-    - Webhook URLs are correct and accessible
-    - Credentials are valid and have proper permissions
-    - Phone number is assigned to correct assistant
+    - Credentials are valid in **Settings** → **Provider Keys**
+    - Phone number is assigned to an assistant
     - Provider account has sufficient balance
+    - Number has voice capability enabled
   </Accordion>
   
   <Accordion title="Poor Audio Quality">
-    **Twilio:** Ensure Media Streams are enabled
-    
-    **Telnyx:** Check Call Control Application settings
-    
-    **Vonage:** Verify WebSocket connection is stable
-    
-    **All:** Verify network connectivity and bandwidth
+    **Try:**
+    - Check your internet connection stability
+    - Ensure the caller has good reception
+    - Review call logs for any errors
+    - Contact support if issues persist
   </Accordion>
   
-  <Accordion title="Provider Detection Issues">
-    **Check priority order:**
-    1. Assistant-level config
-    2. Organization-level config  
-    3. Environment variables
-    
-    **Priority:** Telnyx > Vonage > Twilio if multiple are present
-    
-    **Debug:** Check assistant object in API response to see detected provider
+  <Accordion title="Numbers Not Syncing">
+    **Check:**
+    - Credentials are correct and have proper permissions
+    - Numbers are active in your provider account
+    - Numbers have voice capability enabled
+    - Try re-syncing from **Phone Numbers** → **Sync**
   </Accordion>
   
-  <Accordion title="Vonage-Specific Issues">
-    **Authentication Errors:**
-    - Verify API key and secret are correct
-    - Ensure application ID matches
-    - Check private key is properly formatted (PEM format with `-----BEGIN PRIVATE KEY-----`)
-    
-    **Call Not Connecting:**
-    - Verify webhook URLs are accessible from Vonage servers
-    - Check application has Voice capability enabled in Vonage Dashboard
-    - Confirm phone number is associated with the application
-    
-    **SMS Not Sending:**
-    - Verify 10DLC registration is complete (required for US since Dec 2024)
-    - Check Messages capability is enabled on the application
-    - Confirm phone number has SMS capability
-    - Check organization has Brand ID and Campaign ID configured
-    
-    **Regional Issues:**
-    - Ensure correct `api_region` for your compliance needs
-    - Check number is available in target region
-    - Default region is `api-eu` (Europe) if not specified
-    
-    **Private Key Issues:**
-    - Private key must be in PEM format
-    - Include full key including `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----`
-    - If pasting in dashboard, ensure no extra whitespace
-    - For API, use `\n` for newlines in JSON
+  <Accordion title="SMS Not Sending">
+    **Check:**
+    - Number has SMS capability
+    - Provider account has SMS enabled
+    - For US numbers: 10DLC registration is complete
+    - Message content doesn't violate carrier policies
   </Accordion>
 </AccordionGroup>
 
@@ -795,24 +302,28 @@ for assistant in assistants:
 
 ## Best Practices
 
-- **Start with one provider** and add the second for specific use cases
-- **Test thoroughly** when switching providers for existing assistants
-- **Monitor costs** and usage patterns to optimize provider selection
-- **Keep credentials secure** and rotate them regularly
-- **Use environment variables** for global defaults, per-assistant config for exceptions
-- **Configure regional endpoints** for compliance requirements (Vonage `api-eu` for GDPR)
-- **Set up 10DLC** for US SMS messaging before purchasing Vonage numbers
+- **Start with one provider** and add others for specific use cases
+- **Test thoroughly** before going live with production traffic
+- **Monitor costs** and usage patterns in your provider dashboards
+- **Keep credentials secure** and rotate them periodically
+- **Use regional endpoints** for compliance requirements (Vonage EU/APAC)
+- **Set up 10DLC** for US SMS messaging before sending at scale
 
 ---
 
-## What's Next?
+## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="📞 Call Management" href="/call-management" icon="phone">
-    Configure call handling, transfers, and timeouts
+  <Card title="Phone Number Management" icon="hashtag" href="/phone-number-management">
+    Purchase and manage phone numbers
   </Card>
-  
-  <Card title="🎙️ Audio Configuration" href="/ai-configuration" icon="microphone">
-    Set up TTS/STT providers for voice processing
+  <Card title="Call Management" icon="phone-arrow-right" href="/call-management">
+    Configure call handling and transfers
+  </Card>
+  <Card title="Messaging" icon="message" href="/messaging">
+    Set up SMS and MMS messaging
+  </Card>
+  <Card title="BYO API Keys" icon="key" href="/byo-api-keys">
+    Use your own provider accounts
   </Card>
 </CardGroup>

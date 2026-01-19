@@ -43,7 +43,6 @@
                   "tts-providers/deepgram",
                   "tts-providers/cartesia",
                   "tts-providers/azure",
-                  "tts-providers/kokoro",
                   "tts-providers/inworld",
                   "tts-providers/resemble",
                   "tts-providers/openai",

@@ -164,21 +164,27 @@ Auto top-up has a 5-minute cooldown to prevent duplicate charges during high-vol
 
 ---
 
-## Environment Variables (API Users)
+## API Integration
 
-If you're integrating via API, you'll need:
+If you're integrating via API or SDK, you'll need your API key:
 
-| Variable | Description |
-|----------|-------------|
-| `BURKI_API_KEY` | Your API key from the dashboard |
-| `BURKI_API_URL` | `https://api.burki.dev` |
+<Steps>
+  <Step title="Get Your API Key">
+    Go to **Settings** → **API Keys** → **Generate New Key**
+  </Step>
+  
+  <Step title="Store Securely">
+    Copy the key immediately - you won't be able to see it again. Store it securely in your application's configuration.
+  </Step>
+  
+  <Step title="Make Requests">
+    Use the API base URL `https://api.burki.dev` with your key in the Authorization header.
+  </Step>
+</Steps>
 
-Example `.env` file:
-
-```bash
-BURKI_API_KEY=bk_live_xxxxxxxxxxxx
-BURKI_API_URL=https://api.burki.dev
-```
+<Tip>
+Check out our [SDKs](/sdks/overview) for Python, JavaScript, and Go - they handle authentication and API calls for you.
+</Tip>
 
 ---
 

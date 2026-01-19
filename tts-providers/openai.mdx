@@ -1,43 +1,19 @@
 ---
 title: "OpenAI TTS"
-description: "Future TTS integration with OpenAI's advanced models (Currently in development)"
+description: "OpenAI Text-to-Speech integration (Coming Soon)"
 ---
 
-<Card title="🚀 OpenAI TTS: Future Integration" icon="rocket">
-  OpenAI TTS integration is currently in development. This page outlines the planned features and integration roadmap.
+<Card title="Coming Soon" icon="rocket">
+  OpenAI TTS integration is planned for a future release. This page previews the expected capabilities.
 </Card>
 
-<Callout type="warning">
-**Development Status**: OpenAI TTS is currently implemented as a placeholder in Burki Voice AI. Full integration is planned for a future release.
-</Callout>
+---
 
-## Current Implementation Status
+## Overview
 
-<CardGroup cols={2}>
-  <Card title="📝 Placeholder Implementation" icon="code">
-    **Current State**: Example implementation structure
-    
-    Basic framework is in place for future development
-    
-    **Status**: Not functional for production use
-  </Card>
-  
-  <Card title="🔮 Planned Features" icon="magic">
-    **Future Integration**: Full OpenAI TTS support
-    
-    Will include all OpenAI TTS models and voices
-    
-    **Timeline**: Coming in future updates
-  </Card>
-</CardGroup>
+OpenAI provides high-quality text-to-speech through their API with multiple models and natural-sounding voices.
 
-## OpenAI TTS Overview
-
-<Card title="🎙️ What OpenAI TTS Offers" icon="microphone">
-  OpenAI provides high-quality text-to-speech capabilities through their API with multiple models and voices.
-</Card>
-
-### Available Models (When Integrated)
+### Available Models
 
 <Tabs>
   <Tab title="TTS-1">
@@ -47,14 +23,6 @@ description: "Future TTS integration with OpenAI's advanced models (Currently in
     - **Quality**: Good for most applications
     - **Cost**: Lower cost per character
     - **Best for**: General-purpose TTS, cost-sensitive applications
-    
-    ```json
-    {
-      "model": "tts-1",
-      "input": "Hello from OpenAI TTS!",
-      "voice": "alloy"
-    }
-    ```
   </Tab>
   
   <Tab title="TTS-1-HD">
@@ -64,350 +32,109 @@ description: "Future TTS integration with OpenAI's advanced models (Currently in
     - **Quality**: Superior audio quality
     - **Cost**: Higher cost per character
     - **Best for**: Premium applications, content creation
-    
-    ```json
-    {
-      "model": "tts-1-hd",
-      "input": "Hello from OpenAI TTS HD!",
-      "voice": "nova"
-    }
-    ```
   </Tab>
 </Tabs>
 
-### Voice Options (Planned)
+### Voice Options
 
-<Accordion title="Available Voices">
 <CardGroup cols={3}>
   <Card title="Alloy" icon="user">
     **Balanced and clear**
     
     Neutral voice suitable for most applications
-    
-    `Voice ID: alloy`
   </Card>
   
   <Card title="Echo" icon="user">
     **Deep and resonant**
     
     Male voice with rich, deep tone
-    
-    `Voice ID: echo`
   </Card>
   
   <Card title="Fable" icon="user">
     **Warm and expressive**
     
     Engaging voice for storytelling
-    
-    `Voice ID: fable`
   </Card>
   
   <Card title="Onyx" icon="user">
     **Strong and authoritative**
     
     Confident male voice for professional use
-    
-    `Voice ID: onyx`
   </Card>
   
   <Card title="Nova" icon="user">
     **Bright and energetic**
     
     Female voice with upbeat personality
-    
-    `Voice ID: nova`
   </Card>
   
   <Card title="Shimmer" icon="user">
     **Soft and gentle**
     
     Gentle female voice for calm interactions
-    
-    `Voice ID: shimmer`
   </Card>
 </CardGroup>
-</Accordion>
 
-## Planned Integration Features
+---
 
-<Card title="🛠️ Development Roadmap" icon="road">
-  Here's what we're planning for the full OpenAI TTS integration.
-</Card>
+## Planned Features
 
-<Steps>
-  <Step title="API Integration">
-    Complete OpenAI TTS API integration with authentication and error handling
-  </Step>
-  <Step title="Voice Selection">
-    Full voice library access with preview capabilities
-  </Step>
-  <Step title="Streaming Support">
-    Real-time audio streaming for phone calls and live applications
-  </Step>
-  <Step title="Advanced Features">
-    Speed control, format options, and optimization settings
-  </Step>
-  <Step title="Production Ready">
-    Comprehensive testing and production deployment
-  </Step>
-</Steps>
+When integrated, OpenAI TTS will offer:
 
-## Expected Configuration
+- **Multiple Models**: TTS-1 for speed, TTS-1-HD for quality
+- **6 Built-in Voices**: Alloy, Echo, Fable, Onyx, Nova, Shimmer
+- **Speed Control**: Adjust speaking rate (0.25x to 4.0x)
+- **Multiple Formats**: MP3, Opus, AAC, FLAC output options
+- **Streaming Support**: Real-time audio streaming for phone calls
 
-<Card title="⚙️ Future Configuration Options" icon="gear">
-  When implemented, OpenAI TTS will offer these configuration options in Burki Voice AI.
-</Card>
+---
 
-### Planned Settings Interface
+## Comparison with Available Providers
 
-<Tabs>
-  <Tab title="Basic Setup">
-    **Expected Configuration Fields**:
-    
-    - **API Key**: Your OpenAI API key
-    - **Model**: Choose between TTS-1 and TTS-1-HD
-    - **Voice**: Select from 6 available voices
-    - **Speed**: Adjust speaking rate (0.25x to 4.0x)
-    - **Output Format**: MP3, Opus, AAC, FLAC
-    
-    ```json
-    {
-      "provider": "openai",
-      "model": "tts-1",
-      "voice": "alloy",
-      "speed": 1.0,
-      "output_format": "wav"
-    }
-    ```
-  </Tab>
-  
-  <Tab title="Advanced Options">
-    **Expected Advanced Settings**:
-    
-    - **Response Format**: Audio format optimization
-    - **Sample Rate**: Audio quality settings
-    - **Streaming**: Real-time vs. batch processing
-    - **Error Handling**: Fallback and retry options
-    
-    ```json
-    {
-      "advanced_settings": {
-        "sample_rate": 8000,
-        "streaming_enabled": true,
-        "fallback_voice": "alloy",
-        "retry_attempts": 3
-      }
-    }
-    ```
-  </Tab>
-</Tabs>
+| Feature | OpenAI TTS | ElevenLabs | Deepgram | Cartesia |
+|---------|------------|------------|----------|----------|
+| **Latency** | ~500ms | ~250ms | ~75ms | ~150ms |
+| **Quality** | High | Premium | Good | High |
+| **Voices** | 6 built-in | Custom | 10+ | 20+ |
+| **Languages** | English | 70+ | English | 42 |
+| **Custom Voices** | No | Yes | No | Yes |
 
-## Comparison with Other Providers
+---
 
-<Card title="📊 Expected Performance Comparison" icon="chart-bar">
-  How OpenAI TTS will compare to existing providers once integrated.
-</Card>
+## Available Alternatives
 
-| Feature | OpenAI TTS | ElevenLabs | Deepgram | Inworld |
-|---------|------------|------------|----------|---------|
-| **Latency** | ~500ms | ~250ms | ~75ms | ~200ms |
-| **Quality** | High | Premium | Good | Good |
-| **Voices** | 6 built-in | 9+ custom | 10+ voices | 50+ multilingual |
-| **Languages** | English* | 70+ | English | 11 |
-| **Streaming** | Planned | ✅ | ✅ | ✅ |
-| **Custom Voices** | ❌ | ✅ | ❌ | ✅ |
-
-<Callout type="info">
-*OpenAI TTS primarily supports English, with potential for other languages in future updates.
-</Callout>
-
-## Use Cases (When Available)
-
-<Tabs>
-  <Tab title="Content Creation">
-    **Expected Strengths**:
-    - High-quality voice generation
-    - Consistent OpenAI ecosystem integration
-    - Good for long-form content
-    - Professional narration quality
-    
-    **Best Voices**: Fable (storytelling), Nova (presentations)
-  </Tab>
-  
-  <Tab title="Business Applications">
-    **Expected Strengths**:
-    - Professional voice quality
-    - Reliable enterprise-grade service
-    - Integration with other OpenAI services
-    - Consistent brand voice
-    
-    **Best Voices**: Alloy (neutral), Onyx (authoritative)
-  </Tab>
-  
-  <Tab title="Accessibility">
-    **Expected Strengths**:
-    - Clear pronunciation
-    - Good for text-to-speech assistance
-    - Variable speed control
-    - High-quality audio output
-    
-    **Best Voices**: Shimmer (gentle), Alloy (clear)
-  </Tab>
-</Tabs>
-
-## Development Progress
-
-<Card title="🚧 Current Development Status" icon="construction">
-  Track the progress of OpenAI TTS integration in Burki Voice AI.
-</Card>
-
-<Accordion title="Completed Development">
-- [x] **Basic Framework**: Placeholder implementation structure
-- [x] **Interface Design**: Planned configuration interface
-- [x] **Voice Mapping**: Voice ID and model mapping structure
-- [x] **Error Handling**: Basic error handling framework
-</Accordion>
-
-<Accordion title="In Progress">
-- [ ] **API Integration**: OpenAI TTS API connection and authentication
-- [ ] **Audio Processing**: Real-time audio streaming implementation
-- [ ] **Configuration UI**: User interface for OpenAI TTS settings
-- [ ] **Testing Framework**: Quality assurance and testing procedures
-</Accordion>
-
-<Accordion title="Planned Development">
-- [ ] **Production Deployment**: Full production-ready implementation
-- [ ] **Performance Optimization**: Latency and quality optimization
-- [ ] **Advanced Features**: Speed control and format options
-- [ ] **Documentation**: Complete user documentation and guides
-</Accordion>
-
-## Technical Implementation Notes
-
-<Card title="🔧 Developer Information" icon="code">
-  Technical details for developers interested in the implementation approach.
-</Card>
-
-### Current Placeholder Structure
-
-<CodeGroup>
-
-```python Current Implementation
-class OpenAITTSService(BaseTTSService):
-    """
-    OpenAI TTS service implementation.
-    This is an example implementation to show how new providers can be added.
-    
-    Note: This is a placeholder implementation. To make it functional, you would need to:
-    1. Have the OpenAI library available
-    2. Implement the actual OpenAI TTS API calls
-    3. Handle streaming audio properly
-    """
-    
-    def __init__(self, call_sid=None, api_key=None, voice_id=None, model_id=None, **kwargs):
-        super().__init__(call_sid=call_sid, api_key=api_key)
-        self.voice_id = voice_id or "alloy"
-        self.model_id = model_id or "tts-1"
-        
-    async def start_session(self, options=None, audio_callback=None, metadata=None):
-        # Placeholder implementation
-        self.is_connected = True
-        return True
-        
-    async def process_text(self, text, force_flush=False):
-        # Placeholder - actual implementation needed
-        logger.info(f"Would convert text to speech: {text}")
-        return True
-```
-
-```python Planned Implementation
-class OpenAITTSService(BaseTTSService):
-    """
-    Full OpenAI TTS implementation (planned)
-    """
-    
-    def __init__(self, call_sid=None, api_key=None, **kwargs):
-        import openai
-        self.client = openai.Client(api_key=api_key)
-        super().__init__(call_sid=call_sid, api_key=api_key)
-        
-    async def start_session(self, options=None, audio_callback=None, metadata=None):
-        # Real implementation with OpenAI client
-        self.audio_callback = audio_callback
-        self.is_connected = True
-        return True
-        
-    async def process_text(self, text, force_flush=False):
-        # Real OpenAI TTS API call
-        response = self.client.audio.speech.create(
-            model=self.model_id,
-            voice=self.voice_id,
-            input=text
-        )
-        
-        # Stream audio to callback
-        if self.audio_callback:
-            await self.audio_callback(response.content, True, {})
-        
-        return True
-```
-
-</CodeGroup>
-
-## How to Request This Feature
-
-<Card title="🗳️ Feature Request" icon="hand">
-  Interested in OpenAI TTS integration? Here's how to help prioritize this development.
-</Card>
-
-<Steps>
-  <Step title="GitHub Issue">
-    Create a feature request on the Burki Voice AI repository
-  </Step>
-  <Step title="Use Case Description">
-    Describe your specific use case for OpenAI TTS
-  </Step>
-  <Step title="Priority Feedback">
-    Indicate the importance of this feature for your application
-  </Step>
-  <Step title="Community Support">
-    Encourage others who need this feature to upvote the request
-  </Step>
-</Steps>
-
-## Alternative Providers
-
-<Card title="🔄 Current Alternatives" icon="arrows-rotate">
-  While waiting for OpenAI TTS integration, consider these currently available providers.
-</Card>
+While waiting for OpenAI TTS, these providers offer excellent alternatives:
 
 <CardGroup cols={2}>
-  <Card title="For Quality" href="/tts-providers/elevenlabs">
-    **ElevenLabs** offers premium quality with extensive customization options similar to what OpenAI TTS will provide.
+  <Card title="ElevenLabs" icon="wand-magic-sparkles" href="/tts-providers/elevenlabs">
+    **Premium Quality**
+    
+    70+ languages, voice cloning, advanced controls
   </Card>
   
-  <Card title="For Speed" href="/tts-providers/deepgram">
-    **Deepgram Aura** provides ultra-fast TTS perfect for real-time applications.
+  <Card title="Deepgram Aura" icon="bolt" href="/tts-providers/deepgram">
+    **Ultra-Fast**
+    
+    ~75ms latency, perfect for real-time conversations
   </Card>
   
-  <Card title="For Expression" href="/tts-providers/inworld">
-    **Inworld.ai** offers emotional markup and multilingual support.
+  <Card title="Cartesia Sonic 3" icon="bullseye" href="/tts-providers/cartesia">
+    **Multilingual**
+    
+    42 languages, voice cloning, low latency
   </Card>
   
-  <Card title="For Custom Voices" href="/tts-providers/resemble">
-    **Resemble AI** enables custom voice creation for brand consistency.
+  <Card title="Azure Speech" icon="cloud" href="/tts-providers/azure">
+    **Enterprise Scale**
+    
+    500+ voices, 100+ languages, SSML support
   </Card>
 </CardGroup>
+
+---
 
 ## Stay Updated
 
 <Callout type="info">
-**Development Updates**: Follow our [changelog](/changelog) for updates on OpenAI TTS integration progress and release announcements.
+Follow our [changelog](/changelog) for updates on OpenAI TTS integration and other new features.
 </Callout>
-
----
-
-<Card title="🔔 Get Notified" icon="bell">
-  Want to be notified when OpenAI TTS becomes available? Watch our repository or follow our documentation updates for the latest news.
-</Card> 

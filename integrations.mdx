@@ -1,112 +1,176 @@
 ---
 title: Integrations
-description: "How to connect Burki Voice AI with Twilio, Deepgram, OpenAI, ElevenLabs, and more."
+description: "How Burki Voice AI connects with telephony, speech, and AI providers"
 ---
 
-Burki Voice AI integrates seamlessly with leading telephony, speech, and AI providers. This page explains what each integration does and how to configure it.
+Burki Voice AI integrates seamlessly with leading telephony, speech, and AI providers. All integrations are managed through the Burki Dashboard or API.
 
-## Integration Flow
+## How It Works
+
 ```mermaid
 graph TD;
     Phone[Phone Call]
-    Twilio[Twilio]
-    Burki[Burki Backend]
-    Deepgram[Deepgram STT]
-    OpenAI[OpenAI LLM]
-    ElevenLabs[ElevenLabs TTS]
-    Inworld[Inworld TTS/LLM]
-    Resemble[Resemble TTS]
-    S3[S3 Storage]
-    User[Web Dashboard]
+    Telephony[Telephony Provider]
+    Burki[Burki Platform]
+    STT[Speech-to-Text]
+    LLM[Language Model]
+    TTS[Text-to-Speech]
+    Dashboard[Your Dashboard]
 
-    Phone-->|Media Streams|Twilio
-    Twilio-->|Audio|Burki
-    Burki-->|Transcribe|Deepgram
-    Burki-->|Generate|OpenAI
-    Burki-->|TTS|ElevenLabs
-    Burki-->|TTS|Inworld
-    Burki-->|TTS|Resemble
-    Burki-->|Store Recordings|S3
-    User-->|Manage/Review|Burki
+    Phone-->|Incoming Call|Telephony
+    Telephony-->|Audio Stream|Burki
+    Burki-->|Transcribe|STT
+    Burki-->|Generate Response|LLM
+    Burki-->|Convert to Speech|TTS
+    TTS-->|Audio|Telephony
+    Telephony-->|Response|Phone
+    Dashboard-->|Configure & Monitor|Burki
 ```
 
 <Callout type="info">
-You can mix and match providers for STT, LLM, and TTS. Configure per-assistant or globally.
+You can mix and match providers for STT, LLM, and TTS. Configure per-assistant or at the organization level.
 </Callout>
+
+---
+
+## Provider Categories
 
 <AccordionGroup>
   <Accordion icon="phone" title="Telephony Providers">
-    **Twilio** (traditional, full-featured)
-    - **Purpose:** Handles phone calls, media streaming, and SMS.
-    - **Setup:**
-      - Sign up at [Twilio](https://www.twilio.com/).
-      - Buy a phone number and enable Media Streams.
-      - Set environment variables: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`
-      - Configure Twilio webhook to point to your Burki backend.
+    Burki supports multiple telephony providers for handling phone calls and SMS:
     
-    **Telnyx** (modern, competitive pricing)
-    - **Purpose:** Next-generation telephony with Call Control API.
-    - **Setup:**
-      - Sign up at [Telnyx](https://telnyx.com/).
-      - Buy a phone number and create a Call Control Application.
-      - Set environment variables: `TELNYX_API_KEY`, `TELNYX_CONNECTION_ID`
-      - Configure Telnyx webhook to point to your Burki backend.
+    | Provider | Features |
+    |----------|----------|
+    | **Twilio** | Voice calls, SMS/MMS, global coverage |
+    | **Telnyx** | Voice calls, SMS, competitive pricing |
+    | **Vonage** | Voice calls, SMS, international coverage |
     
-    **Per-Assistant Configuration:**
-    - Each assistant can use different telephony providers.
-    - Configure provider credentials in the assistant settings.
-    - System automatically detects and uses the appropriate provider.
+    **Configuration:**
+    - Go to **Settings** → **Provider Keys** → **Telephony**
+    - Enter your provider credentials (API keys, account IDs)
+    - Burki automatically configures webhooks for you
+    
+    Each assistant can use different telephony providers. Configure in the assistant settings or let Burki use your organization defaults.
+    
+    [Learn more about Telephony Providers →](/telephony-providers)
   </Accordion>
 
   <Accordion icon="waveform" title="Speech-to-Text (STT) Providers">
-    **Deepgram** (default, recommended)
-    - Real-time transcription of audio calls.
-    - Set `DEEPGRAM_API_KEY` in your `.env`.
+    Convert caller speech to text in real-time:
     
-    **Other STT Providers** (coming soon or custom)
-    - You can extend Burki to use other STT APIs by customizing the backend.
+    | Provider | Best For |
+    |----------|----------|
+    | **Deepgram** | Fast, accurate, phone-optimized |
+    | **Azure Speech** | Enterprise, 100+ languages |
+    
+    **Configuration:**
+    - **Burki Cloud:** Select provider in assistant settings (no API key needed)
+    - **BYO Mode:** Add your API key in **Settings** → **Provider Keys** → **STT**
+    
+    [Learn more about STT Providers →](/stt-providers)
   </Accordion>
 
   <Accordion icon="robot" title="Language Model (LLM) Providers">
-    **OpenAI** (default, recommended)
-    - Generates intelligent responses using GPT models.
-    - Set `OPENAI_API_KEY` in your `.env`.
+    Power your assistant's intelligence with leading LLMs:
     
-    **Inworld** (optional)
-    - Use `INWORLD_BEARER_TOKEN` for Inworld LLM.
+    | Provider | Models |
+    |----------|--------|
+    | **OpenAI** | GPT-4o, GPT-4o-mini, GPT-4 Turbo |
+    | **Anthropic** | Claude 3.5 Sonnet, Claude 3 Opus |
+    | **Google** | Gemini 1.5 Pro, Gemini 1.5 Flash |
+    | **Groq** | Llama 3, Mixtral (ultra-fast) |
+    | **xAI** | Grok |
     
-    **Custom LLMs**
-    - Configure provider and API key in assistant settings or `.env`.
+    **Configuration:**
+    - **Burki Cloud:** Select provider and model in assistant settings
+    - **BYO Mode:** Add your API key in **Settings** → **Provider Keys** → **LLM**
+    
+    [Learn more about LLM Providers →](/llm-providers)
   </Accordion>
 
   <Accordion icon="volume-high" title="Text-to-Speech (TTS) Providers">
-    **ElevenLabs** (default, recommended)
-    - Converts text responses to natural-sounding speech.
-    - Set `ELEVENLABS_API_KEY` in your `.env`.
+    Give your assistant a natural-sounding voice:
     
-    **Deepgram TTS** (optional)
-    - Use Deepgram for TTS if enabled in your assistant config.
+    | Provider | Best For |
+    |----------|----------|
+    | **ElevenLabs** | Most natural voices, voice cloning |
+    | **Cartesia** | Low latency, 40+ languages |
+    | **Deepgram** | Fast, cost-effective |
+    | **Azure Speech** | Enterprise, 100+ languages |
+    | **Resemble** | Custom voice cloning |
     
-    **Inworld** (optional)
-    - Use Inworld for TTS with `INWORLD_BEARER_TOKEN`.
+    **Configuration:**
+    - **Burki Cloud:** Select provider and voice in assistant settings
+    - **BYO Mode:** Add your API key in **Settings** → **Provider Keys** → **TTS**
     
-    **Resemble** (optional)
-    - Use `RESEMBLE_API_KEY` for Resemble TTS.
-  </Accordion>
-
-  <Accordion icon="cloud" title="Storage (S3, etc.)">
-    - Stores call recordings and large audio files.
-    - Set S3 environment variables if using cloud storage.
-  </Accordion>
-
-  <Accordion icon="database" title="Database (PostgreSQL)">
-    - Stores all app data (users, calls, assistants, etc.)
-    - Set `DATABASE_URL` in your `.env` file.
+    [Learn more about TTS Providers →](/tts-providers)
   </Accordion>
 </AccordionGroup>
 
-<Callout type="success">
-For a full list of required and optional environment variables, see the [Configuration](configuration) page.
-</Callout>
+---
 
-For troubleshooting integration issues, see the [FAQ](faq) or open an issue on GitHub. 
+## Configuration Modes
+
+<CardGroup cols={2}>
+  <Card title="Burki Cloud" icon="cloud">
+    **Easiest setup**
+    
+    - No API keys needed
+    - We manage all provider connections
+    - Select providers in assistant settings
+    - Pay-as-you-go pricing
+  </Card>
+  <Card title="BYO (Bring Your Own)" icon="key">
+    **Use your own accounts**
+    
+    - Add your API keys in Settings
+    - Pay providers directly
+    - Leverage enterprise pricing
+    - Full control over costs
+  </Card>
+</CardGroup>
+
+<Tip>
+You can mix modes! Use Burki Cloud for some providers and BYO for others based on your needs.
+</Tip>
+
+---
+
+## Setting Up Integrations
+
+<Steps>
+  <Step title="Choose Your Mode">
+    Decide whether to use Burki Cloud (managed) or BYO (your own API keys) for each provider category.
+  </Step>
+  
+  <Step title="Add API Keys (BYO Only)">
+    If using BYO mode, go to **Settings** → **Provider Keys** and add your credentials for each provider.
+  </Step>
+  
+  <Step title="Configure Assistants">
+    When creating or editing an assistant, select your preferred providers for LLM, TTS, and STT.
+  </Step>
+  
+  <Step title="Assign Phone Numbers">
+    Purchase or sync phone numbers and assign them to your assistants.
+  </Step>
+</Steps>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Telephony Providers" icon="phone" href="/telephony-providers">
+    Configure Twilio, Telnyx, or Vonage
+  </Card>
+  <Card title="AI Configuration" icon="brain" href="/ai-configuration">
+    Set up LLM, TTS, and STT providers
+  </Card>
+  <Card title="BYO API Keys" icon="key" href="/byo-api-keys">
+    Use your own provider accounts
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/faq">
+    Common questions and troubleshooting
+  </Card>
+</CardGroup>

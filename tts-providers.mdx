@@ -42,14 +42,6 @@ description: "Choose the perfect voice for your AI assistant from our comprehens
     *Best for: Enterprise, Azure ecosystem*
   </Card>
   
-  <Card title="🏠 Kokoro" icon="server" href="/tts-providers/kokoro">
-    **Self-Hosted**
-    
-    On-premise, privacy-focused, open source
-    
-    *Best for: Privacy-sensitive, on-premise deployments*
-  </Card>
-  
   <Card title="🎭 Inworld.ai" icon="masks-theater" href="/tts-providers/inworld">
     **AI-Powered Emotions**
     
@@ -75,7 +67,6 @@ description: "Choose the perfect voice for your AI assistant from our comprehens
 | **Deepgram** | ~75ms | English | ❌ | WebSocket | Speed & phone calls |
 | **Cartesia** | ~150ms | 42 | ✅ Yes | WebSocket | Multilingual |
 | **Azure** | ~200ms | 100+ | ❌ | HTTP | Enterprise |
-| **Kokoro** | Varies | 9 | ❌ | HTTP | Self-hosted |
 | **Inworld** | ~200ms | 11 | ✅ Zero-shot | HTTP/WS | Emotional expression |
 | **Resemble** | ~300ms | English | ✅ Custom | WebSocket | Brand voices |
 
@@ -143,16 +134,6 @@ All providers follow the same basic setup pattern:
     **Perfect For**: Enterprise applications, Azure ecosystem users
     
     → [Complete Azure Guide](/tts-providers/azure)
-  </Card>
-  
-  <Card title="🏠 Kokoro - Self-Hosted TTS" href="/tts-providers/kokoro">
-    **Latest Models**: kokoro, tts-1, tts-1-hd
-    
-    **Key Features**: On-premise deployment, no API costs, privacy-focused, Arabic support
-    
-    **Perfect For**: Privacy-sensitive, air-gapped, cost-conscious deployments
-    
-    → [Complete Kokoro Guide](/tts-providers/kokoro)
   </Card>
   
   <Card title="🎪 Inworld.ai - AI-Powered Expression" href="/tts-providers/inworld">
@@ -233,14 +214,6 @@ All providers follow the same basic setup pattern:
     - **Model**: Neural
     - **Voice**: Jenny (en-US) or region-specific
     - **Settings**: SSML for fine control, closest Azure region
-  </Tab>
-  
-  <Tab title="Self-Hosted">
-    **Recommended Setup:**
-    - **Provider**: Kokoro
-    - **Model**: kokoro or tts-1-hd
-    - **Voice**: af_alloy (multilingual) or af_heart (English)
-    - **Settings**: GPU for speed, Docker deployment
   </Tab>
   
   <Tab title="Real-time Apps">

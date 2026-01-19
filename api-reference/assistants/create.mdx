@@ -94,11 +94,11 @@ This section covers the core AI models for language, speech-to-text, and text-to
   - `connection_id` (string): Your Telnyx Connection ID for Call Control Application.
 - `webhook_url` (string, optional): A URL to send call event webhooks to.
 - `sms_webhook_url` (string, optional): A URL to send SMS event webhooks to.
-- `messaging_service_sid` (string, optional): Twilio Messaging Service SID for SMS handling. If not provided, uses the default from environment variables.
+- `messaging_service_sid` (string, optional): Twilio Messaging Service SID for SMS handling.
 
 **Telephony Provider Selection:**
-- If both `twilio_config` and `telnyx_config` are provided, Telnyx takes priority.
-- If neither is provided, the system uses environment variables (`TWILIO_*` or `TELNYX_*`).
+- If multiple provider configs are provided, the system will use the one associated with assigned phone numbers.
+- If no provider config is provided, the system uses your organization's default telephony credentials.
 - Each assistant can use a different telephony provider.
 </Accordion>
 </AccordionGroup>

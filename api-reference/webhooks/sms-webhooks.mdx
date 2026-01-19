@@ -14,7 +14,7 @@ To receive SMS webhooks, configure the `sms_webhook_url` field when creating or 
 <CodeGroup>
 
 ```javascript Node.js
-const response = await fetch('https://api.burki.ai/api/v1/assistants', {
+const response = await fetch('https://api.burki.devv/api/v1/assistants', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY',
@@ -33,7 +33,7 @@ const response = await fetch('https://api.burki.ai/api/v1/assistants', {
 import requests
 
 response = requests.post(
-    'https://api.burki.ai/api/v1/assistants',
+    'https://api.burki.devv/api/v1/assistants',
     headers={
         'Authorization': 'Bearer YOUR_API_KEY',
         'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ response = requests.post(
 ```
 
 ```bash cURL
-curl -X POST "https://api.burki.ai/api/v1/assistants" \
+curl -X POST "https://api.burki.devv/api/v1/assistants" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

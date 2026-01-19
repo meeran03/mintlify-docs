@@ -267,52 +267,35 @@ Azure Speech provides advanced voice customization through SSML:
 
 ## Configuration Options
 
-### Environment Variables
-
-```bash
-# Required Azure Speech credentials
-AZURE_SPEECH_KEY=your_azure_speech_key
-AZURE_SPEECH_REGION=eastus  # or westus2, westeurope, etc.
-```
-
 ### Audio Format
 
 Azure Speech automatically outputs the appropriate format for your telephony provider:
 - **Twilio/Telnyx**: PCM μ-law @ 8kHz (`Raw8Khz8BitMonoMULaw`)
 - **Vonage**: PCM 16-bit @ 16kHz (`Raw16Khz16BitMonoPcm`)
 
-## API Integration
+## Configuration in Burki
 
-<CodeGroup>
+To use Azure Speech TTS in your assistant:
 
-```python Python
-from app.services.tts_azure import AzureTTSService
+<Steps>
+  <Step title="Get Azure Credentials">
+    Create a Speech resource in [Azure Portal](https://portal.azure.com) and copy your **Subscription Key** and **Region**.
+  </Step>
+  
+  <Step title="Add to Burki">
+    Go to **Settings** → **Provider Keys** → **TTS** and add your Azure Speech credentials.
+  </Step>
+  
+  <Step title="Configure Assistant">
+    Edit your assistant, select **Azure Speech** as the TTS provider, and choose a voice.
+  </Step>
+</Steps>
 
-# Create Azure TTS instance
-tts = AzureTTSService(
-    call_sid="unique_call_id",
-    api_key="your_azure_speech_key",
-    region="eastus",
-    voice_id="en-US-JennyNeural",
-    model_id="neural",
-    language="en-US",
-    rate=1.0,
-    pitch=1.0
-)
+### SSML Support
 
-# Start session
-await tts.start_session(audio_callback=your_callback)
+Azure Speech supports SSML for advanced voice control:
 
-# Process text
-await tts.process_text("Hello, this is a test.")
-
-# End session
-await tts.end_session()
-```
-
-```python Python (SSML)
-# Using SSML for advanced control
-ssml_text = """
+```xml
 <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
     <voice name="en-US-JennyNeural">
         <prosody rate="+10%" pitch="+5%">
@@ -322,25 +305,9 @@ ssml_text = """
         How can I assist you today?
     </voice>
 </speak>
-"""
-
-# The service handles SSML automatically when processing text
-await tts.process_text("Welcome to our service!")
 ```
 
-```bash Azure CLI
-# Test Azure Speech with CLI
-az cognitiveservices account keys list \
-  --name your-speech-resource \
-  --resource-group your-resource-group
-
-# List available voices
-curl -X GET \
-  "https://eastus.tts.speech.microsoft.com/cognitiveservices/voices/list" \
-  -H "Ocp-Apim-Subscription-Key: your_api_key"
-```
-
-</CodeGroup>
+Use SSML tags in your assistant's responses for fine-grained control over pronunciation, emphasis, and pacing.
 
 ## Regional Selection
 
@@ -373,7 +340,7 @@ curl -X GET \
 **Problem**: API returns 401 Unauthorized
 
 **Solutions**:
-- Verify `AZURE_SPEECH_KEY` is correct
+- Verify your Azure Speech Key is correct in **Settings** → **Provider Keys**
 - Ensure the key is from your Speech resource (not another Azure service)
 - Check that the region matches your Speech resource's region
 </Accordion>
@@ -391,19 +358,11 @@ curl -X GET \
 **Problem**: TTS response is slow
 
 **Solutions**:
-- Select an Azure region closer to your servers
-- Use streaming synthesis instead of waiting for complete audio
+- Select an Azure region closer to your users
+- Burki uses streaming synthesis for optimal performance
 - Consider caching common phrases
 </Accordion>
 
-<Accordion title="SDK Not Installed">
-**Problem**: Azure Speech SDK import fails
-
-**Solution**:
-```bash
-pip install azure-cognitiveservices-speech
-```
-</Accordion>
 
 ## Best Practices
 
@@ -431,10 +390,6 @@ pip install azure-cognitiveservices-speech
   
   <Card title="⚡ Need Speed?" href="/tts-providers/deepgram">
     **Deepgram Aura** - Ultra-low ~75ms latency
-  </Card>
-  
-  <Card title="🏠 Self-Hosted?" href="/tts-providers/kokoro">
-    **Kokoro** - On-premise for privacy-sensitive deployments
   </Card>
 </CardGroup>
 

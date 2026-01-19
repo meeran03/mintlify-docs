@@ -335,20 +335,6 @@ Azure Speech STT supports timing controls to optimize speech detection:
 
 ---
 
-## Environment Variables
-
-```bash
-# Required Azure Speech credentials
-AZURE_SPEECH_KEY=your_subscription_key
-AZURE_SPEECH_REGION=eastus
-```
-
-<Callout type="warning">
-**Security**: Never commit API keys to version control. Use environment variables or secure secrets management.
-</Callout>
-
----
-
 ## Pricing Overview
 
 | Tier | Hours/Month | Price |
@@ -368,7 +354,7 @@ AZURE_SPEECH_REGION=eastus
 **Problem**: API returns 401 Unauthorized
 
 **Solutions**:
-- Verify `AZURE_SPEECH_KEY` is correct
+- Verify your Azure Speech Key is correct in **Settings** → **Provider Keys**
 - Ensure the key is from your Speech resource (not another Azure service)
 - Check that the region matches your Speech resource's region
 - Verify your Azure subscription is active
