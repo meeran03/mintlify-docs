@@ -1,0 +1,79 @@
+---
+title: 'Pause Campaign'
+openapi: 'POST /api/v1/campaigns/{campaign_id}/pause'
+---
+
+Pause a running campaign. In-progress calls will complete, but no new calls will be initiated.
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Behavior
+
+When you pause a campaign:
+- **In-progress calls** continue until completion
+- **Pending contacts** remain in queue
+- **No new calls** are initiated
+- Campaign status changes to `paused`
+
+### Response
+
+```json Response
+{
+  "message": "Campaign paused successfully"
+}
+```
+
+### Example Code
+
+```bash cURL
+curl -X POST "https://api.burki.dev/api/v1/campaigns/42/pause" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.burki.dev/api/v1/campaigns/42/pause",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+if response.status_code == 200:
+    print("Campaign paused successfully")
+else:
+    print(f"Error: {response.json()}")
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/42/pause", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY"
+  }
+});
+
+if (response.ok) {
+  console.log("Campaign paused successfully");
+} else {
+  const error = await response.json();
+  console.error("Error:", error);
+}
+```
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Campaign is not running |
+| 404 | Campaign not found |
+
+### Resuming a Paused Campaign
+
+To resume a paused campaign, use the [Start Campaign](/api-reference/campaigns/start) endpoint. The campaign will continue from where it left off.
+
+```bash
+curl -X POST "https://api.burki.dev/api/v1/campaigns/42/start" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```

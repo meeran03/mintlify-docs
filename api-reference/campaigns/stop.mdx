@@ -1,0 +1,93 @@
+---
+title: 'Stop Campaign'
+openapi: 'POST /api/v1/campaigns/{campaign_id}/stop'
+---
+
+Stop (cancel) a campaign permanently. Use this to terminate a running, paused, or scheduled campaign.
+
+<Callout type="warning">
+Stopping a campaign marks all remaining pending contacts as cancelled. Use pause if you plan to resume later.
+</Callout>
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Behavior
+
+When you stop a campaign:
+- Campaign status changes to `cancelled`
+- **In-progress calls** may complete (provider-dependent)
+- **Pending contacts** are marked as cancelled
+- **Completion timestamp** is recorded
+- Campaign cannot be resumed (use re-execute for new run)
+
+### Valid Starting Statuses
+
+You can stop campaigns that are:
+- `running` - Currently executing
+- `paused` - Temporarily paused
+- `scheduled` - Waiting to start
+
+### Response
+
+```json Response
+{
+  "message": "Campaign stopped successfully"
+}
+```
+
+### Example Code
+
+```bash cURL
+curl -X POST "https://api.burki.dev/api/v1/campaigns/42/stop" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.burki.dev/api/v1/campaigns/42/stop",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+if response.status_code == 200:
+    print("Campaign stopped successfully")
+else:
+    print(f"Error: {response.json()}")
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/42/stop", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY"
+  }
+});
+
+if (response.ok) {
+  console.log("Campaign stopped successfully");
+} else {
+  const error = await response.json();
+  console.error("Error:", error);
+}
+```
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Campaign cannot be stopped (invalid status) |
+| 404 | Campaign not found |
+
+### Pause vs Stop
+
+| Action | Resume Possible | Status | Use Case |
+|--------|-----------------|--------|----------|
+| **Pause** | Yes | `paused` | Temporary break, plan to continue |
+| **Stop** | No | `cancelled` | Permanent termination |
+
+### Re-running a Stopped Campaign
+
+To run a stopped campaign again, use the [Re-execute Campaign](/api-reference/campaigns/re-execute) endpoint to reset contacts and start fresh.

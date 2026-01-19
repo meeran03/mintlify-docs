@@ -1,0 +1,124 @@
+---
+title: 'Get Campaign'
+openapi: 'GET /api/v1/campaigns/{campaign_id}'
+---
+
+Retrieve detailed information about a specific campaign, including contact statistics, templates, and configuration.
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Response
+
+Returns the complete campaign object with all configuration and statistics.
+
+```json Response
+{
+  "id": 42,
+  "name": "February Appointment Reminders",
+  "description": "Reminder calls for February appointments",
+  "campaign_type": "call",
+  "status": "running",
+  "assistant_id": 123,
+  "assistant_name": "Appointment Bot",
+  
+  "welcome_message_template": "Hi {{name|title_case}}, this is {{assistant_name}} calling from {{company}}.",
+  "agenda_template": "I'm calling to remind you about your appointment on {{appointment_date}}.",
+  "end_call_message_template": "Thank you for your time, {{name}}. Have a great day!",
+  "sms_message_template": null,
+  "fallback_values": {
+    "name": "there",
+    "company": "our office"
+  },
+  "variable_mappings": {
+    "Phone": "phone_number",
+    "Name": "name",
+    "Appointment Date": "appointment_date"
+  },
+  "available_variables": ["name", "phone_number", "appointment_date", "company"],
+  
+  "max_attempts": 3,
+  "retry_delay_minutes": 60,
+  
+  "total_contacts": 250,
+  "completed_contacts": 125,
+  "failed_contacts": 10,
+  
+  "created_at": "2024-02-01T10:00:00Z",
+  "updated_at": "2024-02-05T14:30:00Z",
+  
+  "last_import_file_name": "contacts_february.csv",
+  "last_import_date": "2024-02-01T10:30:00Z",
+  "last_import_row_count": 250
+}
+```
+
+### Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `id` | Unique campaign identifier |
+| `name` | Campaign name |
+| `description` | Campaign description |
+| `campaign_type` | Type: `call`, `sms`, or `mixed` |
+| `status` | Current status |
+| `assistant_id` | Associated assistant ID |
+| `assistant_name` | Name of the associated assistant |
+| `welcome_message_template` | Opening message template |
+| `agenda_template` | Call agenda template |
+| `end_call_message_template` | Closing message template |
+| `sms_message_template` | SMS message template |
+| `fallback_values` | Default values for missing variables |
+| `variable_mappings` | Column to variable mappings |
+| `available_variables` | List of detected variables |
+| `max_attempts` | Maximum retry attempts |
+| `retry_delay_minutes` | Delay between retries |
+| `total_contacts` | Total number of contacts |
+| `completed_contacts` | Successfully contacted |
+| `failed_contacts` | Failed contact attempts |
+| `last_import_file_name` | Name of last imported file |
+| `last_import_date` | Date of last import |
+| `last_import_row_count` | Rows in last import |
+
+### Example Code
+
+```bash cURL
+curl -X GET "https://api.burki.dev/api/v1/campaigns/42" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.burki.dev/api/v1/campaigns/42",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+campaign = response.json()
+print(f"Campaign: {campaign['name']}")
+print(f"Status: {campaign['status']}")
+print(f"Progress: {campaign['completed_contacts']}/{campaign['total_contacts']}")
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/42", {
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY"
+  }
+});
+
+const campaign = await response.json();
+console.log(`Campaign: ${campaign.name}`);
+console.log(`Status: ${campaign.status}`);
+console.log(`Progress: ${campaign.completed_contacts}/${campaign.total_contacts}`);
+```
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 404 | Campaign not found |
+| 401 | Unauthorized - invalid or missing API key |
+| 403 | Forbidden - campaign belongs to different organization |

@@ -60,6 +60,7 @@
               "telephony-providers",
               "messaging",
               "phone-number-management",
+              "campaigns",
               "rag",
               "call-management",
               "tools",
@@ -144,6 +145,8 @@
               "api-reference/calls/list",
               "api-reference/calls/get-by-id",
               "api-reference/calls/get-by-sid",
+              "api-reference/calls/initiate",
+              "api-reference/calls/terminate",
               "api-reference/calls/get-count",
               "api-reference/calls/search",
               "api-reference/calls/get-analytics",
@@ -175,7 +178,10 @@
               "api-reference/calls/data/get-transcripts-by-sid",
               "api-reference/calls/data/export-transcripts",
               "api-reference/calls/data/get-recordings-by-id",
-              "api-reference/calls/data/get-recordings-by-sid"
+              "api-reference/calls/data/get-recordings-by-sid",
+              "api-reference/calls/data/get-messages",
+              "api-reference/calls/data/get-webhook-logs",
+              "api-reference/calls/data/update-metadata"
             ]
           },
           {
@@ -196,9 +202,31 @@
             ]
           },
           {
+            "group": "Campaigns",
+            "pages": [
+              "api-reference/campaigns/list",
+              "api-reference/campaigns/create",
+              "api-reference/campaigns/get",
+              "api-reference/campaigns/update",
+              "api-reference/campaigns/delete",
+              "api-reference/campaigns/start",
+              "api-reference/campaigns/pause",
+              "api-reference/campaigns/stop",
+              "api-reference/campaigns/re-execute",
+              "api-reference/campaigns/contacts",
+              "api-reference/campaigns/import-data",
+              "api-reference/campaigns/progress",
+              "api-reference/campaigns/executions",
+              "api-reference/campaigns/schedule-get",
+              "api-reference/campaigns/schedule-save",
+              "api-reference/campaigns/template-preview"
+            ]
+          },
+          {
             "group": "WebSockets",
             "pages": [
-              "api-reference/websockets/live-transcript"
+              "api-reference/websockets/live-transcript",
+              "api-reference/websockets/campaign-progress"
             ]
           },
           {
@@ -209,6 +237,21 @@
               "api-reference/tools/get-by-id",
               "api-reference/tools/assign",
               "api-reference/tools/discover-lambda"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
+          {
+            "group": "SDK Documentation",
+            "pages": [
+              "sdks/overview",
+              "sdks/python",
+              "sdks/javascript",
+              "sdks/go",
+              "sdks/realtime"
             ]
           }
         ]

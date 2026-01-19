@@ -1,0 +1,201 @@
+---
+title: 'Initiate Call'
+openapi: 'POST /calls/initiate'
+---
+
+Programmatically initiate an outbound call from one of your AI assistants to a phone number.
+
+This is one of the most powerful features of Burki - it allows you to trigger AI-powered outbound calls from your application logic, enabling use cases like appointment reminders, lead follow-ups, and proactive customer outreach.
+
+## How It Works
+
+1. **You send a request** with the source phone number, destination number, and optional customization
+2. **Burki resolves the assistant** based on your parameters
+3. **The call is placed** through your configured telephony provider (Twilio, Telnyx, Vonage, or SIP)
+4. **Your AI assistant** handles the conversation automatically
+
+<Info>
+**Multi-Provider Support**: This endpoint works with Twilio, Telnyx, Vonage, and BYO SIP Trunk. The system automatically uses the provider configured for the specified `from_phone_number`.
+</Info>
+
+## Request Body
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `from_phone_number` | string | Yes | Phone number to call from (E.164 format). Must be assigned to an assistant in your organization. |
+| `to_phone_number` | string | Yes | Destination phone number (E.164 format). |
+| `assistant_id` | integer | No | Override the default assistant. If not provided, uses the assistant assigned to `from_phone_number`. |
+| `welcome_message` | string | No | Custom greeting for this call. Supports `{{variable}}` template syntax. |
+| `agenda` | string | No | Call objective/context for the AI. Supports `{{variable}}` template syntax. |
+| `variables` | object | No | Key-value pairs for template substitution in `welcome_message` and `agenda`. |
+
+### Assistant Resolution
+
+The system determines which assistant handles the call:
+
+1. **If `assistant_id` is provided**: Uses that specific assistant
+2. **If phone number has a direct assistant**: Uses the assigned assistant
+3. **If phone number has an assistant graph**: Uses the graph's entry point assistant
+
+## Examples
+
+### Minimal Request
+
+```json
+{
+  "from_phone_number": "+15551234567",
+  "to_phone_number": "+15559876543"
+}
+```
+
+### With Custom Welcome Message
+
+```json
+{
+  "from_phone_number": "+15551234567",
+  "to_phone_number": "+15559876543",
+  "welcome_message": "Hi! This is Sarah from Acme Corp calling about your recent inquiry."
+}
+```
+
+### With Template Variables
+
+```json
+{
+  "from_phone_number": "+15551234567",
+  "to_phone_number": "+15559876543",
+  "welcome_message": "Hello {{name}}, this is a reminder about your {{appointment_type}} appointment tomorrow at {{time}}.",
+  "agenda": "Confirm the appointment with {{name}} and answer any questions they have.",
+  "variables": {
+    "name": "John Smith",
+    "appointment_type": "dental cleaning",
+    "time": "2:30 PM"
+  }
+}
+```
+
+### With Assistant Override
+
+```json
+{
+  "from_phone_number": "+15551234567",
+  "to_phone_number": "+15559876543",
+  "assistant_id": 456,
+  "welcome_message": "Hi there! I'm calling from our sales team."
+}
+```
+
+## Response
+
+```json
+{
+  "message": "Call initiated successfully",
+  "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Status message |
+| `call_sid` | string | Unique identifier for the call from your telephony provider |
+
+## Error Responses
+
+### 400 Bad Request
+
+Missing or invalid parameters.
+
+```json
+{
+  "detail": "from_phone_number is required"
+}
+```
+
+```json
+{
+  "detail": "Invalid phone number format. Use E.164 format (e.g., +1234567890)"
+}
+```
+
+### 402 Payment Required
+
+Insufficient account balance.
+
+```json
+{
+  "detail": "Insufficient balance. Please add funds to continue making calls."
+}
+```
+
+### 403 Forbidden
+
+Phone number or assistant doesn't belong to your organization.
+
+```json
+{
+  "detail": "Unauthorized: phone number +15551234567 does not belong to your organization"
+}
+```
+
+### 404 Not Found
+
+No assistant found for the phone number.
+
+```json
+{
+  "detail": "No assistant found for phone number +15551234567"
+}
+```
+
+## Use Cases
+
+### Appointment Reminders
+
+```python
+import requests
+
+def send_appointment_reminder(patient_phone, patient_name, appointment_time, appointment_type):
+    response = requests.post(
+        "https://api.burki.dev/calls/initiate",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        json={
+            "from_phone_number": "+15551234567",
+            "to_phone_number": patient_phone,
+            "welcome_message": "Hello {{name}}, this is a friendly reminder about your {{type}} appointment scheduled for {{time}}.",
+            "agenda": "Confirm the appointment, offer rescheduling if needed, and answer any questions.",
+            "variables": {
+                "name": patient_name,
+                "type": appointment_type,
+                "time": appointment_time
+            }
+        }
+    )
+    return response.json()
+```
+
+### Lead Follow-up
+
+```javascript
+const axios = require('axios');
+
+async function followUpWithLead(leadPhone, leadName, productInterest) {
+  const response = await axios.post('https://api.burki.dev/calls/initiate', {
+    from_phone_number: '+15551234567',
+    to_phone_number: leadPhone,
+    welcome_message: `Hi {{name}}! I'm following up on your interest in our {{product}}.`,
+    agenda: 'Qualify the lead, answer questions about the product, and schedule a demo if interested.',
+    variables: {
+      name: leadName,
+      product: productInterest
+    }
+  }, {
+    headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
+  });
+  
+  return response.data;
+}
+```
+
+### Bulk Outreach with Campaign
+
+For large-scale outbound calling, consider using the [Campaigns API](/api-reference/campaigns) which provides scheduling, retry logic, and analytics.

@@ -1,0 +1,180 @@
+---
+title: 'Get Campaign Progress'
+openapi: 'GET /api/v1/campaigns/{campaign_id}/progress'
+---
+
+Get real-time progress and metrics for a campaign. Use this endpoint for dashboard displays and progress tracking.
+
+<Callout type="tip">
+For live updates without polling, use the [Campaign Progress WebSocket](/api-reference/websockets/campaign-progress) instead.
+</Callout>
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Response
+
+```json Response
+{
+  "campaign_id": 42,
+  "status": "running",
+  "progress": {
+    "total_contacts": 500,
+    "completed": 325,
+    "failed": 25,
+    "processing": 5,
+    "pending": 145,
+    "progress_percentage": 70.0,
+    "success_rate": 92.86
+  },
+  "metrics": {
+    "total_duration_seconds": 14625,
+    "average_duration_seconds": 45,
+    "success_rate": 92.86,
+    "answer_rate": 85.0,
+    "completion_rate": 70.0,
+    "cost_estimate": 25.50,
+    "actual_cost": 18.75,
+    "last_updated": "2024-02-15T14:30:00Z"
+  },
+  "started_at": "2024-02-15T09:00:00Z",
+  "completed_at": null,
+  "recent_activity": [
+    {
+      "execution_id": 1001,
+      "contact_phone": "+15551234567",
+      "status": "completed",
+      "executed_at": "2024-02-15T14:29:30Z",
+      "call_id": "CA123abc456def"
+    },
+    {
+      "execution_id": 1000,
+      "contact_phone": "+15559876543",
+      "status": "failed",
+      "executed_at": "2024-02-15T14:28:45Z",
+      "call_id": "CA789ghi012jkl"
+    }
+  ]
+}
+```
+
+### Response Fields
+
+#### Progress Object
+
+| Field | Description |
+|-------|-------------|
+| `total_contacts` | Total contacts to process |
+| `completed` | Successfully contacted |
+| `failed` | Failed contact attempts |
+| `processing` | Currently being contacted |
+| `pending` | Waiting to be contacted |
+| `progress_percentage` | Completion percentage |
+| `success_rate` | Success rate (completed / (completed + failed)) |
+
+#### Metrics Object
+
+| Field | Description |
+|-------|-------------|
+| `total_duration_seconds` | Total call time |
+| `average_duration_seconds` | Average call duration |
+| `success_rate` | Success percentage |
+| `answer_rate` | Calls answered percentage |
+| `completion_rate` | Progress percentage |
+| `cost_estimate` | Estimated total cost |
+| `actual_cost` | Actual cost so far |
+| `last_updated` | Last metrics update |
+
+#### Recent Activity
+
+Array of recent execution events (most recent first):
+
+| Field | Description |
+|-------|-------------|
+| `execution_id` | Execution record ID |
+| `contact_phone` | Contact's phone number |
+| `status` | Execution status |
+| `executed_at` | Execution timestamp |
+| `call_id` | Call SID (for calls) |
+
+### Example Code
+
+```bash cURL
+curl -X GET "https://api.burki.dev/api/v1/campaigns/42/progress" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+import time
+
+def monitor_campaign(campaign_id, api_key):
+    """Poll campaign progress until complete."""
+    while True:
+        response = requests.get(
+            f"https://api.burki.dev/api/v1/campaigns/{campaign_id}/progress",
+            headers={"Authorization": f"Bearer {api_key}"}
+        )
+        
+        data = response.json()
+        progress = data["progress"]
+        
+        print(f"Progress: {progress['completed']}/{progress['total_contacts']} "
+              f"({progress['progress_percentage']:.1f}%)")
+        print(f"Success rate: {progress['success_rate']:.1f}%")
+        
+        if data["status"] in ["completed", "cancelled", "failed"]:
+            print(f"Campaign {data['status']}")
+            break
+        
+        time.sleep(5)  # Poll every 5 seconds
+
+monitor_campaign(42, "YOUR_API_KEY")
+```
+
+```javascript JavaScript
+async function monitorCampaign(campaignId, apiKey) {
+  while (true) {
+    const response = await fetch(
+      `https://api.burki.dev/api/v1/campaigns/${campaignId}/progress`,
+      {
+        headers: { "Authorization": `Bearer ${apiKey}` }
+      }
+    );
+    
+    const data = await response.json();
+    const progress = data.progress;
+    
+    console.log(`Progress: ${progress.completed}/${progress.total_contacts} ` +
+                `(${progress.progress_percentage.toFixed(1)}%)`);
+    console.log(`Success rate: ${progress.success_rate.toFixed(1)}%`);
+    
+    if (["completed", "cancelled", "failed"].includes(data.status)) {
+      console.log(`Campaign ${data.status}`);
+      break;
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
+}
+
+monitorCampaign(42, "YOUR_API_KEY");
+```
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 404 | Campaign not found |
+| 401 | Unauthorized |
+
+### Polling Recommendations
+
+| Scenario | Recommended Interval |
+|----------|---------------------|
+| Active dashboard | 5-10 seconds |
+| Background monitoring | 30-60 seconds |
+| Batch processing | On-demand |
+
+For real-time updates without polling overhead, use the WebSocket endpoint.

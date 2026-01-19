@@ -5,21 +5,56 @@ openapi: 'POST /calls/initiate'
 
 This endpoint is used to programmatically initiate an outbound call from one of your AI assistants to an external phone number. It is a system endpoint that you call from your own application logic, not a webhook for an external service.
 
-When you call this endpoint, it instructs Twilio to place a call. Twilio then makes a request to your `/twiml` webhook, passing along the parameters you provide here as metadata. This allows the system to route the call to the correct assistant and begin the conversation.
+When you call this endpoint, Burki instructs your telephony provider (Twilio, Telnyx, or Vonage) to place a call. The provider then makes a request to your webhook, passing along the parameters you provide here as metadata. This allows the system to route the call to the correct assistant and begin the conversation.
 
-### Request Body
+<Info>
+**Multi-Provider Support**: This endpoint works with Twilio, Telnyx, Vonage, and BYO SIP Trunk. The system automatically uses the provider configured for the specified `from_phone_number`.
+</Info>
+
+## Request Body
 
 The request body is a JSON object specifying the details of the outbound call.
 
-- `assistant_id` (integer, **required**): The ID of the assistant that should make the call.
+### Required Parameters
+
+- `from_phone_number` (string, **required**): The phone number to call from, in E.164 format. This number must be assigned to an assistant or assistant graph in your organization.
 - `to_phone_number` (string, **required**): The destination phone number to call, in E.164 format.
+
+### Optional Parameters
+
+- `assistant_id` (integer, optional): Override the default assistant attached to the phone number. If not provided, the system uses the assistant assigned to `from_phone_number`.
 - `welcome_message` (string, optional): A custom welcome message for the assistant to say at the beginning of the call. If not provided, the assistant's default greeting will be used. Supports variable substitution using `{{variable}}` syntax.
 - `agenda` (string, optional): A specific topic or goal for the call. This can be used to guide the assistant's conversation. Supports variable substitution using `{{variable}}` syntax.
-- `variables` (object, optional): A dictionary of custom variables for template substitution in the welcome_message and agenda. Variables can be referenced using double curly brackets, e.g., `{{name}}`, `{{company}}`, etc.
+- `variables` (object, optional): A dictionary of custom variables for template substitution in the `welcome_message` and `agenda`. Variables can be referenced using double curly brackets, e.g., `{{name}}`, `{{company}}`, etc.
+
+### Assistant Resolution Logic
+
+The system determines which assistant handles the call using the following priority:
+
+1. **If `assistant_id` is provided**: Use the specified assistant (must belong to your organization)
+2. **If `from_phone_number` is assigned to an assistant**: Use that assistant
+3. **If `from_phone_number` is assigned to an assistant graph**: Use the entry point assistant from the graph
+
+<Warning>
+If no assistant can be resolved through the above logic, the request will fail with a 404 error.
+</Warning>
+
+## Examples
+
+### Basic Call (Using Phone Number's Default Assistant)
 
 ```json Request
 {
-  "assistant_id": 123,
+  "from_phone_number": "+15551234567",
+  "to_phone_number": "+15559876543"
+}
+```
+
+### Call with Custom Message and Variables
+
+```json Request
+{
+  "from_phone_number": "+15551234567",
   "to_phone_number": "+15559876543",
   "welcome_message": "Hello {{name}}, this is a reminder about your appointment tomorrow at {{time}}.",
   "agenda": "Remind {{name}} about their upcoming {{appointment_type}} appointment.",
@@ -31,13 +66,68 @@ The request body is a JSON object specifying the details of the outbound call.
 }
 ```
 
-### Response
+### Call with Assistant Override
 
-A successful request will return a `200 OK` status with a JSON object containing the `call_sid` from Twilio, confirming that the call has been initiated.
+Use a different assistant than the one assigned to the phone number:
+
+```json Request
+{
+  "from_phone_number": "+15551234567",
+  "to_phone_number": "+15559876543",
+  "assistant_id": 456,
+  "welcome_message": "Hi there! I'm calling about your recent inquiry."
+}
+```
+
+## Response
+
+A successful request will return a `200 OK` status with a JSON object containing the `call_sid` from your telephony provider, confirming that the call has been initiated.
 
 ```json Response
 {
   "message": "Call initiated successfully",
   "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }
-``` 
+```
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when required parameters are missing or invalid.
+
+```json
+{
+  "detail": "from_phone_number is required"
+}
+```
+
+### 402 Payment Required
+
+Returned when your organization has insufficient funds.
+
+```json
+{
+  "detail": "Insufficient balance. Please add funds to continue making calls."
+}
+```
+
+### 403 Forbidden
+
+Returned when the phone number or assistant doesn't belong to your organization.
+
+```json
+{
+  "detail": "Unauthorized: phone number +15551234567 does not belong to your organization"
+}
+```
+
+### 404 Not Found
+
+Returned when no assistant can be resolved for the call.
+
+```json
+{
+  "detail": "No assistant found for phone number +15551234567"
+}
+```

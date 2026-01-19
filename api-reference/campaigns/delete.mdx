@@ -1,0 +1,87 @@
+---
+title: 'Delete Campaign'
+openapi: 'DELETE /api/v1/campaigns/{campaign_id}'
+---
+
+Permanently delete a campaign and all associated data including contacts, executions, and schedules.
+
+<Callout type="warning">
+Running campaigns cannot be deleted. Stop the campaign first using the stop endpoint.
+</Callout>
+
+<Callout type="error">
+This action is irreversible. All campaign data, contacts, and execution history will be permanently deleted.
+</Callout>
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Response
+
+```json Response
+{
+  "message": "Campaign deleted successfully"
+}
+```
+
+### What Gets Deleted
+
+When you delete a campaign, the following data is permanently removed:
+
+- Campaign configuration and settings
+- All imported contacts
+- Execution history and logs
+- Schedule configurations
+- Import history records
+
+### Example Code
+
+```bash cURL
+curl -X DELETE "https://api.burki.dev/api/v1/campaigns/42" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+response = requests.delete(
+    "https://api.burki.dev/api/v1/campaigns/42",
+    headers={"Authorization": "Bearer YOUR_API_KEY"}
+)
+
+if response.status_code == 200:
+    print("Campaign deleted successfully")
+else:
+    print(f"Error: {response.json()}")
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/42", {
+  method: "DELETE",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY"
+  }
+});
+
+if (response.ok) {
+  console.log("Campaign deleted successfully");
+} else {
+  const error = await response.json();
+  console.error("Error:", error);
+}
+```
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Cannot delete running campaign - stop it first |
+| 404 | Campaign not found |
+| 401 | Unauthorized - invalid or missing API key |
+
+### Best Practices
+
+- **Export data first** if you need to keep records of the campaign results
+- **Stop running campaigns** before attempting to delete
+- **Consider pausing** instead of deleting if you might need the campaign later

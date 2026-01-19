@@ -1,0 +1,162 @@
+---
+title: 'Terminate Call'
+openapi: 'POST /api/v1/calls/{call_sid}/terminate'
+---
+
+Immediately terminate an ongoing call. This endpoint allows you to programmatically hang up a call that is currently in progress.
+
+## Use Cases
+
+- **Admin intervention**: Manually end calls that need immediate termination
+- **Automatic cutoff**: End calls when certain conditions are met (e.g., time limits, budget caps)
+- **Emergency stop**: Quickly terminate all active calls during system maintenance
+- **Quality control**: End calls that are not meeting quality standards
+
+## Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `call_sid` | string | Yes | The unique call SID (Session ID) from your telephony provider |
+
+## Request
+
+This endpoint does not require a request body.
+
+```bash
+curl -X POST "https://api.burki.dev/api/v1/calls/CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/terminate" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Response
+
+### Success (200 OK)
+
+```json
+{
+  "success": true,
+  "message": "Call terminated successfully via twilio"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Whether the termination was successful |
+| `message` | string | Status message including the provider used |
+
+## Error Responses
+
+### 400 Bad Request
+
+Returned when the call is not in an "ongoing" status.
+
+```json
+{
+  "detail": "Cannot terminate call - current status is 'completed'"
+}
+```
+
+### 404 Not Found
+
+Returned when the call doesn't exist or doesn't belong to your organization.
+
+```json
+{
+  "detail": "Call not found or you don't have permission to terminate it"
+}
+```
+
+### 500 Internal Server Error
+
+Returned when the telephony provider fails to terminate the call.
+
+```json
+{
+  "detail": "Failed to terminate call via twilio"
+}
+```
+
+## Provider Support
+
+This endpoint works with all supported telephony providers:
+
+| Provider | Notes |
+|----------|-------|
+| Twilio | Uses Twilio's call update API |
+| Telnyx | Uses Telnyx Call Control API |
+| Vonage | Uses Vonage Voice API |
+| BYO SIP Trunk | Uses SIP CANCEL/BYE signaling |
+
+The system automatically detects which provider to use based on the call's metadata.
+
+## Examples
+
+### Python
+
+```python
+import requests
+
+def terminate_call(call_sid):
+    response = requests.post(
+        f"https://api.burki.dev/api/v1/calls/{call_sid}/terminate",
+        headers={"Authorization": "Bearer YOUR_API_KEY"}
+    )
+    
+    if response.status_code == 200:
+        print(f"Call {call_sid} terminated successfully")
+        return response.json()
+    else:
+        print(f"Failed to terminate: {response.json()['detail']}")
+        return None
+```
+
+### Node.js
+
+```javascript
+const axios = require('axios');
+
+async function terminateCall(callSid) {
+  try {
+    const response = await axios.post(
+      `https://api.burki.dev/api/v1/calls/${callSid}/terminate`,
+      {},
+      {
+        headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
+      }
+    );
+    
+    console.log('Call terminated:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to terminate:', error.response.data.detail);
+    throw error;
+  }
+}
+```
+
+### Terminate All Active Calls
+
+```python
+import requests
+
+def terminate_all_active_calls():
+    # First, get all ongoing calls
+    calls_response = requests.get(
+        "https://api.burki.dev/api/v1/calls",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        params={"status": "ongoing"}
+    )
+    
+    ongoing_calls = calls_response.json()["items"]
+    
+    # Terminate each one
+    for call in ongoing_calls:
+        terminate_call(call["call_sid"])
+        print(f"Terminated call {call['call_sid']}")
+```
+
+## Notes
+
+- The call status will be updated to "completed" in the database after termination
+- Call duration is calculated up to the termination time
+- Billing is recorded for the portion of the call that occurred
+- Termination is immediate - there is no graceful hangup message by default

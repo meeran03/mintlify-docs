@@ -1,0 +1,230 @@
+---
+title: 'Update Call Metadata'
+openapi: 'PATCH /api/v1/calls/{call_id}/metadata'
+---
+
+Update the custom metadata associated with a call. This allows you to attach arbitrary data to call records for tracking, analytics, or integration with your systems.
+
+<Info>
+**Merge Behavior**: New metadata is merged with existing metadata. To remove a field, set its value to `null`.
+</Info>
+
+## Use Cases
+
+- **CRM Integration**: Link calls to customer records, tickets, or opportunities
+- **Campaign Tracking**: Tag calls with campaign IDs for attribution
+- **Custom Analytics**: Add business-specific data for reporting
+- **Outcome Tracking**: Record call outcomes like "appointment_booked" or "sale_completed"
+
+## Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `call_id` | integer | Yes | The internal call ID (not the call SID) |
+
+## Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `metadata` | object | Yes | Key-value pairs to store with the call |
+
+```json
+{
+  "metadata": {
+    "customer_id": "cust_abc123",
+    "ticket_id": "TICKET-456",
+    "campaign": "spring_outreach_2024",
+    "outcome": "appointment_scheduled",
+    "custom_field": "any_value"
+  }
+}
+```
+
+## Request Example
+
+```bash
+curl -X PATCH "https://api.burki.dev/api/v1/calls/101/metadata" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metadata": {
+      "customer_id": "cust_abc123",
+      "outcome": "appointment_scheduled"
+    }
+  }'
+```
+
+## Response
+
+Returns the updated call object with the merged metadata.
+
+```json
+{
+  "id": 101,
+  "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "assistant_id": 123,
+  "assistant_name": "ServiceBot",
+  "to_phone_number": "+15551234567",
+  "customer_phone_number": "+15559876543",
+  "status": "completed",
+  "duration": 180,
+  "started_at": "2024-01-15T10:00:00Z",
+  "ended_at": "2024-01-15T10:03:00Z",
+  "call_meta": {
+    "customer_id": "cust_abc123",
+    "outcome": "appointment_scheduled"
+  },
+  "total_cost": 0.05,
+  "llm_cost": 0.02,
+  "tts_cost": 0.01,
+  "stt_cost": 0.01,
+  "telephony_cost": 0.01,
+  "cost_currency": "USD"
+}
+```
+
+## Error Responses
+
+### 404 Not Found
+
+```json
+{
+  "detail": "Call with ID 101 not found in your organization"
+}
+```
+
+### 422 Unprocessable Entity
+
+```json
+{
+  "detail": [
+    {
+      "loc": ["body", "metadata"],
+      "msg": "field required",
+      "type": "value_error.missing"
+    }
+  ]
+}
+```
+
+## Examples
+
+### Python - Add Customer Info
+
+```python
+import requests
+
+def tag_call_with_customer(call_id, customer_id, customer_name):
+    response = requests.patch(
+        f"https://api.burki.dev/api/v1/calls/{call_id}/metadata",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        json={
+            "metadata": {
+                "customer_id": customer_id,
+                "customer_name": customer_name,
+                "tagged_at": "2024-01-15T10:00:00Z"
+            }
+        }
+    )
+    
+    return response.json()
+```
+
+### Python - Record Call Outcome
+
+```python
+def record_call_outcome(call_id, outcome, notes=None):
+    metadata = {
+        "outcome": outcome,  # e.g., "sale", "no_answer", "callback_requested"
+        "outcome_recorded_at": "2024-01-15T10:00:00Z"
+    }
+    
+    if notes:
+        metadata["outcome_notes"] = notes
+    
+    response = requests.patch(
+        f"https://api.burki.dev/api/v1/calls/{call_id}/metadata",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        json={"metadata": metadata}
+    )
+    
+    return response.json()
+```
+
+### Node.js - Campaign Attribution
+
+```javascript
+const axios = require('axios');
+
+async function attributeCallToCampaign(callId, campaignId, source) {
+  const response = await axios.patch(
+    `https://api.burki.dev/api/v1/calls/${callId}/metadata`,
+    {
+      metadata: {
+        campaign_id: campaignId,
+        traffic_source: source,
+        attributed_at: new Date().toISOString()
+      }
+    },
+    {
+      headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
+    }
+  );
+  
+  return response.data;
+}
+```
+
+### Webhook Integration
+
+A common pattern is to update call metadata from your webhook handler:
+
+```python
+from flask import Flask, request
+import requests
+
+app = Flask(__name__)
+
+@app.route('/webhooks/burki', methods=['POST'])
+def handle_webhook():
+    event = request.json
+    
+    if event['event'] == 'call_ended':
+        call_id = event['call_id']
+        
+        # Look up the customer in your CRM
+        customer = lookup_customer_by_phone(event['customer_phone_number'])
+        
+        if customer:
+            # Tag the call with customer info
+            requests.patch(
+                f"https://api.burki.dev/api/v1/calls/{call_id}/metadata",
+                headers={"Authorization": "Bearer YOUR_API_KEY"},
+                json={
+                    "metadata": {
+                        "crm_customer_id": customer['id'],
+                        "account_type": customer['type'],
+                        "lifetime_value": customer['ltv']
+                    }
+                }
+            )
+    
+    return {'received': True}
+```
+
+## Best Practices
+
+1. **Use Consistent Keys**: Establish naming conventions for your metadata fields (e.g., `customer_id` vs `customerId`)
+
+2. **Keep Values Simple**: Store IDs and references rather than large objects. Use your own systems for detailed data.
+
+3. **Timestamp Important Updates**: Include timestamps when recording outcomes or status changes.
+
+4. **Don't Store Sensitive Data**: Avoid storing PII, credentials, or other sensitive information in call metadata.
+
+## Notes
+
+- Metadata is stored as JSON and supports nested objects
+- There is no size limit enforced, but keep metadata concise
+- Metadata is included in call exports and analytics
+- Use the [List Calls](/api-reference/calls/list) endpoint to filter calls by metadata (coming soon)

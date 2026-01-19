@@ -1,0 +1,204 @@
+---
+title: 'Get Campaign Executions'
+openapi: 'GET /api/v1/campaigns/{campaign_id}/executions'
+---
+
+Retrieve a paginated list of execution records for a campaign. Each execution represents a single contact attempt (call or SMS).
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Query Parameters
+
+- `page` (integer, optional, default: 1): Page number for pagination
+- `per_page` (integer, optional, default: 50, max: 1000): Results per page
+
+### Response
+
+```json Response
+{
+  "executions": [
+    {
+      "id": 1001,
+      "execution_id": 1001,
+      "contact_id": 101,
+      "contact_name": "John Smith",
+      "contact_phone": "+15551234567",
+      "status": "completed",
+      "call_id": "CA123abc456def789ghi",
+      "sms_id": null,
+      "executed_at": "2024-02-15T14:29:30Z",
+      "execution_data": {
+        "from_number": "+15550001234",
+        "to_number": "+15551234567",
+        "personalized_welcome_message": "Hi John, this is Sarah from Acme Healthcare.",
+        "template_variables_used": {
+          "name": "John Smith",
+          "appointment_date": "February 15th"
+        },
+        "duration_seconds": 45,
+        "voice_analytics": {
+          "sentiment_score": 0.85
+        }
+      }
+    },
+    {
+      "id": 1000,
+      "execution_id": 1000,
+      "contact_id": 102,
+      "contact_name": "Jane Doe",
+      "contact_phone": "+15559876543",
+      "status": "no_answer",
+      "call_id": "CA789ghi012jkl345mno",
+      "sms_id": null,
+      "executed_at": "2024-02-15T14:28:45Z",
+      "execution_data": {
+        "from_number": "+15550001234",
+        "to_number": "+15559876543",
+        "error_details": "No answer after 30 seconds",
+        "retry_reason": "Will retry in 30 minutes"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 50,
+    "total_items": 350,
+    "total_pages": 7,
+    "has_next": true,
+    "has_prev": false
+  }
+}
+```
+
+### Response Fields
+
+#### Execution Object
+
+| Field | Description |
+|-------|-------------|
+| `id` | Execution record ID |
+| `execution_id` | Same as id (for compatibility) |
+| `contact_id` | Associated contact ID |
+| `contact_name` | Contact's name |
+| `contact_phone` | Contact's phone number |
+| `status` | Execution status |
+| `call_id` | Twilio/Telnyx Call SID (for calls) |
+| `sms_id` | SMS message ID (for SMS) |
+| `executed_at` | Execution timestamp |
+| `execution_data` | Detailed execution information |
+
+#### Execution Data Object
+
+| Field | Description |
+|-------|-------------|
+| `from_number` | Outbound caller ID |
+| `to_number` | Recipient phone number |
+| `personalized_welcome_message` | Rendered welcome message |
+| `personalized_agenda` | Rendered agenda (if set) |
+| `template_variables_used` | Variables and values used |
+| `duration_seconds` | Call duration |
+| `error_details` | Error description (if failed) |
+| `retry_reason` | Retry information |
+| `voice_analytics` | Voice analysis results |
+
+### Execution Statuses
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Queued for execution |
+| `in_progress` | Currently executing |
+| `completed` | Successfully completed |
+| `failed` | Execution failed |
+| `no_answer` | Call not answered |
+| `busy` | Line was busy |
+| `voicemail` | Reached voicemail |
+| `skipped` | Skipped execution |
+
+### Example Code
+
+```bash cURL
+curl -X GET "https://api.burki.dev/api/v1/campaigns/42/executions?page=1&per_page=100" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+def get_all_executions(campaign_id, api_key):
+    """Fetch all executions with pagination."""
+    executions = []
+    page = 1
+    
+    while True:
+        response = requests.get(
+            f"https://api.burki.dev/api/v1/campaigns/{campaign_id}/executions",
+            params={"page": page, "per_page": 100},
+            headers={"Authorization": f"Bearer {api_key}"}
+        )
+        
+        data = response.json()
+        executions.extend(data["executions"])
+        
+        if not data["pagination"]["has_next"]:
+            break
+        page += 1
+    
+    return executions
+
+# Get all executions
+all_executions = get_all_executions(42, "YOUR_API_KEY")
+
+# Analyze results
+completed = [e for e in all_executions if e["status"] == "completed"]
+failed = [e for e in all_executions if e["status"] in ["failed", "no_answer"]]
+
+print(f"Total executions: {len(all_executions)}")
+print(f"Completed: {len(completed)}")
+print(f"Failed/No Answer: {len(failed)}")
+```
+
+```javascript JavaScript
+async function getAllExecutions(campaignId, apiKey) {
+  const executions = [];
+  let page = 1;
+  
+  while (true) {
+    const response = await fetch(
+      `https://api.burki.dev/api/v1/campaigns/${campaignId}/executions?page=${page}&per_page=100`,
+      {
+        headers: { "Authorization": `Bearer ${apiKey}` }
+      }
+    );
+    
+    const data = await response.json();
+    executions.push(...data.executions);
+    
+    if (!data.pagination.has_next) break;
+    page++;
+  }
+  
+  return executions;
+}
+
+// Get and analyze
+const executions = await getAllExecutions(42, "YOUR_API_KEY");
+const completed = executions.filter(e => e.status === "completed");
+console.log(`Success rate: ${(completed.length / executions.length * 100).toFixed(1)}%`);
+```
+
+### Use Cases
+
+- **Audit trail**: Review all contact attempts
+- **Analytics**: Calculate custom metrics
+- **Debugging**: Investigate failed calls
+- **Export**: Extract data for external analysis
+- **Compliance**: Track contact history
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 404 | Campaign not found |
+| 401 | Unauthorized |

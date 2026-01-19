@@ -3,14 +3,14 @@ title: 'Send SMS'
 openapi: 'POST /sms/send'
 ---
 
-This endpoint allows you to send SMS messages through one of your AI assistants. The system automatically determines which telephony provider (Twilio or Telnyx) to use based on the assistant configuration associated with the `from_phone_number`.
+This endpoint allows you to send SMS messages through one of your AI assistants. The system automatically determines which telephony provider (Twilio, Telnyx, or Vonage) to use based on the assistant configuration associated with the `from_phone_number`.
 
 ## How It Works
 
 1. **Assistant Lookup**: The system identifies the assistant based on the `from_phone_number`
-2. **Provider Selection**: Automatically uses the assistant's configured telephony provider (Twilio or Telnyx)
-3. **Message Delivery**: Sends the SMS through the appropriate provider's API
-4. **Response**: Returns success status with message ID and provider information
+2. **Provider Selection**: Automatically uses the assistant's configured telephony provider
+3. **Queue or Send**: Either queues the message (with rate limiting) or sends immediately
+4. **Response**: Returns success status with message ID, provider, and delivery status
 
 <Info>
 **Multi-Provider Support**: Your assistants can use different telephony providers. The system automatically routes SMS messages through the correct provider based on which assistant owns the phone number.
@@ -18,41 +18,109 @@ This endpoint allows you to send SMS messages through one of your AI assistants.
 
 ## Request Body
 
-The request body is a JSON object containing the SMS details.
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `from_phone_number` | string | Yes | Sender phone number (must be assigned to an assistant) |
+| `to_phone_number` | string | Yes | Recipient phone number in E.164 format |
+| `message` | string | Yes | SMS message content (max 1600 characters) |
+| `media_urls` | array | No | List of media URLs for MMS messages |
+| `queue` | boolean | No | If `true` (default), queue with rate limiting. If `false`, send immediately |
+| `idempotency_key` | string | No | Unique key to prevent duplicate sends on retries (max 256 chars) |
 
-- `from_phone_number` (string, **required**): The sender phone number that must be assigned to one of your assistants
-- `to_phone_number` (string, **required**): The recipient phone number in E.164 format (e.g., +1234567890)
-- `message` (string, **required**): The SMS message content (max 1600 characters)
-- `media_urls` (array of strings, optional): List of media URLs for MMS messages
+### Basic Request
 
-```json Request
+```json
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Hello! This is a follow-up message from your AI assistant."
+}
+```
+
+### With All Options
+
+```json
 {
   "from_phone_number": "+1234567890",
   "to_phone_number": "+1555123456",
   "message": "Hello! This is a follow-up message from your AI assistant.",
-  "media_urls": ["https://example.com/image.jpg"]
+  "media_urls": ["https://example.com/image.jpg"],
+  "queue": false,
+  "idempotency_key": "order:12345:confirmation"
 }
 ```
 
+## Queue vs Immediate Send
+
+<Tabs>
+<Tab title="Queued (Default)">
+When `queue: true` (default):
+- Messages are queued and sent with rate limiting
+- Helps avoid carrier throttling
+- Better for bulk sends
+- Returns `status: "queued"`
+
+```json
+{
+  "queue": true
+}
+```
+</Tab>
+<Tab title="Immediate">
+When `queue: false`:
+- Message is sent immediately
+- Better for time-sensitive messages
+- May hit rate limits if sending many messages
+- Returns `status: "sent"` or `status: "failed"`
+
+```json
+{
+  "queue": false
+}
+```
+</Tab>
+</Tabs>
+
+## Idempotency
+
+The `idempotency_key` parameter prevents duplicate messages when retrying failed requests:
+
+```json
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Your order #12345 has shipped!",
+  "idempotency_key": "order:12345:shipped:notification"
+}
+```
+
+<Info>
+**Header Alternative**: You can also provide the idempotency key via the `Idempotency-Key` header. If both are provided, the header takes precedence.
+</Info>
+
 ## Response
 
-A successful request returns a `200 OK` status with details about the sent message.
+A successful request returns a `200 OK` status with details about the message.
 
-```json Response
+```json
 {
   "success": true,
   "message_id": "SM1234567890abcdef",
-  "message": "SMS sent successfully via telnyx",
-  "provider": "telnyx"
+  "message": "SMS queued successfully via telnyx",
+  "provider": "telnyx",
+  "status": "queued"
 }
 ```
 
 ## Response Fields
 
-- `success` (boolean): Whether the SMS was sent successfully
-- `message_id` (string): Unique identifier for the message from the telephony provider
-- `message` (string): Human-readable status message
-- `provider` (string): The telephony provider used ("twilio" or "telnyx")
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Whether the operation was successful |
+| `message_id` | string | Unique identifier for the message |
+| `message` | string | Human-readable status message |
+| `provider` | string | Telephony provider used (`twilio`, `telnyx`, or `vonage`) |
+| `status` | string | Delivery status: `queued`, `sent`, or `failed` |
 
 ## Error Responses
 
@@ -102,19 +170,34 @@ Send follow-up messages after customer service calls:
 {
   "from_phone_number": "+1234567890",
   "to_phone_number": "+1555123456",
-  "message": "Thanks for calling! Here's the link we discussed: https://support.example.com/article/123"
+  "message": "Thanks for calling! Here's the link we discussed: https://support.example.com/article/123",
+  "queue": false
 }
 ```
 
 ### Appointment Reminders
 
-Send automated appointment reminders:
+Send automated appointment reminders with idempotency:
 
 ```json
 {
   "from_phone_number": "+1234567890",
   "to_phone_number": "+1555123456",
-  "message": "Reminder: Your appointment is tomorrow at 2:00 PM. Reply CONFIRM to confirm or RESCHEDULE to change the time."
+  "message": "Reminder: Your appointment is tomorrow at 2:00 PM. Reply CONFIRM to confirm or RESCHEDULE to change the time.",
+  "idempotency_key": "appointment:456:reminder:24h"
+}
+```
+
+### Bulk Notifications (Queued)
+
+For sending many messages, use the queue to avoid rate limits:
+
+```json
+{
+  "from_phone_number": "+1234567890",
+  "to_phone_number": "+1555123456",
+  "message": "Flash sale! 50% off all items today only. Shop now: example.com/sale",
+  "queue": true
 }
 ```
 
@@ -155,9 +238,10 @@ SMS sending is subject to rate limits imposed by the underlying telephony provid
 
 - **Twilio**: Varies by account type and message volume
 - **Telnyx**: Varies by account configuration
+- **Vonage**: Varies by account type
 
 <Warning>
-**Provider Limits**: Each telephony provider has its own rate limits and restrictions. Make sure your usage complies with your provider's terms of service.
+**Provider Limits**: Each telephony provider has its own rate limits and restrictions. Use the `queue: true` option (default) to let Burki handle rate limiting automatically.
 </Warning>
 
 ## Best Practices
@@ -165,8 +249,20 @@ SMS sending is subject to rate limits imposed by the underlying telephony provid
 ### Phone Number Format
 
 Always use E.164 format for phone numbers:
-- ✅ Correct: `+1234567890`
-- ❌ Incorrect: `(123) 456-7890`, `123-456-7890`, `1234567890`
+- Correct: `+1234567890`
+- Incorrect: `(123) 456-7890`, `123-456-7890`, `1234567890`
+
+### Idempotency Keys
+
+Use meaningful idempotency keys that include:
+- The type of message (e.g., `order`, `appointment`, `alert`)
+- A unique identifier (e.g., order ID, appointment ID)
+- The specific action (e.g., `confirmation`, `reminder`)
+
+Examples:
+- `order:12345:confirmation`
+- `appointment:789:reminder:24h`
+- `chat:session123:msg:456:outbound`
 
 ### Message Content
 
@@ -188,13 +284,14 @@ response = requests.post(
     json={
         "from_phone_number": "+1234567890",
         "to_phone_number": "+1555123456",
-        "message": "Hello from your AI assistant!"
+        "message": "Hello from your AI assistant!",
+        "idempotency_key": "test:123:hello"
     }
 )
 
 if response.status_code == 200:
     data = response.json()
-    print(f"SMS sent successfully via {data['provider']}")
+    print(f"SMS {data['status']} via {data['provider']}")
     print(f"Message ID: {data['message_id']}")
 else:
     print(f"Error: {response.status_code} - {response.json()['detail']}")
@@ -207,12 +304,14 @@ else:
 ```javascript
 const axios = require('axios');
 
-async function sendSMS(fromPhone, toPhone, message) {
+async function sendSMS(fromPhone, toPhone, message, options = {}) {
   try {
     const response = await axios.post('https://api.burki.dev/sms/send', {
       from_phone_number: fromPhone,
       to_phone_number: toPhone,
-      message: message
+      message: message,
+      queue: options.queue ?? true,
+      idempotency_key: options.idempotencyKey
     }, {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY',
@@ -220,13 +319,19 @@ async function sendSMS(fromPhone, toPhone, message) {
       }
     });
     
-    console.log('SMS sent:', response.data);
+    console.log(`SMS ${response.data.status}:`, response.data);
     return response.data;
   } catch (error) {
     console.error('Failed to send SMS:', error.response.data);
     throw error;
   }
 }
+
+// Usage
+sendSMS('+1234567890', '+1555123456', 'Hello!', {
+  queue: false,
+  idempotencyKey: 'test:123'
+});
 ```
 
 ### Python
@@ -234,7 +339,7 @@ async function sendSMS(fromPhone, toPhone, message) {
 ```python
 import requests
 
-def send_sms(from_phone, to_phone, message, media_urls=None):
+def send_sms(from_phone, to_phone, message, media_urls=None, queue=True, idempotency_key=None):
     url = "https://api.burki.dev/sms/send"
     headers = {
         "Authorization": "Bearer YOUR_API_KEY",
@@ -244,11 +349,15 @@ def send_sms(from_phone, to_phone, message, media_urls=None):
     payload = {
         "from_phone_number": from_phone,
         "to_phone_number": to_phone,
-        "message": message
+        "message": message,
+        "queue": queue
     }
     
     if media_urls:
         payload["media_urls"] = media_urls
+    
+    if idempotency_key:
+        payload["idempotency_key"] = idempotency_key
     
     response = requests.post(url, json=payload, headers=headers)
     
@@ -256,13 +365,22 @@ def send_sms(from_phone, to_phone, message, media_urls=None):
         return response.json()
     else:
         raise Exception(f"SMS failed: {response.json()['detail']}")
+
+# Usage
+result = send_sms(
+    "+1234567890",
+    "+1555123456",
+    "Your order has shipped!",
+    idempotency_key="order:789:shipped"
+)
+print(f"Status: {result['status']}")
 ```
 
 ### PHP
 
 ```php
 <?php
-function sendSMS($fromPhone, $toPhone, $message, $mediaUrls = null) {
+function sendSMS($fromPhone, $toPhone, $message, $options = []) {
     $url = 'https://api.burki.dev/sms/send';
     $headers = [
         'Authorization: Bearer YOUR_API_KEY',
@@ -272,11 +390,16 @@ function sendSMS($fromPhone, $toPhone, $message, $mediaUrls = null) {
     $data = [
         'from_phone_number' => $fromPhone,
         'to_phone_number' => $toPhone,
-        'message' => $message
+        'message' => $message,
+        'queue' => $options['queue'] ?? true
     ];
     
-    if ($mediaUrls) {
-        $data['media_urls'] = $mediaUrls;
+    if (isset($options['media_urls'])) {
+        $data['media_urls'] = $options['media_urls'];
+    }
+    
+    if (isset($options['idempotency_key'])) {
+        $data['idempotency_key'] = $options['idempotency_key'];
     }
     
     $ch = curl_init();
@@ -298,4 +421,3 @@ function sendSMS($fromPhone, $toPhone, $message, $mediaUrls = null) {
 }
 ?>
 ```
-

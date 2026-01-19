@@ -1,0 +1,814 @@
+---
+title: Go SDK
+description: "Official Go SDK for the Burki Voice AI Platform"
+---
+
+<Info>
+The Burki Go SDK provides an idiomatic Go interface to the Burki Voice AI API with channel-based streaming for real-time events.
+</Info>
+
+## Installation
+
+```bash
+go get github.com/burki-ai/burki-go
+```
+
+**Requirements:** Go 1.18+
+
+---
+
+## Quick Start
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+
+    burki "github.com/burki-ai/burki-go/burki"
+)
+
+func main() {
+    // Initialize the client
+    client := burki.NewClient("your-api-key")
+
+    // List all assistants
+    assistants, err := client.Assistants.List(nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    for _, assistant := range assistants {
+        fmt.Printf("%d: %s\n", assistant.ID, assistant.Name)
+    }
+
+    // Create a new assistant
+    assistant, err := client.Assistants.Create(&burki.CreateAssistantParams{
+        Name:        "Support Bot",
+        Description: "Customer support assistant",
+        LLMSettings: &burki.LLMSettings{
+            SystemPrompt: "You are a helpful customer support agent.",
+            Temperature:  0.7,
+        },
+        TTSSettings: &burki.TTSSettings{
+            Provider: "elevenlabs",
+            VoiceID:  "rachel",
+        },
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("Created assistant: %s\n", assistant.Name)
+}
+```
+
+---
+
+## Configuration
+
+### Basic Configuration
+
+```go
+client := burki.NewClient("your-api-key")
+```
+
+### Custom Options
+
+```go
+client := burki.NewClientWithOptions(&burki.ClientOptions{
+    APIKey:  "your-api-key",
+    BaseURL: "https://custom.burki.dev",
+    Timeout: 60 * time.Second,
+})
+```
+
+### Using Environment Variables
+
+```go
+import "os"
+
+client := burki.NewClient(os.Getenv("BURKI_API_KEY"))
+```
+
+---
+
+## Resources
+
+<Tabs>
+  <Tab title="Assistants">
+
+### List Assistants
+
+```go
+// Basic list
+assistants, err := client.Assistants.List(nil)
+if err != nil {
+    log.Fatal(err)
+}
+
+// With pagination
+assistants, err := client.Assistants.List(&burki.AssistantListParams{
+    Limit: 100,
+})
+```
+
+### Get an Assistant
+
+```go
+assistant, err := client.Assistants.Get(123)
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Printf("Name: %s\n", assistant.Name)
+```
+
+### Create an Assistant
+
+```go
+maxIdle := 3
+assistant, err := client.Assistants.Create(&burki.CreateAssistantParams{
+    Name:        "My Bot",
+    Description: "A helpful customer support bot",
+    LLMProvider: "openai",
+    LLMSettings: &burki.LLMSettings{
+        SystemPrompt: "You are helpful.",
+        Temperature:  0.7,
+        MaxTokens:    1000,
+    },
+    TTSSettings: &burki.TTSSettings{
+        Provider: "elevenlabs",
+        VoiceID:  "rachel",
+        BackgroundSound: &burki.BackgroundSoundSettings{
+            Enabled: true,
+            Volume:  0.3,
+        },
+    },
+    STTSettings: &burki.STTSettings{
+        Provider: "deepgram",
+        Model:    "nova-2",
+        Language: "en-US",
+        FluxConfig: &burki.FluxConfig{
+            EotTimeoutMs: intPtr(2000),
+        },
+    },
+    InterruptionSettings: &burki.InterruptionSettings{
+        InterruptionThreshold: 3,
+        MinSpeakingTime:       0.5,
+    },
+    ToolsSettings: &burki.ToolsSettings{
+        EndCall: &burki.EndCallTool{
+            Enabled:   true,
+            Scenarios: []string{"user says goodbye"},
+        },
+        TransferCall: &burki.TransferCallTool{
+            Enabled:         true,
+            TransferNumbers: []string{"+14155551234"},
+        },
+    },
+    IdleMessage:     "Are you still there?",
+    MaxIdleMessages: &maxIdle,
+})
+```
+
+### Update an Assistant
+
+```go
+name := "Updated Bot"
+assistant, err := client.Assistants.Update(123, &burki.UpdateAssistantParams{
+    Name: &name,
+})
+```
+
+### Delete an Assistant
+
+```go
+err := client.Assistants.Delete(123)
+if err != nil {
+    log.Fatal(err)
+}
+```
+
+  </Tab>
+  <Tab title="Calls">
+
+### Initiate an Outbound Call
+
+```go
+response, err := client.Calls.Initiate(&burki.InitiateCallParams{
+    FromPhoneNumber: "+14155559999",
+    ToPhoneNumber:   "+14155551234",
+    WelcomeMessage:  "Hello! This is a follow-up call.",
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Printf("Call SID: %s\n", response.CallSID)
+```
+
+### List Calls
+
+```go
+calls, err := client.Calls.List(&burki.CallListParams{
+    Status: "completed",
+    Limit:  50,
+})
+```
+
+### Get Call Details
+
+```go
+// By ID
+call, err := client.Calls.Get(123)
+
+// By SID
+call, err := client.Calls.GetBySID("CA123...")
+```
+
+### Get Transcripts
+
+```go
+// By call ID
+transcripts, err := client.Calls.GetTranscripts(123, "", false)
+
+// By SID
+transcripts, err := client.Calls.GetTranscriptsBySID("CA123...", "", false)
+
+// Export transcripts (txt, json, csv)
+data, err := client.Calls.ExportTranscripts(123, "txt", "")
+```
+
+### Get Recordings
+
+```go
+// By call ID
+recordings, err := client.Calls.GetRecordings(123, "")
+
+// By SID
+recordings, err := client.Calls.GetRecordingsBySID("CA123...", "")
+
+// Get streaming URL
+url := client.Calls.GetRecordingURL(123, 456)
+```
+
+### Get Call Metrics
+
+```go
+metrics, err := client.Calls.GetMetrics(123)
+fmt.Printf("Duration: %d seconds\n", metrics.Duration)
+fmt.Printf("Avg latency: %d ms\n", metrics.AvgLatency)
+```
+
+### Get Messages & Webhook Logs
+
+```go
+// Get LLM conversation messages
+messages, err := client.Calls.GetMessages(123, "")
+
+// Get webhook logs
+logs, err := client.Calls.GetWebhookLogs(123, "")
+```
+
+### Update Metadata
+
+```go
+call, err := client.Calls.UpdateMetadata(123, map[string]interface{}{
+    "customer_name": "John Doe",
+    "priority":      "high",
+})
+```
+
+### Terminate a Call
+
+```go
+err := client.Calls.Terminate("CA123...")
+```
+
+### Analytics & Stats
+
+```go
+// Get analytics (1d, 7d, 30d, 90d)
+analytics, err := client.Calls.GetAnalytics("7d")
+
+// Get basic stats
+stats, err := client.Calls.GetStats()
+
+// Export calls data (csv, json)
+data, err := client.Calls.Export("csv", &burki.CallListParams{
+    Status: "completed",
+})
+
+// Search calls
+calls, err := client.Calls.Search("customer name", 50)
+```
+
+  </Tab>
+  <Tab title="Phone Numbers">
+
+### Search Available Numbers
+
+```go
+numbers, err := client.PhoneNumbers.Search(&burki.PhoneNumberSearchParams{
+    Country:  "US",
+    AreaCode: "415",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+for _, number := range numbers {
+    fmt.Printf("%s - %s\n", number.PhoneNumber, number.Locality)
+}
+```
+
+### Purchase a Number
+
+```go
+number, err := client.PhoneNumbers.Purchase(&burki.PhoneNumberPurchaseParams{
+    PhoneNumber: "+14155551234",
+    Provider:    "twilio",
+})
+```
+
+### Assign to Assistant
+
+```go
+number, err := client.PhoneNumbers.Assign(123, &burki.PhoneNumberAssignParams{
+    AssistantID: 456,
+})
+```
+
+### Release a Number
+
+```go
+err := client.PhoneNumbers.Release(123)
+```
+
+  </Tab>
+  <Tab title="Documents (RAG)">
+
+### Upload a Document
+
+```go
+// Upload from file path
+document, err := client.Documents.Upload(123, "/path/to/document.pdf", true)
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Printf("Uploaded: %s\n", document.Filename)
+```
+
+### Upload from URL
+
+```go
+document, err := client.Documents.UploadFromURL(123, &burki.DocumentUploadFromURLParams{
+    URL:         "https://example.com/document.pdf",
+    AutoProcess: true,
+})
+```
+
+### List Documents
+
+```go
+documents, err := client.Documents.List(123)
+for _, doc := range documents {
+    fmt.Printf("%s - %s\n", doc.Filename, doc.Status)
+}
+```
+
+### Check Processing Status
+
+```go
+status, err := client.Documents.GetStatus(456)
+fmt.Printf("Status: %s\n", status.ProcessingStatus)
+fmt.Printf("Chunks: %d\n", status.ChunkCount)
+```
+
+### Reprocess a Document
+
+```go
+document, err := client.Documents.Reprocess(456)
+```
+
+### Delete a Document
+
+```go
+err := client.Documents.Delete(456)
+```
+
+  </Tab>
+  <Tab title="Tools">
+
+### List Tools
+
+```go
+tools, err := client.Tools.List()
+```
+
+### Create an HTTP Tool
+
+```go
+tool, err := client.Tools.Create(&burki.CreateToolParams{
+    Name:        "check_inventory",
+    ToolType:    "http",
+    Description: "Check product inventory",
+    HTTPConfig: &burki.HTTPToolConfig{
+        Method: "GET",
+        URL:    "https://api.example.com/inventory",
+        Headers: map[string]string{
+            "Authorization": "Bearer {{API_KEY}}",
+        },
+    },
+})
+```
+
+### Assign Tool to Assistant
+
+```go
+err := client.Tools.Assign(123, 456)
+```
+
+### Discover AWS Lambda Functions
+
+```go
+lambdas, err := client.Tools.DiscoverLambda("us-east-1")
+for _, fn := range lambdas {
+    fmt.Printf("%s (%s)\n", fn.FunctionName, fn.Runtime)
+}
+```
+
+  </Tab>
+  <Tab title="SMS">
+
+### Send an SMS
+
+```go
+response, err := client.SMS.Send(&burki.SMSSendParams{
+    To:         "+14155551234",
+    FromNumber: "+14155559999",
+    Body:       "Hello from Burki!",
+})
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Printf("Message SID: %s\n", response.SID)
+```
+
+### Get Conversations
+
+```go
+conversations, err := client.SMS.GetConversations(123, 0, 50)
+for _, conv := range conversations {
+    fmt.Printf("%s: %d messages\n", conv.PhoneNumber, conv.MessageCount)
+}
+```
+
+  </Tab>
+  <Tab title="Campaigns">
+
+### Create a Campaign
+
+```go
+campaign, err := client.Campaigns.Create(&burki.CreateCampaignParams{
+    Name:        "Outreach Campaign",
+    AssistantID: 123,
+    Contacts: []burki.CampaignContact{
+        {PhoneNumber: "+14155551234", Name: "John"},
+        {PhoneNumber: "+14155555678", Name: "Jane"},
+    },
+})
+```
+
+### Start the Campaign
+
+```go
+campaign, err := client.Campaigns.Start(456)
+```
+
+### Pause the Campaign
+
+```go
+campaign, err := client.Campaigns.Pause(456)
+```
+
+### Get Campaign Progress
+
+```go
+progress, err := client.Campaigns.GetProgress(456)
+fmt.Printf("Completed: %d/%d\n", progress.CompletedContacts, progress.TotalContacts)
+fmt.Printf("Success rate: %.2f%%\n", progress.SuccessRate)
+```
+
+  </Tab>
+</Tabs>
+
+---
+
+## Real-time Streaming
+
+The Go SDK uses channels for real-time WebSocket streaming, providing an idiomatic Go experience.
+
+### Live Transcript Streaming
+
+```go
+// Create the stream
+stream := client.Realtime.LiveTranscript("CA123...")
+
+// Connect to WebSocket
+if err := stream.Connect(); err != nil {
+    log.Fatal(err)
+}
+defer stream.Close()
+
+// Optionally send ping to keep connection alive
+go func() {
+    for {
+        time.Sleep(30 * time.Second)
+        stream.SendPing()
+    }
+}()
+
+// Listen for events using select
+for {
+    select {
+    case event := <-stream.Events:
+        switch e := event.(type) {
+        case *burki.TranscriptEvent:
+            fmt.Printf("[%s]: %s\n", e.Speaker, e.Content)
+        case *burki.CallStatusEvent:
+            fmt.Printf("Call status: %s\n", e.Status)
+            if e.Status == "completed" {
+                return
+            }
+        }
+    case err := <-stream.Errors:
+        log.Printf("Error: %v\n", err)
+    case <-stream.Done:
+        fmt.Println("Stream closed")
+        return
+    }
+}
+```
+
+### Campaign Progress Streaming
+
+```go
+// Create the stream
+stream := client.Realtime.CampaignProgress(123)
+
+// Connect to WebSocket
+if err := stream.Connect(); err != nil {
+    log.Fatal(err)
+}
+defer stream.Close()
+
+// Listen for events
+for {
+    select {
+    case event := <-stream.Events:
+        switch e := event.(type) {
+        case *burki.CampaignProgressEvent:
+            fmt.Printf("Progress: %d/%d\n", e.CompletedContacts, e.TotalContacts)
+        case *burki.ContactCompletedEvent:
+            fmt.Printf("Completed: %s - %s\n", e.PhoneNumber, e.Outcome)
+        case *burki.CampaignCompletedEvent:
+            fmt.Printf("Campaign finished! Success rate: %.2f%%\n", e.SuccessRate)
+            return
+        }
+    case err := <-stream.Errors:
+        log.Printf("Error: %v\n", err)
+    case <-stream.Done:
+        fmt.Println("Stream closed")
+        return
+    }
+}
+```
+
+### Stream Methods
+
+```go
+// Connect to WebSocket
+err := stream.Connect()
+
+// Send ping for keepalive
+stream.SendPing()
+
+// Request current status
+stream.RequestStatus()
+
+// Close the connection
+stream.Close()
+
+// Channels available:
+// stream.Events - receives typed events
+// stream.Errors - receives errors
+// stream.Done   - signals stream closure
+```
+
+---
+
+## Error Handling
+
+The Go SDK provides typed errors that you can check using type assertions:
+
+```go
+import burki "github.com/burki-ai/burki-go/burki"
+
+client := burki.NewClient("your-api-key")
+
+assistant, err := client.Assistants.Get(999)
+if err != nil {
+    switch e := err.(type) {
+    case *burki.AuthenticationError:
+        fmt.Println("Invalid API key")
+    case *burki.NotFoundError:
+        fmt.Println("Assistant not found")
+    case *burki.ValidationError:
+        fmt.Printf("Validation error: %s\n", e.Message)
+        for field, msg := range e.FieldErrors {
+            fmt.Printf("  %s: %s\n", field, msg)
+        }
+    case *burki.RateLimitError:
+        fmt.Printf("Rate limited. Retry after %d seconds\n", e.RetryAfter)
+    case *burki.ServerError:
+        fmt.Println("Server error occurred")
+    default:
+        fmt.Printf("Unknown error: %v\n", err)
+    }
+    return
+}
+```
+
+### Error Types
+
+| Error Type | Description |
+|------------|-------------|
+| `AuthenticationError` | Invalid or missing API key |
+| `NotFoundError` | Resource not found (404) |
+| `ValidationError` | Invalid request parameters (400) |
+| `RateLimitError` | Too many requests (429) |
+| `ServerError` | Internal server error (5xx) |
+
+---
+
+## Complete Example
+
+Here's a complete example demonstrating the SDK's capabilities:
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "os"
+    "time"
+
+    burki "github.com/burki-ai/burki-go/burki"
+)
+
+func main() {
+    // Initialize client
+    client := burki.NewClient(os.Getenv("BURKI_API_KEY"))
+
+    // 1. Create an assistant
+    assistant, err := client.Assistants.Create(&burki.CreateAssistantParams{
+        Name:        "Sales Assistant",
+        Description: "Outbound sales assistant",
+        LLMSettings: &burki.LLMSettings{
+            SystemPrompt: `You are a friendly sales representative.
+                Your goal is to schedule product demos.`,
+            Temperature: 0.8,
+        },
+        TTSSettings: &burki.TTSSettings{
+            Provider: "elevenlabs",
+            VoiceID:  "adam",
+        },
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Created assistant: %s (ID: %d)\n", assistant.Name, assistant.ID)
+
+    // 2. Search and purchase a phone number
+    numbers, err := client.PhoneNumbers.Search(&burki.PhoneNumberSearchParams{
+        Country:  "US",
+        AreaCode: "415",
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    if len(numbers) > 0 {
+        purchased, err := client.PhoneNumbers.Purchase(&burki.PhoneNumberPurchaseParams{
+            PhoneNumber: numbers[0].PhoneNumber,
+            Provider:    "twilio",
+        })
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        _, err = client.PhoneNumbers.Assign(purchased.ID, &burki.PhoneNumberAssignParams{
+            AssistantID: assistant.ID,
+        })
+        if err != nil {
+            log.Fatal(err)
+        }
+        fmt.Printf("Assigned %s to assistant\n", purchased.PhoneNumber)
+    }
+
+    // 3. Upload knowledge document
+    doc, err := client.Documents.UploadFromURL(assistant.ID, &burki.DocumentUploadFromURLParams{
+        URL:         "https://example.com/product-guide.pdf",
+        AutoProcess: true,
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Uploaded document: %s\n", doc.Filename)
+
+    // 4. Create and start a campaign
+    campaign, err := client.Campaigns.Create(&burki.CreateCampaignParams{
+        Name:        "Q1 Outreach",
+        AssistantID: assistant.ID,
+        Contacts: []burki.CampaignContact{
+            {PhoneNumber: "+14155551234", Name: "John Smith"},
+            {PhoneNumber: "+14155555678", Name: "Jane Doe"},
+        },
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("Created campaign: %s\n", campaign.Name)
+
+    _, err = client.Campaigns.Start(campaign.ID)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println("Campaign started!")
+
+    // 5. Monitor campaign progress
+    stream := client.Realtime.CampaignProgress(campaign.ID)
+    if err := stream.Connect(); err != nil {
+        log.Fatal(err)
+    }
+    defer stream.Close()
+
+    // Keepalive goroutine
+    go func() {
+        ticker := time.NewTicker(30 * time.Second)
+        defer ticker.Stop()
+        for range ticker.C {
+            stream.SendPing()
+        }
+    }()
+
+    // Listen for events
+    for {
+        select {
+        case event := <-stream.Events:
+            switch e := event.(type) {
+            case *burki.CampaignProgressEvent:
+                fmt.Printf("Progress: %d/%d\n", e.CompletedContacts, e.TotalContacts)
+            case *burki.ContactCompletedEvent:
+                fmt.Printf("Completed: %s - %s\n", e.PhoneNumber, e.Outcome)
+            case *burki.CampaignCompletedEvent:
+                fmt.Printf("\nCampaign finished!\n")
+                fmt.Printf("Success rate: %.2f%%\n", e.SuccessRate)
+                fmt.Printf("Total calls: %d\n", e.TotalContacts)
+                return
+            }
+        case err := <-stream.Errors:
+            log.Printf("Error: %v\n", err)
+        case <-stream.Done:
+            fmt.Println("Stream closed")
+            return
+        }
+    }
+}
+
+// Helper function for pointer values
+func intPtr(i int) *int {
+    return &i
+}
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="/sdks/python">
+    Check out the Python SDK with async support
+  </Card>
+  <Card title="JavaScript SDK" icon="js" href="/sdks/javascript">
+    TypeScript-first SDK with full types
+  </Card>
+  <Card title="Real-time Streaming" icon="bolt" href="/sdks/realtime">
+    Deep dive into WebSocket streaming
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Complete REST API documentation
+  </Card>
+</CardGroup>

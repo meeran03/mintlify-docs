@@ -1,0 +1,184 @@
+---
+title: 'Preview Template'
+openapi: 'POST /api/v1/campaigns/template-preview'
+---
+
+Preview how a template will render with sample variable values. Use this to test and validate your templates before starting a campaign.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `template` | string | Yes | Template string to preview |
+| `variables` | object | No | Sample variable values |
+
+### Template Syntax
+
+Templates use Jinja2-style syntax:
+
+| Syntax | Description |
+|--------|-------------|
+| `{{variable}}` | Insert variable value |
+| `{{variable\|filter}}` | Apply filter to variable |
+| `{{variable\|default('fallback')}}` | Use fallback if missing |
+
+### Available Filters
+
+| Filter | Description | Example |
+|--------|-------------|---------|
+| `phone_format` | Format phone number | `(555) 123-4567` |
+| `title_case` | Capitalize words | `John Smith` |
+| `upper` | UPPERCASE | `JOHN SMITH` |
+| `lower` | lowercase | `john smith` |
+| `default(value)` | Fallback value | Use if variable missing |
+
+### System Variables
+
+These are always available:
+
+| Variable | Default Value |
+|----------|---------------|
+| `assistant_name` | `"your assistant"` |
+| `company` | `"our company"` |
+| `name` | `"there"` |
+
+### Example Request
+
+```json Request Body
+{
+  "template": "Hi {{name|title_case}}, this is {{assistant_name}} from {{company}}. I'm calling about your appointment on {{appointment_date}}.",
+  "variables": {
+    "name": "john smith",
+    "assistant_name": "Sarah",
+    "company": "Acme Healthcare",
+    "appointment_date": "February 15th"
+  }
+}
+```
+
+### Response
+
+```json Response
+{
+  "success": true,
+  "rendered_template": "Hi John Smith, this is Sarah from Acme Healthcare. I'm calling about your appointment on February 15th."
+}
+```
+
+### Example with Missing Variables
+
+Request with missing `appointment_date`:
+
+```json Request Body
+{
+  "template": "Hi {{name|default('there')}}, your appointment is on {{appointment_date|default('your scheduled date')}}.",
+  "variables": {
+    "name": "John"
+  }
+}
+```
+
+```json Response
+{
+  "success": true,
+  "rendered_template": "Hi John, your appointment is on your scheduled date."
+}
+```
+
+### Example Code
+
+```bash cURL
+curl -X POST "https://api.burki.dev/api/v1/campaigns/template-preview" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": "Hi {{name}}, this is {{assistant_name}} calling.",
+    "variables": {
+      "name": "John",
+      "assistant_name": "Sarah"
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://api.burki.dev/api/v1/campaigns/template-preview",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={
+        "template": "Hi {{name|title_case}}, this is {{assistant_name}}.",
+        "variables": {
+            "name": "john smith",
+            "assistant_name": "Sarah"
+        }
+    }
+)
+
+result = response.json()
+if result["success"]:
+    print(f"Preview: {result['rendered_template']}")
+else:
+    print("Template error occurred")
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/template-preview", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    template: "Hi {{name|title_case}}, this is {{assistant_name}}.",
+    variables: {
+      name: "john smith",
+      assistant_name: "Sarah"
+    }
+  })
+});
+
+const result = await response.json();
+if (result.success) {
+  console.log(`Preview: ${result.rendered_template}`);
+}
+```
+
+### Template Examples
+
+**Welcome message:**
+```text
+Hi {{name|title_case}}, this is {{assistant_name}} from {{company}}. 
+How are you today?
+```
+
+**Appointment reminder:**
+```text
+I'm calling to remind you about your {{appointment_type|default('appointment')}} 
+scheduled for {{appointment_date}} at {{appointment_time|default('your scheduled time')}}.
+```
+
+**SMS message:**
+```text
+Hi {{name}}, reminder: You have an appointment at {{company}} on {{date}}. 
+Reply CONFIRM to confirm or call us to reschedule.
+```
+
+### Error Handling
+
+If template has syntax errors:
+
+```json Response (Error)
+{
+  "success": false,
+  "rendered_template": "[Template Error: unexpected '}'...] Original template here..."
+}
+```
+
+### Best Practices
+
+1. **Always test templates** before starting campaigns
+2. **Use default filters** for optional variables
+3. **Keep templates concise** - especially for SMS
+4. **Use title_case** for names to handle different input formats
+5. **Test with empty variables** to ensure fallbacks work

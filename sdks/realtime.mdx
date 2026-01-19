@@ -1,0 +1,763 @@
+---
+title: Real-time Streaming
+description: "WebSocket streaming for live transcripts and campaign progress across all Burki SDKs"
+---
+
+<Info>
+All Burki SDKs support real-time WebSocket streaming for live transcripts during calls and campaign progress monitoring. This enables building powerful real-time dashboards, monitoring tools, and analytics systems.
+</Info>
+
+## Overview
+
+Burki provides two real-time streaming endpoints:
+
+| Feature | Description | Use Cases |
+|---------|-------------|-----------|
+| **Live Transcripts** | Stream real-time transcriptions during active calls | Call monitoring, live captions, sentiment analysis |
+| **Campaign Progress** | Stream campaign execution updates | Progress dashboards, real-time analytics, alerting |
+
+---
+
+## Live Transcript Streaming
+
+Stream real-time transcripts as they are generated during calls. Perfect for building:
+
+- Call monitoring dashboards
+- Live supervisor interfaces
+- Real-time sentiment analysis
+- Accessibility features (live captions)
+- Training and coaching tools
+
+### Event Types
+
+| Event Type | Description |
+|------------|-------------|
+| `connection_established` | WebSocket connection successful |
+| `transcript` | New transcript segment from user or assistant |
+| `call_status` | Call status change (in-progress, completed, failed) |
+| `error` | Error message |
+| `pong` | Response to ping (keepalive) |
+
+### Transcript Event Data
+
+```json
+{
+  "type": "transcript",
+  "call_sid": "CA123abc...",
+  "timestamp": "2026-01-19T12:00:05.123Z",
+  "data": {
+    "content": "Hello, how can I help you today?",
+    "speaker": "assistant",
+    "is_final": true,
+    "confidence": 0.95,
+    "segment_start": 5.2,
+    "segment_end": 7.1,
+    "created_at": "2026-01-19T12:00:05.123Z"
+  }
+}
+```
+
+### Implementation Examples
+
+<Tabs>
+  <Tab title="Python">
+
+The Python SDK uses async context managers for streaming:
+
+```python
+import asyncio
+from burki import BurkiClient
+
+async def monitor_call(call_sid: str):
+    client = BurkiClient(api_key="your-api-key")
+    
+    async with client.realtime.live_transcript(call_sid=call_sid) as stream:
+        async for event in stream:
+            if event.type == "transcript":
+                speaker = event.data.speaker
+                content = event.data.content
+                print(f"[{speaker}]: {content}")
+                
+            elif event.type == "call_status":
+                print(f"Call status: {event.status}")
+                if event.status == "completed":
+                    break
+                    
+            elif event.type == "error":
+                print(f"Error: {event.message}")
+                break
+
+# Run the monitor
+asyncio.run(monitor_call("CA123abc..."))
+```
+
+**Features:**
+- Automatic connection management with context manager
+- Async iteration for events
+- Clean disconnection on exit
+
+  </Tab>
+  <Tab title="JavaScript">
+
+The JavaScript SDK uses async iterators:
+
+```typescript
+import { BurkiClient } from '@burki.dev/sdk';
+
+async function monitorCall(callSid: string) {
+  const client = new BurkiClient({ apiKey: 'your-api-key' });
+  
+  const stream = client.realtime.liveTranscript(callSid);
+  await stream.connect();
+
+  try {
+    for await (const event of stream) {
+      switch (event.type) {
+        case 'transcript':
+          console.log(`[${event.speaker}]: ${event.content}`);
+          break;
+          
+        case 'call_status':
+          console.log(`Call status: ${event.status}`);
+          if (event.status === 'completed') {
+            stream.disconnect();
+            return;
+          }
+          break;
+          
+        case 'error':
+          console.error(`Error: ${event.message}`);
+          stream.disconnect();
+          return;
+      }
+    }
+  } finally {
+    stream.disconnect();
+  }
+}
+
+monitorCall('CA123abc...');
+```
+
+**Features:**
+- Async iterator pattern (`for await...of`)
+- Explicit connect/disconnect control
+- TypeScript type safety
+
+  </Tab>
+  <Tab title="Go">
+
+The Go SDK uses channels for event streaming:
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "time"
+
+    burki "github.com/burki-ai/burki-go/burki"
+)
+
+func monitorCall(callSID string) {
+    client := burki.NewClient("your-api-key")
+    
+    stream := client.Realtime.LiveTranscript(callSID)
+    if err := stream.Connect(); err != nil {
+        log.Fatal(err)
+    }
+    defer stream.Close()
+
+    // Keepalive goroutine
+    go func() {
+        ticker := time.NewTicker(30 * time.Second)
+        defer ticker.Stop()
+        for range ticker.C {
+            stream.SendPing()
+        }
+    }()
+
+    // Event loop using select
+    for {
+        select {
+        case event := <-stream.Events:
+            switch e := event.(type) {
+            case *burki.TranscriptEvent:
+                fmt.Printf("[%s]: %s\n", e.Speaker, e.Content)
+            case *burki.CallStatusEvent:
+                fmt.Printf("Call status: %s\n", e.Status)
+                if e.Status == "completed" {
+                    return
+                }
+            }
+        case err := <-stream.Errors:
+            log.Printf("Error: %v\n", err)
+            return
+        case <-stream.Done:
+            fmt.Println("Stream closed")
+            return
+        }
+    }
+}
+```
+
+**Features:**
+- Channel-based event delivery
+- Select statement for concurrent handling
+- Explicit goroutine management
+
+  </Tab>
+</Tabs>
+
+---
+
+## Campaign Progress Streaming
+
+Monitor campaign execution in real-time. Perfect for building:
+
+- Campaign progress dashboards
+- Real-time analytics displays
+- Automated alerting systems
+- Performance monitoring tools
+
+### Event Types
+
+| Event Type | Description |
+|------------|-------------|
+| `connection_established` | WebSocket connection successful |
+| `progress` | Periodic progress update with counts |
+| `contact_completed` | Individual contact call completed |
+| `campaign_completed` | Campaign finished (all contacts processed) |
+| `error` | Error message |
+
+### Progress Event Data
+
+```json
+{
+  "type": "progress",
+  "campaign_id": 123,
+  "timestamp": "2026-01-19T12:05:00.000Z",
+  "data": {
+    "total_contacts": 100,
+    "completed_contacts": 45,
+    "successful_contacts": 38,
+    "failed_contacts": 7,
+    "pending_contacts": 55,
+    "success_rate": 84.4
+  }
+}
+```
+
+### Contact Completed Event
+
+```json
+{
+  "type": "contact_completed",
+  "campaign_id": 123,
+  "timestamp": "2026-01-19T12:05:30.000Z",
+  "data": {
+    "phone_number": "+14155551234",
+    "name": "John Smith",
+    "outcome": "success",
+    "duration": 125,
+    "call_sid": "CA456def..."
+  }
+}
+```
+
+### Implementation Examples
+
+<Tabs>
+  <Tab title="Python">
+
+```python
+import asyncio
+from burki import BurkiClient
+
+async def monitor_campaign(campaign_id: int):
+    client = BurkiClient(api_key="your-api-key")
+    
+    async with client.realtime.campaign_progress(campaign_id=campaign_id) as stream:
+        async for event in stream:
+            if event.type == "progress":
+                completed = event.data.completed_contacts
+                total = event.data.total_contacts
+                rate = event.data.success_rate
+                print(f"Progress: {completed}/{total} ({rate:.1f}% success)")
+                
+            elif event.type == "contact_completed":
+                phone = event.data.phone_number
+                outcome = event.data.outcome
+                print(f"Completed: {phone} - {outcome}")
+                
+            elif event.type == "campaign_completed":
+                print(f"\nCampaign finished!")
+                print(f"Total contacts: {event.data.total_contacts}")
+                print(f"Success rate: {event.data.success_rate:.1f}%")
+                break
+
+# Run the monitor
+asyncio.run(monitor_campaign(123))
+```
+
+  </Tab>
+  <Tab title="JavaScript">
+
+```typescript
+import { BurkiClient } from '@burki.dev/sdk';
+
+async function monitorCampaign(campaignId: number) {
+  const client = new BurkiClient({ apiKey: 'your-api-key' });
+  
+  const stream = client.realtime.campaignProgress(campaignId);
+  await stream.connect();
+
+  for await (const event of stream) {
+    switch (event.type) {
+      case 'progress':
+        console.log(
+          `Progress: ${event.completedContacts}/${event.totalContacts} ` +
+          `(${event.successRate.toFixed(1)}% success)`
+        );
+        break;
+        
+      case 'contact_completed':
+        console.log(`Completed: ${event.phoneNumber} - ${event.outcome}`);
+        break;
+        
+      case 'campaign_completed':
+        console.log('\nCampaign finished!');
+        console.log(`Total contacts: ${event.totalContacts}`);
+        console.log(`Success rate: ${event.successRate.toFixed(1)}%`);
+        stream.disconnect();
+        return;
+    }
+  }
+}
+
+monitorCampaign(123);
+```
+
+  </Tab>
+  <Tab title="Go">
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "time"
+
+    burki "github.com/burki-ai/burki-go/burki"
+)
+
+func monitorCampaign(campaignID int) {
+    client := burki.NewClient("your-api-key")
+    
+    stream := client.Realtime.CampaignProgress(campaignID)
+    if err := stream.Connect(); err != nil {
+        log.Fatal(err)
+    }
+    defer stream.Close()
+
+    // Keepalive
+    go func() {
+        ticker := time.NewTicker(30 * time.Second)
+        defer ticker.Stop()
+        for range ticker.C {
+            stream.SendPing()
+        }
+    }()
+
+    for {
+        select {
+        case event := <-stream.Events:
+            switch e := event.(type) {
+            case *burki.CampaignProgressEvent:
+                fmt.Printf("Progress: %d/%d (%.1f%% success)\n",
+                    e.CompletedContacts, e.TotalContacts, e.SuccessRate)
+            case *burki.ContactCompletedEvent:
+                fmt.Printf("Completed: %s - %s\n", e.PhoneNumber, e.Outcome)
+            case *burki.CampaignCompletedEvent:
+                fmt.Printf("\nCampaign finished!\n")
+                fmt.Printf("Total contacts: %d\n", e.TotalContacts)
+                fmt.Printf("Success rate: %.1f%%\n", e.SuccessRate)
+                return
+            }
+        case err := <-stream.Errors:
+            log.Printf("Error: %v\n", err)
+            return
+        case <-stream.Done:
+            return
+        }
+    }
+}
+```
+
+  </Tab>
+</Tabs>
+
+---
+
+## Connection Management
+
+### Keepalive / Ping
+
+Send periodic pings to keep the WebSocket connection alive, especially for long-running sessions:
+
+<CodeGroup>
+```python Python
+import asyncio
+
+async def with_keepalive(stream, interval=30):
+    async def ping_loop():
+        while True:
+            await asyncio.sleep(interval)
+            await stream.send_ping()
+    
+    # Start ping task
+    ping_task = asyncio.create_task(ping_loop())
+    
+    try:
+        async for event in stream:
+            yield event
+    finally:
+        ping_task.cancel()
+```
+
+```typescript JavaScript
+const stream = client.realtime.liveTranscript(callSid);
+await stream.connect();
+
+// Send ping every 30 seconds
+const pingInterval = setInterval(() => {
+  stream.sendPing();
+}, 30000);
+
+// Clean up on disconnect
+stream.on('disconnect', () => {
+  clearInterval(pingInterval);
+});
+```
+
+```go Go
+// Keepalive goroutine
+go func() {
+    ticker := time.NewTicker(30 * time.Second)
+    defer ticker.Stop()
+    for range ticker.C {
+        stream.SendPing()
+    }
+}()
+```
+</CodeGroup>
+
+### Reconnection Strategy
+
+Implement exponential backoff for automatic reconnection:
+
+<CodeGroup>
+```python Python
+import asyncio
+from burki import BurkiClient
+
+async def resilient_stream(call_sid: str, max_retries=5):
+    client = BurkiClient(api_key="your-api-key")
+    retries = 0
+    
+    while retries < max_retries:
+        try:
+            async with client.realtime.live_transcript(call_sid) as stream:
+                retries = 0  # Reset on successful connection
+                async for event in stream:
+                    yield event
+                    
+        except Exception as e:
+            retries += 1
+            if retries >= max_retries:
+                raise
+            
+            # Exponential backoff
+            delay = min(2 ** retries, 60)
+            print(f"Reconnecting in {delay}s (attempt {retries})")
+            await asyncio.sleep(delay)
+```
+
+```typescript JavaScript
+class ResilientStream {
+  private maxRetries = 5;
+  private retries = 0;
+  
+  async *connect(callSid: string) {
+    while (this.retries < this.maxRetries) {
+      try {
+        const stream = client.realtime.liveTranscript(callSid);
+        await stream.connect();
+        
+        this.retries = 0; // Reset on success
+        
+        for await (const event of stream) {
+          yield event;
+        }
+        
+      } catch (error) {
+        this.retries++;
+        if (this.retries >= this.maxRetries) {
+          throw error;
+        }
+        
+        const delay = Math.min(Math.pow(2, this.retries) * 1000, 60000);
+        console.log(`Reconnecting in ${delay}ms (attempt ${this.retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+}
+```
+
+```go Go
+func resilientStream(callSID string, maxRetries int) error {
+    client := burki.NewClient(os.Getenv("BURKI_API_KEY"))
+    retries := 0
+    
+    for retries < maxRetries {
+        stream := client.Realtime.LiveTranscript(callSID)
+        err := stream.Connect()
+        if err != nil {
+            retries++
+            if retries >= maxRetries {
+                return err
+            }
+            delay := time.Duration(math.Min(float64(1<<retries), 60)) * time.Second
+            log.Printf("Reconnecting in %v (attempt %d)", delay, retries)
+            time.Sleep(delay)
+            continue
+        }
+        
+        retries = 0 // Reset on success
+        
+        // Process events...
+        for {
+            select {
+            case event := <-stream.Events:
+                // Handle event
+            case <-stream.Done:
+                // Reconnect
+                break
+            }
+        }
+    }
+    return nil
+}
+```
+</CodeGroup>
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="When to Use Streaming vs Polling">
+
+**Use Streaming When:**
+- You need real-time updates (< 1 second latency)
+- Building live dashboards or monitoring interfaces
+- Processing events as they happen (e.g., sentiment analysis)
+- Monitoring long-running operations (campaigns, calls)
+
+**Use Polling When:**
+- Periodic status checks are sufficient (> 30 seconds)
+- Simple status display without live updates
+- Lower resource usage is a priority
+- Connection stability is a concern
+
+</Accordion>
+
+<Accordion title="Resource Management">
+
+**Always Clean Up:**
+- Close streams when done (`close()`, `disconnect()`, or context manager exit)
+- Cancel keepalive tasks/goroutines
+- Handle disconnection events gracefully
+
+**Memory Considerations:**
+- Don't store all events in memory for long streams
+- Process or persist events as they arrive
+- Use bounded buffers if accumulating data
+
+**Connection Limits:**
+- Maximum 10 concurrent connections per call
+- Maximum 100 messages per second per connection
+- Consider connection pooling for multiple streams
+
+</Accordion>
+
+<Accordion title="Error Handling">
+
+**Handle All Error Types:**
+- Connection errors (network issues)
+- Authentication errors (invalid API key)
+- Not found errors (invalid call_sid or campaign_id)
+- Rate limit errors (too many connections)
+
+**Graceful Degradation:**
+- Fall back to polling if streaming fails
+- Show stale data with "updating..." indicator
+- Log errors for debugging
+
+**User Experience:**
+- Show connection status to users
+- Indicate when data may be stale
+- Provide manual refresh option
+
+</Accordion>
+
+<Accordion title="Security Considerations">
+
+**API Key Protection:**
+- Never expose API keys in client-side code (browser)
+- Use server-side proxies for browser applications
+- Store keys in environment variables
+
+**Data Privacy:**
+- Transcripts may contain sensitive information
+- Implement appropriate access controls
+- Consider data retention policies
+
+**Connection Security:**
+- Always use WSS (WebSocket Secure) in production
+- Validate SSL certificates
+- Implement authentication tokens if needed
+
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Use Case Examples
+
+### Call Monitoring Dashboard
+
+Build a real-time call center monitoring interface:
+
+```typescript
+class CallMonitoringDashboard {
+  private activeStreams = new Map<string, RealtimeStream>();
+  
+  async monitorCall(callSid: string, displayElement: HTMLElement) {
+    const stream = client.realtime.liveTranscript(callSid);
+    await stream.connect();
+    
+    this.activeStreams.set(callSid, stream);
+    
+    for await (const event of stream) {
+      if (event.type === 'transcript') {
+        this.updateTranscriptDisplay(displayElement, event);
+      } else if (event.type === 'call_status' && event.status === 'completed') {
+        this.stopMonitoring(callSid);
+        break;
+      }
+    }
+  }
+  
+  stopMonitoring(callSid: string) {
+    const stream = this.activeStreams.get(callSid);
+    if (stream) {
+      stream.disconnect();
+      this.activeStreams.delete(callSid);
+    }
+  }
+  
+  stopAll() {
+    for (const [callSid, stream] of this.activeStreams) {
+      stream.disconnect();
+    }
+    this.activeStreams.clear();
+  }
+}
+```
+
+### Real-time Sentiment Analysis
+
+Analyze call sentiment as transcripts arrive:
+
+```python
+from textblob import TextBlob
+
+async def analyze_sentiment(call_sid: str):
+    client = BurkiClient(api_key="your-api-key")
+    sentiment_scores = []
+    
+    async with client.realtime.live_transcript(call_sid) as stream:
+        async for event in stream:
+            if event.type == "transcript" and event.data.speaker == "user":
+                # Analyze user sentiment
+                blob = TextBlob(event.data.content)
+                score = blob.sentiment.polarity
+                sentiment_scores.append(score)
+                
+                # Alert on negative sentiment
+                if score < -0.5:
+                    await alert_supervisor(call_sid, event.data.content, score)
+                
+                # Calculate rolling average
+                avg = sum(sentiment_scores[-10:]) / min(len(sentiment_scores), 10)
+                print(f"Rolling sentiment: {avg:.2f}")
+```
+
+### Campaign Progress Webhook
+
+Forward campaign events to external systems:
+
+```go
+func forwardCampaignEvents(campaignID int, webhookURL string) {
+    client := burki.NewClient(os.Getenv("BURKI_API_KEY"))
+    stream := client.Realtime.CampaignProgress(campaignID)
+    
+    if err := stream.Connect(); err != nil {
+        log.Fatal(err)
+    }
+    defer stream.Close()
+
+    httpClient := &http.Client{Timeout: 10 * time.Second}
+    
+    for {
+        select {
+        case event := <-stream.Events:
+            // Forward to webhook
+            jsonData, _ := json.Marshal(event)
+            resp, err := httpClient.Post(webhookURL, "application/json", 
+                bytes.NewBuffer(jsonData))
+            if err != nil {
+                log.Printf("Webhook error: %v", err)
+            } else {
+                resp.Body.Close()
+            }
+            
+        case <-stream.Done:
+            return
+        }
+    }
+}
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="/sdks/python">
+    Full Python SDK documentation
+  </Card>
+  <Card title="JavaScript SDK" icon="js" href="/sdks/javascript">
+    Full JavaScript/TypeScript SDK documentation
+  </Card>
+  <Card title="Go SDK" icon="golang" href="/sdks/go">
+    Full Go SDK documentation
+  </Card>
+  <Card title="Live Transcript API" icon="code" href="/api-reference/websockets/live-transcript">
+    REST API WebSocket reference
+  </Card>
+</CardGroup>

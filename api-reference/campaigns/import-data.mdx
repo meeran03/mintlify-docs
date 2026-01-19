@@ -1,0 +1,174 @@
+---
+title: 'Import Campaign Contacts'
+openapi: 'POST /api/v1/campaigns/{campaign_id}/import-data'
+---
+
+Bulk import contacts from a CSV file into a campaign. The endpoint validates phone numbers, detects duplicates, and maps columns to contact fields.
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Request
+
+This endpoint accepts `multipart/form-data` with the following fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `file` | file | Yes | CSV file with contacts |
+| `column_mappings` | string | No | JSON string mapping CSV columns to fields |
+
+### CSV Format Requirements
+
+- **Required column**: Phone number (auto-detected or mapped)
+- **Recommended**: Header row with column names
+- **Encoding**: UTF-8
+- **Delimiter**: Comma (,)
+
+### Phone Number Validation
+
+Phone numbers are automatically normalized to E.164 format:
+
+| Input Format | Normalized Output |
+|--------------|-------------------|
+| `5551234567` | `+15551234567` |
+| `1-555-123-4567` | `+15551234567` |
+| `(555) 123-4567` | `+15551234567` |
+| `+15551234567` | `+15551234567` |
+
+### Column Mapping
+
+The system auto-detects common column names:
+
+| CSV Column Names | Maps To |
+|------------------|---------|
+| phone, phone_number, mobile, cell | `phone_number` |
+| name, full_name, contact_name | `name` |
+| email, email_address | `email` |
+| company, organization | `company` |
+
+For custom mappings, provide a JSON object:
+
+```json
+{
+  "Phone Number": "phone_number",
+  "Customer Name": "name",
+  "Appt Date": "appointment_date"
+}
+```
+
+### Example CSV
+
+```csv
+Phone Number,Customer Name,Company,Appointment Date
+5551234567,John Smith,Acme Corp,2024-02-15
+5559876543,Jane Doe,Tech Inc,2024-02-16
+```
+
+### Response
+
+```json Response
+{
+  "success": true,
+  "message": "Successfully imported 250 contacts",
+  "imported_count": 250,
+  "total_contacts": 250,
+  "file_name": "contacts_february.csv",
+  "import_date": "2024-02-01T10:30:00Z"
+}
+```
+
+### Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `success` | Whether import succeeded |
+| `message` | Human-readable status |
+| `imported_count` | Number of contacts imported |
+| `total_contacts` | Total contacts in campaign after import |
+| `file_name` | Original filename |
+| `import_date` | Import timestamp |
+
+### Example Code
+
+```bash cURL
+curl -X POST "https://api.burki.dev/api/v1/campaigns/42/import-data" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -F "file=@contacts.csv" \
+  -F 'column_mappings={"Phone": "phone_number", "Name": "name"}'
+```
+
+```python Python
+import requests
+
+# Simple import
+with open("contacts.csv", "rb") as f:
+    response = requests.post(
+        "https://api.burki.dev/api/v1/campaigns/42/import-data",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        files={"file": ("contacts.csv", f, "text/csv")}
+    )
+
+result = response.json()
+print(f"Imported {result['imported_count']} contacts")
+
+# With custom column mappings
+import json
+
+with open("contacts.csv", "rb") as f:
+    response = requests.post(
+        "https://api.burki.dev/api/v1/campaigns/42/import-data",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        files={"file": ("contacts.csv", f, "text/csv")},
+        data={
+            "column_mappings": json.dumps({
+                "Phone": "phone_number",
+                "Customer Name": "name",
+                "Appt Date": "appointment_date"
+            })
+        }
+    )
+```
+
+```javascript JavaScript
+const formData = new FormData();
+formData.append("file", fileInput.files[0]);
+formData.append("column_mappings", JSON.stringify({
+  "Phone": "phone_number",
+  "Name": "name"
+}));
+
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/42/import-data", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY"
+  },
+  body: formData
+});
+
+const result = await response.json();
+console.log(`Imported ${result.imported_count} contacts`);
+```
+
+### Behavior
+
+- **Existing contacts** with same phone number are skipped (not duplicated)
+- **Pending/skipped contacts** from previous imports are deleted before new import
+- **Completed/failed contacts** are preserved for history
+- **All custom columns** become template variables
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Invalid file format or empty file |
+| 404 | Campaign not found |
+| 500 | Import processing failed |
+
+### Best Practices
+
+1. **Validate data** before importing - check phone number formats
+2. **Use consistent column names** across imports
+3. **Include name column** for better personalization
+4. **Remove duplicates** in your source data
+5. **Test with small file** before large imports

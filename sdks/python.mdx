@@ -1,0 +1,603 @@
+---
+title: Python SDK
+description: "Official Python SDK for the Burki Voice AI Platform"
+---
+
+<Info>
+The Burki Python SDK provides a simple, Pythonic interface to the Burki Voice AI API with support for both synchronous and asynchronous operations.
+</Info>
+
+## Installation
+
+```bash
+pip install burki
+```
+
+**Requirements:** Python 3.8+
+
+---
+
+## Quick Start
+
+```python
+from burki import BurkiClient
+
+# Initialize the client
+client = BurkiClient(api_key="your-api-key")
+
+# List all assistants
+assistants = client.assistants.list()
+for assistant in assistants:
+    print(f"{assistant.id}: {assistant.name}")
+
+# Create a new assistant
+assistant = client.assistants.create(
+    name="Support Bot",
+    description="Customer support assistant",
+    llm_settings={
+        "model": "gpt-4o-mini",
+        "temperature": 0.7,
+        "system_prompt": "You are a helpful customer support agent."
+    },
+    tts_settings={
+        "provider": "elevenlabs",
+        "voice_id": "rachel"
+    }
+)
+```
+
+---
+
+## Configuration
+
+### Basic Configuration
+
+```python
+client = BurkiClient(api_key="your-api-key")
+```
+
+### Custom Base URL
+
+```python
+client = BurkiClient(
+    api_key="your-api-key",
+    base_url="https://custom.burki.dev"
+)
+```
+
+### Timeout Settings
+
+```python
+client = BurkiClient(
+    api_key="your-api-key",
+    timeout=30.0  # seconds
+)
+```
+
+### Using Environment Variables
+
+```python
+import os
+from burki import BurkiClient
+
+client = BurkiClient(api_key=os.environ["BURKI_API_KEY"])
+```
+
+---
+
+## Resources
+
+<Tabs>
+  <Tab title="Assistants">
+
+### List Assistants
+
+```python
+assistants = client.assistants.list()
+```
+
+### Get a Specific Assistant
+
+```python
+assistant = client.assistants.get(assistant_id=123)
+```
+
+### Create an Assistant
+
+```python
+assistant = client.assistants.create(
+    name="My Bot",
+    description="A helpful assistant",
+    llm_settings={
+        "model": "gpt-4o-mini",
+        "temperature": 0.7,
+        "system_prompt": "You are helpful."
+    },
+    tts_settings={
+        "provider": "elevenlabs",
+        "voice_id": "rachel"
+    }
+)
+```
+
+### Update an Assistant
+
+```python
+assistant = client.assistants.update(
+    assistant_id=123,
+    name="Updated Bot",
+    description="Updated description"
+)
+```
+
+### Delete an Assistant
+
+```python
+client.assistants.delete(assistant_id=123)
+```
+
+  </Tab>
+  <Tab title="Calls">
+
+### Initiate an Outbound Call
+
+```python
+response = client.calls.initiate(
+    from_phone_number="+14155559999",
+    to_phone_number="+14155551234",
+    welcome_message="Hello! This is a follow-up call.",
+    agenda="Discuss the recent proposal"
+)
+```
+
+### List Calls with Filters
+
+```python
+calls = client.calls.list(
+    status="completed",
+    date_from="2026-01-01",
+    limit=50
+)
+```
+
+### Get Call Details
+
+```python
+call = client.calls.get(call_id=123)
+```
+
+### Get Call Transcripts
+
+```python
+transcripts = client.calls.get_transcripts(call_id=123)
+for transcript in transcripts:
+    print(f"{transcript.speaker}: {transcript.content}")
+```
+
+### Get Call Recordings
+
+```python
+recordings = client.calls.get_recordings(call_id=123)
+```
+
+### Get Call Metrics
+
+```python
+metrics = client.calls.get_metrics(call_id=123)
+print(f"Duration: {metrics.duration}s")
+print(f"Latency: {metrics.avg_latency}ms")
+```
+
+### Terminate an Ongoing Call
+
+```python
+client.calls.terminate(call_sid="CA123...")
+```
+
+  </Tab>
+  <Tab title="Phone Numbers">
+
+### Search Available Numbers
+
+```python
+numbers = client.phone_numbers.search(
+    country="US",
+    area_code="415"
+)
+
+for number in numbers:
+    print(f"{number.phone_number} - {number.locality}")
+```
+
+### Purchase a Number
+
+```python
+number = client.phone_numbers.purchase(
+    phone_number="+14155551234",
+    provider="twilio"
+)
+```
+
+### Assign to an Assistant
+
+```python
+client.phone_numbers.assign(
+    phone_number_id=123,
+    assistant_id=456
+)
+```
+
+### Release a Number
+
+```python
+client.phone_numbers.release(phone_number_id=123)
+```
+
+  </Tab>
+  <Tab title="Documents (RAG)">
+
+### Upload a Document
+
+```python
+document = client.documents.upload(
+    assistant_id=123,
+    file_path="knowledge.pdf"
+)
+print(f"Uploaded: {document.filename}")
+```
+
+### List Documents
+
+```python
+documents = client.documents.list(assistant_id=123)
+for doc in documents:
+    print(f"{doc.filename} - {doc.status}")
+```
+
+### Check Processing Status
+
+```python
+status = client.documents.get_status(document_id=456)
+print(f"Status: {status.processing_status}")
+print(f"Chunks: {status.chunk_count}")
+```
+
+### Delete a Document
+
+```python
+client.documents.delete(document_id=456)
+```
+
+  </Tab>
+  <Tab title="Tools">
+
+### List Tools
+
+```python
+tools = client.tools.list()
+```
+
+### Create an HTTP Tool
+
+```python
+tool = client.tools.create(
+    name="check_inventory",
+    tool_type="http",
+    description="Check product inventory",
+    config={
+        "method": "GET",
+        "url": "https://api.example.com/inventory",
+        "headers": {"Authorization": "Bearer {{API_KEY}}"}
+    }
+)
+```
+
+### Assign Tool to Assistant
+
+```python
+client.tools.assign(tool_id=123, assistant_id=456)
+```
+
+### Discover AWS Lambda Functions
+
+```python
+lambdas = client.tools.discover_lambda(region="us-east-1")
+for fn in lambdas:
+    print(f"{fn.function_name} - {fn.runtime}")
+```
+
+  </Tab>
+  <Tab title="SMS">
+
+### Send an SMS
+
+```python
+message = client.sms.send(
+    to="+14155551234",
+    from_number="+14155559999",
+    body="Hello from Burki!"
+)
+print(f"Message SID: {message.sid}")
+```
+
+### Get Conversations
+
+```python
+conversations = client.sms.get_conversations(assistant_id=123)
+for conv in conversations:
+    print(f"{conv.phone_number}: {conv.message_count} messages")
+```
+
+  </Tab>
+  <Tab title="Campaigns">
+
+### Create a Campaign
+
+```python
+campaign = client.campaigns.create(
+    name="Outreach Campaign",
+    assistant_id=123,
+    contacts=[
+        {"phone_number": "+14155551234", "name": "John"},
+        {"phone_number": "+14155555678", "name": "Jane"}
+    ]
+)
+```
+
+### Start the Campaign
+
+```python
+client.campaigns.start(campaign_id=456)
+```
+
+### Pause the Campaign
+
+```python
+client.campaigns.pause(campaign_id=456)
+```
+
+### Get Campaign Progress
+
+```python
+progress = client.campaigns.get(campaign_id=456)
+print(f"Completed: {progress.completed_calls}/{progress.total_contacts}")
+print(f"Success rate: {progress.success_rate}%")
+```
+
+  </Tab>
+</Tabs>
+
+---
+
+## Real-time Streaming
+
+The Python SDK supports WebSocket streaming for real-time transcripts and campaign progress using async context managers.
+
+### Live Transcript Streaming
+
+```python
+import asyncio
+from burki import BurkiClient
+
+async def stream_transcripts():
+    client = BurkiClient(api_key="your-api-key")
+    
+    # Stream live transcripts during a call
+    async with client.realtime.live_transcript(call_sid="CA123...") as stream:
+        async for event in stream:
+            if event.type == "transcript":
+                print(f"[{event.speaker}]: {event.content}")
+            elif event.type == "call_status":
+                print(f"Call status: {event.status}")
+
+asyncio.run(stream_transcripts())
+```
+
+### Campaign Progress Streaming
+
+```python
+import asyncio
+from burki import BurkiClient
+
+async def monitor_campaign():
+    client = BurkiClient(api_key="your-api-key")
+    
+    # Stream campaign progress updates
+    async with client.realtime.campaign_progress(campaign_id=123) as stream:
+        async for update in stream:
+            if update.type == "progress":
+                print(f"Progress: {update.completed}/{update.total}")
+            elif update.type == "contact_completed":
+                print(f"Completed call to {update.phone_number}")
+            elif update.type == "campaign_completed":
+                print(f"Campaign finished! Success rate: {update.success_rate}%")
+
+asyncio.run(monitor_campaign())
+```
+
+---
+
+## Async Usage
+
+The SDK supports both synchronous and asynchronous usage. All resource methods have async counterparts with the `_async` suffix:
+
+### Synchronous
+
+```python
+# Sync usage (blocking)
+assistants = client.assistants.list()
+assistant = client.assistants.get(assistant_id=123)
+```
+
+### Asynchronous
+
+```python
+import asyncio
+from burki import BurkiClient
+
+async def main():
+    client = BurkiClient(api_key="your-api-key")
+    
+    # Async usage (non-blocking)
+    assistants = await client.assistants.list_async()
+    assistant = await client.assistants.get_async(assistant_id=123)
+    
+    # Concurrent requests
+    results = await asyncio.gather(
+        client.assistants.list_async(),
+        client.calls.list_async(limit=10),
+        client.phone_numbers.list_async()
+    )
+
+asyncio.run(main())
+```
+
+---
+
+## Error Handling
+
+The SDK provides typed exceptions for different error scenarios:
+
+```python
+from burki import BurkiClient
+from burki.exceptions import (
+    AuthenticationError,
+    NotFoundError,
+    ValidationError,
+    RateLimitError,
+    ServerError
+)
+
+client = BurkiClient(api_key="your-api-key")
+
+try:
+    assistant = client.assistants.get(assistant_id=999)
+except AuthenticationError:
+    print("Invalid API key")
+except NotFoundError:
+    print("Assistant not found")
+except ValidationError as e:
+    print(f"Validation error: {e.message}")
+    print(f"Field errors: {e.errors}")
+except RateLimitError as e:
+    print(f"Rate limited. Retry after {e.retry_after} seconds")
+except ServerError:
+    print("Server error occurred")
+```
+
+### Exception Types
+
+| Exception | Description |
+|-----------|-------------|
+| `AuthenticationError` | Invalid or missing API key |
+| `NotFoundError` | Resource not found (404) |
+| `ValidationError` | Invalid request parameters (400) |
+| `RateLimitError` | Too many requests (429) |
+| `ServerError` | Internal server error (5xx) |
+
+---
+
+## Complete Example
+
+Here's a complete example that creates an assistant, assigns a phone number, uploads a knowledge document, and monitors incoming calls:
+
+```python
+import asyncio
+import os
+from burki import BurkiClient
+from burki.exceptions import NotFoundError
+
+async def setup_voice_assistant():
+    client = BurkiClient(api_key=os.environ["BURKI_API_KEY"])
+    
+    # 1. Create an assistant
+    assistant = client.assistants.create(
+        name="Customer Support",
+        description="24/7 customer support assistant",
+        llm_settings={
+            "model": "gpt-4o-mini",
+            "temperature": 0.7,
+            "system_prompt": """You are a friendly customer support agent for Acme Inc.
+            Help customers with their questions about products, orders, and returns.
+            Be helpful, professional, and concise."""
+        },
+        tts_settings={
+            "provider": "elevenlabs",
+            "voice_id": "rachel"
+        }
+    )
+    print(f"Created assistant: {assistant.name} (ID: {assistant.id})")
+    
+    # 2. Search and purchase a phone number
+    numbers = client.phone_numbers.search(country="US", area_code="415")
+    if numbers:
+        purchased = client.phone_numbers.purchase(
+            phone_number=numbers[0].phone_number,
+            provider="twilio"
+        )
+        print(f"Purchased: {purchased.phone_number}")
+        
+        # Assign to assistant
+        client.phone_numbers.assign(
+            phone_number_id=purchased.id,
+            assistant_id=assistant.id
+        )
+        print(f"Assigned to assistant")
+    
+    # 3. Upload knowledge base document
+    document = client.documents.upload(
+        assistant_id=assistant.id,
+        file_path="company_faq.pdf"
+    )
+    print(f"Uploaded document: {document.filename}")
+    
+    # 4. Create an HTTP tool for order lookup
+    tool = client.tools.create(
+        name="lookup_order",
+        tool_type="http",
+        description="Look up customer order by order ID",
+        config={
+            "method": "GET",
+            "url": "https://api.acme.com/orders/{{order_id}}",
+            "headers": {"Authorization": "Bearer {{ACME_API_KEY}}"}
+        }
+    )
+    client.tools.assign(tool_id=tool.id, assistant_id=assistant.id)
+    print(f"Assigned tool: {tool.name}")
+    
+    # 5. Monitor live calls
+    print("\nMonitoring for incoming calls...")
+    calls = client.calls.list(assistant_id=assistant.id, status="in-progress")
+    
+    for call in calls:
+        print(f"\nActive call: {call.call_sid}")
+        async with client.realtime.live_transcript(call_sid=call.call_sid) as stream:
+            async for event in stream:
+                if event.type == "transcript":
+                    print(f"[{event.speaker}]: {event.content}")
+                elif event.type == "call_status" and event.status == "completed":
+                    print("Call ended")
+                    break
+
+if __name__ == "__main__":
+    asyncio.run(setup_voice_assistant())
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="JavaScript SDK" icon="js" href="/sdks/javascript">
+    Check out the TypeScript-first JavaScript SDK
+  </Card>
+  <Card title="Real-time Streaming" icon="bolt" href="/sdks/realtime">
+    Deep dive into WebSocket streaming
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Complete REST API documentation
+  </Card>
+  <Card title="RAG Documentation" icon="book" href="/rag">
+    Learn about knowledge base integration
+  </Card>
+</CardGroup>

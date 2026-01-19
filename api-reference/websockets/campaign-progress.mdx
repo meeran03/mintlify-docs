@@ -1,0 +1,473 @@
+---
+title: 'Campaign Progress WebSocket'
+description: 'Real-time campaign progress updates via WebSocket connection'
+---
+
+## WebSocket Endpoint
+
+**Endpoint:** `wss://api.burki.dev/ws/campaigns/{campaign_id}/progress?token={api_key}`
+
+This WebSocket endpoint provides real-time streaming of campaign progress updates. Use it to build live monitoring dashboards without polling.
+
+### Path Parameters
+
+- `campaign_id` (integer, **required**): The ID of the campaign to monitor
+
+### Authentication
+
+**Required**: All connections must be authenticated using a valid API key.
+
+Pass your API key as a query parameter:
+
+```
+wss://api.burki.dev/ws/campaigns/42/progress?token=your_api_key
+```
+
+### Connection Process
+
+1. **Connect**: Establish WebSocket connection with campaign ID and token
+2. **Receive Acknowledgment**: Server confirms connection
+3. **Get Initial Data**: Receive current progress state
+4. **Stream Updates**: Receive real-time progress updates
+5. **Handle Events**: Process contact completions, failures, etc.
+
+## Server-to-Client Messages
+
+### Connection Acknowledgment
+
+Sent immediately after connection is established:
+
+```json
+{
+  "type": "connection_ack",
+  "campaign_id": 42,
+  "timestamp": 1707984000.123
+}
+```
+
+### Initial Progress
+
+Current campaign state sent after connection:
+
+```json
+{
+  "type": "initial_progress",
+  "data": {
+    "campaign_id": 42,
+    "status": "running",
+    "progress": {
+      "total_contacts": 500,
+      "completed": 325,
+      "failed": 25,
+      "processing": 5,
+      "pending": 145,
+      "progress_percentage": 70.0,
+      "success_rate": 92.86
+    },
+    "started_at": "2024-02-15T09:00:00Z",
+    "completed_at": null,
+    "recent_activity": []
+  }
+}
+```
+
+### Progress Update
+
+Sent whenever progress changes (contact completed, failed, etc.):
+
+```json
+{
+  "type": "progress_update",
+  "data": {
+    "campaign_id": 42,
+    "status": "running",
+    "progress": {
+      "total_contacts": 500,
+      "completed": 326,
+      "failed": 25,
+      "processing": 4,
+      "pending": 145,
+      "progress_percentage": 70.2,
+      "success_rate": 92.88
+    },
+    "started_at": "2024-02-15T09:00:00Z",
+    "completed_at": null
+  }
+}
+```
+
+### Metrics History
+
+Response to `request_history` client message:
+
+```json
+{
+  "type": "metrics_history",
+  "data": [
+    {
+      "timestamp": "2024-02-15T09:00:00Z",
+      "completed": 0,
+      "failed": 0,
+      "success_rate": 0
+    },
+    {
+      "timestamp": "2024-02-15T10:00:00Z",
+      "completed": 150,
+      "failed": 10,
+      "success_rate": 93.75
+    }
+  ]
+}
+```
+
+### Pong Response
+
+Response to ping health check:
+
+```json
+{
+  "type": "pong"
+}
+```
+
+## Client-to-Server Messages
+
+### Ping (Health Check)
+
+Send periodically to maintain connection:
+
+```json
+{
+  "type": "ping"
+}
+```
+
+### Request Update
+
+Request current progress on demand:
+
+```json
+{
+  "type": "request_update"
+}
+```
+
+### Request History
+
+Request historical metrics (last N hours):
+
+```json
+{
+  "type": "request_history",
+  "hours": 24
+}
+```
+
+## Progress Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `total_contacts` | integer | Total contacts in campaign |
+| `completed` | integer | Successfully contacted |
+| `failed` | integer | Failed contact attempts |
+| `processing` | integer | Currently being contacted |
+| `pending` | integer | Waiting to be contacted |
+| `progress_percentage` | float | Completion percentage |
+| `success_rate` | float | Success rate percentage |
+
+## Campaign Status Values
+
+| Status | Description |
+|--------|-------------|
+| `draft` | Not yet started |
+| `scheduled` | Waiting for scheduled time |
+| `running` | Actively executing |
+| `paused` | Temporarily paused |
+| `completed` | All contacts processed |
+| `cancelled` | Stopped before completion |
+| `failed` | Campaign error |
+
+## Example Usage
+
+### JavaScript
+
+```javascript
+const campaignId = 42;
+const apiKey = "your_api_key_here";
+const ws = new WebSocket(`wss://api.burki.dev/ws/campaigns/${campaignId}/progress?token=${apiKey}`);
+
+ws.onopen = function() {
+  console.log("Connected to campaign progress stream");
+  
+  // Set up ping interval to keep connection alive
+  setInterval(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "ping" }));
+    }
+  }, 30000);
+};
+
+ws.onmessage = function(event) {
+  const message = JSON.parse(event.data);
+  
+  switch (message.type) {
+    case "connection_ack":
+      console.log("Connection confirmed for campaign", message.campaign_id);
+      break;
+      
+    case "initial_progress":
+    case "progress_update":
+      const progress = message.data.progress;
+      console.log(`Progress: ${progress.completed}/${progress.total_contacts} ` +
+                  `(${progress.progress_percentage.toFixed(1)}%)`);
+      console.log(`Status: ${message.data.status}`);
+      
+      // Update your UI here
+      updateProgressBar(progress.progress_percentage);
+      updateStats(progress);
+      
+      // Check if campaign completed
+      if (message.data.status === "completed") {
+        console.log("Campaign completed!");
+      }
+      break;
+      
+    case "pong":
+      // Connection is healthy
+      break;
+      
+    default:
+      console.log("Unknown message type:", message.type);
+  }
+};
+
+ws.onerror = function(error) {
+  console.error("WebSocket error:", error);
+};
+
+ws.onclose = function(event) {
+  console.log("Connection closed:", event.code, event.reason);
+  // Implement reconnection logic here
+};
+
+// Request historical metrics
+function requestHistory() {
+  ws.send(JSON.stringify({ type: "request_history", hours: 24 }));
+}
+```
+
+### Python
+
+```python
+import asyncio
+import websockets
+import json
+
+async def monitor_campaign(campaign_id: int, api_key: str):
+    """Monitor campaign progress via WebSocket."""
+    uri = f"wss://api.burki.dev/ws/campaigns/{campaign_id}/progress?token={api_key}"
+    
+    async with websockets.connect(uri) as websocket:
+        print(f"Connected to campaign {campaign_id}")
+        
+        # Start ping task to keep connection alive
+        async def ping_task():
+            while True:
+                await asyncio.sleep(30)
+                await websocket.send(json.dumps({"type": "ping"}))
+        
+        ping = asyncio.create_task(ping_task())
+        
+        try:
+            async for message in websocket:
+                data = json.loads(message)
+                
+                if data["type"] == "connection_ack":
+                    print(f"Connection confirmed for campaign {data['campaign_id']}")
+                    
+                elif data["type"] in ["initial_progress", "progress_update"]:
+                    progress = data["data"]["progress"]
+                    status = data["data"]["status"]
+                    
+                    print(f"Status: {status}")
+                    print(f"Progress: {progress['completed']}/{progress['total_contacts']} "
+                          f"({progress['progress_percentage']:.1f}%)")
+                    print(f"Success rate: {progress['success_rate']:.1f}%")
+                    print("---")
+                    
+                    if status == "completed":
+                        print("Campaign completed!")
+                        break
+                        
+                elif data["type"] == "pong":
+                    pass  # Connection healthy
+                    
+        finally:
+            ping.cancel()
+
+# Run the monitor
+asyncio.run(monitor_campaign(42, "your_api_key_here"))
+```
+
+### React Hook Example
+
+```javascript
+import { useEffect, useState, useCallback, useRef } from 'react';
+
+function useCampaignProgress(campaignId, apiKey) {
+  const [progress, setProgress] = useState(null);
+  const [status, setStatus] = useState('disconnected');
+  const [error, setError] = useState(null);
+  const wsRef = useRef(null);
+
+  const connect = useCallback(() => {
+    const ws = new WebSocket(
+      `wss://api.burki.dev/ws/campaigns/${campaignId}/progress?token=${apiKey}`
+    );
+
+    ws.onopen = () => {
+      setStatus('connected');
+      setError(null);
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      
+      if (message.type === 'initial_progress' || message.type === 'progress_update') {
+        setProgress(message.data);
+      }
+    };
+
+    ws.onerror = () => {
+      setError('Connection error');
+      setStatus('error');
+    };
+
+    ws.onclose = () => {
+      setStatus('disconnected');
+      // Reconnect after 5 seconds
+      setTimeout(connect, 5000);
+    };
+
+    wsRef.current = ws;
+
+    // Ping every 30 seconds
+    const pingInterval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'ping' }));
+      }
+    }, 30000);
+
+    return () => {
+      clearInterval(pingInterval);
+      ws.close();
+    };
+  }, [campaignId, apiKey]);
+
+  useEffect(() => {
+    const cleanup = connect();
+    return cleanup;
+  }, [connect]);
+
+  return { progress, status, error };
+}
+
+// Usage in component
+function CampaignDashboard({ campaignId, apiKey }) {
+  const { progress, status, error } = useCampaignProgress(campaignId, apiKey);
+
+  if (status === 'disconnected') return <div>Connecting...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!progress) return <div>Loading...</div>;
+
+  return (
+    <div>
+      <h2>Campaign Progress</h2>
+      <p>Status: {progress.status}</p>
+      <p>Progress: {progress.progress.completed}/{progress.progress.total_contacts}</p>
+      <progress 
+        value={progress.progress.progress_percentage} 
+        max="100"
+      />
+      <p>Success Rate: {progress.progress.success_rate.toFixed(1)}%</p>
+    </div>
+  );
+}
+```
+
+## Connection Management
+
+### Reconnection Strategy
+
+Implement exponential backoff for reconnection:
+
+```javascript
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 10;
+
+function reconnect() {
+  if (reconnectAttempts >= maxReconnectAttempts) {
+    console.error("Max reconnection attempts reached");
+    return;
+  }
+  
+  const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+  reconnectAttempts++;
+  
+  console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts})`);
+  setTimeout(connect, delay);
+}
+```
+
+### Keep-Alive
+
+Send ping messages every 30 seconds to maintain the connection:
+
+```javascript
+setInterval(() => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "ping" }));
+  }
+}, 30000);
+```
+
+## Error Handling
+
+### Close Codes
+
+| Code | Description |
+|------|-------------|
+| 1000 | Normal closure |
+| 1001 | Going away |
+| 1008 | Authentication failed |
+| 4000 | Internal server error |
+| 4004 | Campaign not found |
+
+### Authentication Errors
+
+If authentication fails, the connection is immediately closed with code 1008:
+
+```javascript
+ws.onclose = function(event) {
+  if (event.code === 1008) {
+    console.error("Authentication failed - check your API key");
+  }
+};
+```
+
+## Best Practices
+
+1. **Always authenticate**: Include valid API key in query parameter
+2. **Implement ping/pong**: Send pings every 30 seconds to keep connection alive
+3. **Handle reconnection**: Implement exponential backoff for reconnection
+4. **Process all message types**: Handle connection_ack, initial_progress, progress_update
+5. **Monitor connection state**: Track open/close events for UI feedback
+6. **Clean up on unmount**: Close WebSocket when component unmounts
+
+## Multi-Campaign Monitoring
+
+To monitor multiple campaigns, use the campaigns monitor endpoint:
+
+**Endpoint:** `wss://api.burki.dev/ws/campaigns/monitor?token={api_key}`
+
+This provides an overview of all campaigns in your organization with the ability to subscribe to specific campaigns.

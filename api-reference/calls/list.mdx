@@ -3,42 +3,237 @@ title: 'List Calls'
 openapi: 'GET /api/v1/calls'
 ---
 
-This endpoint retrieves a paginated list of all calls for your organization. It offers a comprehensive set of filters to help you find specific calls.
+Retrieve a paginated list of all calls for your organization. This endpoint provides comprehensive filtering options to help you find specific calls.
 
-### Query Parameters
+## Query Parameters
 
-- `skip` (integer, optional, default: 0): The number of call records to skip before starting to collect the result set.
-- `limit` (integer, optional, default: 100): The maximum number of call records to return in a single request.
-- `status` (string, optional): Filter calls by their status (e.g., `completed`, `failed`, `in-progress`).
-- `assistant_id` (integer, optional): Filter calls handled by a specific assistant.
-- `customer_phone` (string, optional): Find calls involving a specific customer phone number (supports partial matches).
-- `date_from` (string, optional): Filter for calls that started on or after this date (ISO 8601 format: `YYYY-MM-DDTHH:MM:SS`).
-- `date_to` (string, optional): Filter for calls that started on or before this date (ISO 8601 format).
-- `min_duration` (integer, optional): Filter for calls with a duration greater than or equal to this value (in seconds).
-- `max_duration` (integer, optional): Filter for calls with a duration less than or equal to this value (in seconds).
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `skip` | integer | 0 | Number of records to skip (for pagination) |
+| `limit` | integer | 100 | Maximum records to return (1-1000) |
+| `status` | string | - | Filter by status: `ongoing`, `completed`, `failed` |
+| `assistant_id` | integer | - | Filter by specific assistant ID |
+| `customer_phone` | string | - | Filter by customer phone (supports partial match) |
+| `date_from` | string | - | Filter calls started on/after this date (ISO 8601) |
+| `date_to` | string | - | Filter calls started on/before this date (ISO 8601) |
+| `min_duration` | integer | - | Minimum call duration in seconds |
+| `max_duration` | integer | - | Maximum call duration in seconds |
 
-### Response
+## Request Examples
 
-The response is a JSON array of call objects, each containing detailed information about a call.
+### Basic Request
 
-```json Response
-[
-  {
-    "id": 101,
-    "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "assistant_id": 123,
-    "to_phone_number": "+15551234567",
-    "customer_phone_number": "+15559876543",
+```bash
+curl "https://api.burki.dev/api/v1/calls" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### With Filters
+
+```bash
+curl "https://api.burki.dev/api/v1/calls?status=completed&assistant_id=123&date_from=2024-01-01T00:00:00Z&limit=50" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Pagination
+
+```bash
+# Page 1
+curl "https://api.burki.dev/api/v1/calls?skip=0&limit=50"
+
+# Page 2
+curl "https://api.burki.dev/api/v1/calls?skip=50&limit=50"
+```
+
+## Response
+
+The response is a paginated object containing the call items and pagination metadata.
+
+```json
+{
+  "items": [
+    {
+      "id": 101,
+      "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "assistant_id": 123,
+      "assistant_name": "ServiceBot",
+      "assistant_graph_name": "Customer Support Flow",
+      "to_phone_number": "+15551234567",
+      "customer_phone_number": "+15559876543",
+      "status": "completed",
+      "duration": 180,
+      "started_at": "2024-01-15T10:00:00Z",
+      "ended_at": "2024-01-15T10:03:00Z",
+      "call_meta": {
+        "customer_id": "cust_abc123",
+        "campaign": "winter_outreach"
+      },
+      "total_cost": 0.05,
+      "llm_cost": 0.02,
+      "tts_cost": 0.01,
+      "stt_cost": 0.01,
+      "telephony_cost": 0.01,
+      "cost_currency": "USD"
+    }
+  ],
+  "total": 1250,
+  "skip": 0,
+  "limit": 100
+}
+```
+
+## Response Fields
+
+### Pagination
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `items` | array | Array of call objects |
+| `total` | integer | Total number of calls matching the filters |
+| `skip` | integer | Number of records skipped |
+| `limit` | integer | Maximum records returned |
+
+### Call Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Internal call ID |
+| `call_sid` | string | Telephony provider's call SID |
+| `assistant_id` | integer | ID of the assistant that handled the call |
+| `assistant_name` | string | Name of the assistant |
+| `assistant_graph_name` | string | Name of the assistant graph (if call was routed through a graph) |
+| `to_phone_number` | string | The phone number that was called (your number) |
+| `customer_phone_number` | string | The customer's phone number |
+| `status` | string | Call status: `ongoing`, `completed`, `failed` |
+| `duration` | integer | Call duration in seconds |
+| `started_at` | string | When the call started (ISO 8601) |
+| `ended_at` | string | When the call ended (ISO 8601) |
+| `call_meta` | object | Custom metadata attached to the call |
+
+### Cost Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `total_cost` | number | Total cost of the call |
+| `llm_cost` | number | Cost of LLM usage (tokens) |
+| `tts_cost` | number | Cost of text-to-speech |
+| `stt_cost` | number | Cost of speech-to-text |
+| `telephony_cost` | number | Cost of telephony (minutes) |
+| `cost_currency` | string | Currency code (e.g., `USD`) |
+
+## Call Statuses
+
+| Status | Description |
+|--------|-------------|
+| `ongoing` | Call is currently active |
+| `completed` | Call ended normally |
+| `failed` | Call failed (e.g., no answer, busy, error) |
+
+## Examples
+
+### Python - Iterate All Calls
+
+```python
+import requests
+
+def get_all_calls(filters=None):
+    """Fetch all calls with pagination."""
+    all_calls = []
+    skip = 0
+    limit = 100
+    
+    while True:
+        params = {"skip": skip, "limit": limit}
+        if filters:
+            params.update(filters)
+        
+        response = requests.get(
+            "https://api.burki.dev/api/v1/calls",
+            headers={"Authorization": "Bearer YOUR_API_KEY"},
+            params=params
+        )
+        
+        data = response.json()
+        all_calls.extend(data["items"])
+        
+        if len(data["items"]) < limit:
+            break
+        
+        skip += limit
+    
+    return all_calls
+
+# Get all completed calls from January 2024
+calls = get_all_calls({
     "status": "completed",
-    "started_at": "2023-10-30T10:00:00Z",
-    "ended_at": "2023-10-30T10:05:00Z",
-    "duration": 300,
-    "cost": 0.05,
-    "metadata": {
-      "customer_id": "cust_abc123"
-    },
-    "created_at": "2023-10-30T10:00:00Z",
-    "updated_at": "2023-10-30T10:05:00Z"
-  }
-]
-``` 
+    "date_from": "2024-01-01T00:00:00Z",
+    "date_to": "2024-01-31T23:59:59Z"
+})
+
+print(f"Found {len(calls)} calls")
+```
+
+### Node.js - Filter by Assistant
+
+```javascript
+const axios = require('axios');
+
+async function getCallsByAssistant(assistantId) {
+  const response = await axios.get('https://api.burki.dev/api/v1/calls', {
+    headers: { 'Authorization': 'Bearer YOUR_API_KEY' },
+    params: {
+      assistant_id: assistantId,
+      status: 'completed',
+      limit: 100
+    }
+  });
+  
+  return response.data;
+}
+```
+
+### Calculate Total Cost
+
+```python
+def calculate_total_costs(assistant_id, date_from, date_to):
+    """Calculate total costs for an assistant in a date range."""
+    response = requests.get(
+        "https://api.burki.dev/api/v1/calls",
+        headers={"Authorization": "Bearer YOUR_API_KEY"},
+        params={
+            "assistant_id": assistant_id,
+            "date_from": date_from,
+            "date_to": date_to,
+            "status": "completed",
+            "limit": 1000
+        }
+    )
+    
+    data = response.json()
+    
+    totals = {
+        "calls": len(data["items"]),
+        "duration_seconds": 0,
+        "total_cost": 0,
+        "llm_cost": 0,
+        "tts_cost": 0,
+        "stt_cost": 0,
+        "telephony_cost": 0
+    }
+    
+    for call in data["items"]:
+        totals["duration_seconds"] += call.get("duration", 0) or 0
+        totals["total_cost"] += call.get("total_cost", 0) or 0
+        totals["llm_cost"] += call.get("llm_cost", 0) or 0
+        totals["tts_cost"] += call.get("tts_cost", 0) or 0
+        totals["stt_cost"] += call.get("stt_cost", 0) or 0
+        totals["telephony_cost"] += call.get("telephony_cost", 0) or 0
+    
+    return totals
+```
+
+## Notes
+
+- Results are ordered by `started_at` descending (newest first)
+- The `assistant_graph_name` field is only populated when the call was routed through an assistant graph
+- Cost fields may be `null` for calls that are still ongoing or if cost tracking is not enabled

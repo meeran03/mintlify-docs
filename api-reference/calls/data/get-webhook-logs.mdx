@@ -1,0 +1,220 @@
+---
+title: 'Get Webhook Logs'
+openapi: 'GET /api/v1/calls/{call_id}/webhook-logs'
+---
+
+Retrieve all webhook delivery logs for a specific call. This endpoint provides detailed information about webhook requests sent during the call, including request payloads, response status codes, timing, and any errors.
+
+<Info>
+**Debugging Webhooks**: Use this endpoint to troubleshoot webhook delivery issues, verify that events are being sent correctly, and understand the timing of webhook deliveries during a call.
+</Info>
+
+## Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `call_id` | integer | Yes | The internal call ID (not the call SID) |
+
+## Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `webhook_type` | string | No | Filter by webhook type (e.g., `call_started`, `call_ended`, `transcript`) |
+
+## Request
+
+```bash
+curl "https://api.burki.dev/api/v1/calls/101/webhook-logs" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Filter by Webhook Type
+
+```bash
+curl "https://api.burki.dev/api/v1/calls/101/webhook-logs?webhook_type=call_ended" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+## Response
+
+Returns an array of webhook log objects ordered by attempt time.
+
+```json
+[
+  {
+    "id": 1,
+    "call_id": 101,
+    "assistant_id": 123,
+    "webhook_url": "https://yourapi.com/webhooks/burki",
+    "webhook_type": "call_started",
+    "request_payload": {
+      "event": "call_started",
+      "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "customer_phone_number": "+15559876543",
+      "assistant_id": 123,
+      "timestamp": "2024-01-15T10:00:00Z"
+    },
+    "response_status_code": 200,
+    "response_body": "{\"received\": true}",
+    "response_time_ms": 145,
+    "attempted_at": "2024-01-15T10:00:00Z",
+    "success": true,
+    "error_message": null,
+    "retry_count": 0,
+    "webhook_metadata": null
+  },
+  {
+    "id": 2,
+    "call_id": 101,
+    "assistant_id": 123,
+    "webhook_url": "https://yourapi.com/webhooks/burki",
+    "webhook_type": "call_ended",
+    "request_payload": {
+      "event": "call_ended",
+      "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "duration": 180,
+      "status": "completed",
+      "transcript_summary": "Customer inquired about order status...",
+      "timestamp": "2024-01-15T10:03:00Z"
+    },
+    "response_status_code": 200,
+    "response_body": "{\"received\": true}",
+    "response_time_ms": 89,
+    "attempted_at": "2024-01-15T10:03:01Z",
+    "success": true,
+    "error_message": null,
+    "retry_count": 0,
+    "webhook_metadata": null
+  }
+]
+```
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique webhook log ID |
+| `call_id` | integer | ID of the parent call |
+| `assistant_id` | integer | ID of the assistant that triggered the webhook |
+| `webhook_url` | string | The URL where the webhook was sent |
+| `webhook_type` | string | Type of webhook event |
+| `request_payload` | object | The JSON payload sent to the webhook URL |
+| `response_status_code` | integer | HTTP status code returned by your server |
+| `response_body` | string | Response body from your server (truncated if large) |
+| `response_time_ms` | integer | Time taken for your server to respond (milliseconds) |
+| `attempted_at` | string | When the webhook was attempted (ISO 8601) |
+| `success` | boolean | Whether the delivery was successful |
+| `error_message` | string | Error message if delivery failed |
+| `retry_count` | integer | Number of retry attempts made |
+| `webhook_metadata` | object | Additional metadata about the webhook |
+
+## Webhook Types
+
+| Type | Description |
+|------|-------------|
+| `call_started` | Sent when a call begins |
+| `call_ended` | Sent when a call completes |
+| `transcript` | Sent for real-time transcript updates |
+| `tool_call` | Sent when a tool/function is invoked |
+| `transfer_initiated` | Sent when a call transfer begins |
+| `sms_received` | Sent when an SMS is received |
+
+## Error Responses
+
+### 404 Not Found
+
+```json
+{
+  "detail": "Call with ID 101 not found in your organization"
+}
+```
+
+## Use Cases
+
+### Debug Failed Webhooks
+
+```python
+import requests
+
+def find_failed_webhooks(call_id):
+    response = requests.get(
+        f"https://api.burki.dev/api/v1/calls/{call_id}/webhook-logs",
+        headers={"Authorization": "Bearer YOUR_API_KEY"}
+    )
+    
+    logs = response.json()
+    
+    failed = [log for log in logs if not log["success"]]
+    
+    for log in failed:
+        print(f"Failed webhook: {log['webhook_type']}")
+        print(f"  URL: {log['webhook_url']}")
+        print(f"  Error: {log['error_message']}")
+        print(f"  Status Code: {log['response_status_code']}")
+        print(f"  Retries: {log['retry_count']}")
+        print()
+    
+    return failed
+```
+
+### Monitor Webhook Latency
+
+```python
+def analyze_webhook_performance(call_id):
+    response = requests.get(
+        f"https://api.burki.dev/api/v1/calls/{call_id}/webhook-logs",
+        headers={"Authorization": "Bearer YOUR_API_KEY"}
+    )
+    
+    logs = response.json()
+    
+    successful_logs = [log for log in logs if log["success"]]
+    
+    if not successful_logs:
+        return None
+    
+    response_times = [log["response_time_ms"] for log in successful_logs]
+    
+    return {
+        "avg_response_time_ms": sum(response_times) / len(response_times),
+        "max_response_time_ms": max(response_times),
+        "min_response_time_ms": min(response_times),
+        "total_webhooks": len(successful_logs)
+    }
+```
+
+### Verify Webhook Delivery
+
+```python
+def verify_webhook_delivery(call_id, expected_types):
+    """Verify that all expected webhook types were delivered successfully."""
+    response = requests.get(
+        f"https://api.burki.dev/api/v1/calls/{call_id}/webhook-logs",
+        headers={"Authorization": "Bearer YOUR_API_KEY"}
+    )
+    
+    logs = response.json()
+    
+    delivered_types = set(
+        log["webhook_type"] for log in logs if log["success"]
+    )
+    
+    missing = set(expected_types) - delivered_types
+    
+    return {
+        "all_delivered": len(missing) == 0,
+        "delivered": list(delivered_types),
+        "missing": list(missing)
+    }
+
+# Example usage
+result = verify_webhook_delivery(101, ["call_started", "call_ended"])
+print(f"All webhooks delivered: {result['all_delivered']}")
+```
+
+## Notes
+
+- Webhooks are only sent if you have configured a `webhook_url` on your assistant
+- Failed webhooks are automatically retried up to 3 times with exponential backoff
+- Response bodies larger than 10KB are truncated in the logs
+- Webhook logs are retained for 30 days

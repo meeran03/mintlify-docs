@@ -1,0 +1,103 @@
+---
+title: 'Update Campaign'
+openapi: 'PUT /api/v1/campaigns/{campaign_id}'
+---
+
+Update an existing campaign's configuration. Only campaigns in `draft` or `paused` status can be updated.
+
+<Callout type="warning">
+Running or completed campaigns cannot be updated. Pause the campaign first if you need to make changes.
+</Callout>
+
+### Path Parameters
+
+- `campaign_id` (integer, required): The unique identifier of the campaign
+
+### Request Body
+
+All fields are optional. Only include fields you want to update.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Campaign name (1-200 characters) |
+| `description` | string | Campaign description |
+| `welcome_message_template` | string | Template for welcome message |
+| `agenda_template` | string | Template for call agenda |
+| `end_call_message_template` | string | Template for end call message |
+| `sms_message_template` | string | Template for SMS content |
+| `fallback_values` | object | Fallback values for missing variables |
+| `max_attempts` | integer | Max retry attempts |
+| `retry_delay_minutes` | integer | Delay between retries |
+
+### Example Request
+
+```json Request Body
+{
+  "name": "Updated Campaign Name",
+  "agenda_template": "I'm calling about your upcoming appointment on {{appointment_date}} at {{appointment_time}}.",
+  "max_attempts": 5
+}
+```
+
+### Response
+
+Returns a success message when the update is complete.
+
+```json Response
+{
+  "message": "Campaign updated successfully"
+}
+```
+
+### Example Code
+
+```bash cURL
+curl -X PUT "https://api.burki.dev/api/v1/campaigns/42" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Campaign Name",
+    "max_attempts": 5
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.put(
+    "https://api.burki.dev/api/v1/campaigns/42",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={
+        "name": "Updated Campaign Name",
+        "max_attempts": 5
+    }
+)
+
+result = response.json()
+print(result["message"])
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.burki.dev/api/v1/campaigns/42", {
+  method: "PUT",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    name: "Updated Campaign Name",
+    max_attempts: 5
+  })
+});
+
+const result = await response.json();
+console.log(result.message);
+```
+
+### Error Responses
+
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Cannot update running or completed campaigns |
+| 404 | Campaign not found |
+| 401 | Unauthorized - invalid or missing API key |

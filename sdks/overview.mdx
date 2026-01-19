@@ -1,0 +1,272 @@
+---
+title: SDK Overview
+description: "Official SDKs for the Burki Voice AI Platform - Python, JavaScript/TypeScript, and Go"
+---
+
+<Info>
+Burki provides official SDKs in Python, JavaScript/TypeScript, and Go to help you integrate voice AI capabilities into your applications quickly and easily.
+</Info>
+
+## Available SDKs
+
+| Language | Package | Installation | Status |
+|----------|---------|--------------|--------|
+| **Python** | `burki` | `pip install burki` | Available |
+| **JavaScript/TypeScript** | `@burki.dev/sdk` | `npm install @burki.dev/sdk` | Available |
+| **Go** | `github.com/burki-ai/burki-go` | `go get github.com/burki-ai/burki-go` | Available |
+
+---
+
+## Feature Support Matrix
+
+All SDKs provide comprehensive access to the Burki API:
+
+| Feature | Python | JavaScript | Go |
+|---------|--------|------------|-----|
+| **Assistants** | Full CRUD | Full CRUD + extras | Full CRUD |
+| **Calls** | List, transcripts, recordings, metrics | Full management + analytics | Full management |
+| **Phone Numbers** | Search, purchase, assign | Full management + webhooks | Search, purchase, assign |
+| **Documents (RAG)** | Upload, list, status | Upload (file/URL), reprocess | Upload (file/URL) |
+| **Tools** | Create, assign, Lambda discovery | Full CRUD + Lambda discovery | Create, assign, Lambda |
+| **SMS** | Send, conversations | Full management + queue | Send, conversations |
+| **Campaigns** | Create, start, progress | Full CRUD + contacts | Create, start, progress |
+| **Real-time Streaming** | Async context managers | Async iterators | Channel-based |
+| **Async Support** | Sync + Async methods | Native async/await | Goroutines |
+| **TypeScript Types** | N/A | Full type definitions | N/A |
+
+---
+
+## Quick Start
+
+Get started with the Burki SDK in your preferred language:
+
+<CodeGroup>
+```python Python
+from burki import BurkiClient
+
+# Initialize the client
+client = BurkiClient(api_key="your-api-key")
+
+# List all assistants
+assistants = client.assistants.list()
+for assistant in assistants:
+    print(f"{assistant.id}: {assistant.name}")
+
+# Create a new assistant
+assistant = client.assistants.create(
+    name="Support Bot",
+    description="Customer support assistant",
+    llm_settings={
+        "model": "gpt-4o-mini",
+        "temperature": 0.7,
+        "system_prompt": "You are a helpful customer support agent."
+    },
+    tts_settings={
+        "provider": "elevenlabs",
+        "voice_id": "rachel"
+    }
+)
+```
+
+```typescript JavaScript/TypeScript
+import { BurkiClient } from '@burki.dev/sdk';
+
+// Initialize the client
+const client = new BurkiClient({ apiKey: 'your-api-key' });
+
+// List all assistants
+const assistants = await client.assistants.list();
+for (const assistant of assistants) {
+  console.log(`${assistant.id}: ${assistant.name}`);
+}
+
+// Create a new assistant
+const assistant = await client.assistants.create({
+  name: 'Support Bot',
+  description: 'Customer support assistant',
+  llmSettings: {
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    systemPrompt: 'You are a helpful customer support agent.'
+  },
+  ttsSettings: {
+    provider: 'elevenlabs',
+    voiceId: 'rachel'
+  }
+});
+```
+
+```go Go
+package main
+
+import (
+    "fmt"
+    "log"
+
+    burki "github.com/burki-ai/burki-go/burki"
+)
+
+func main() {
+    // Initialize the client
+    client := burki.NewClient("your-api-key")
+
+    // List all assistants
+    assistants, err := client.Assistants.List(nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    for _, assistant := range assistants {
+        fmt.Printf("%d: %s\n", assistant.ID, assistant.Name)
+    }
+
+    // Create a new assistant
+    assistant, err := client.Assistants.Create(&burki.CreateAssistantParams{
+        Name:        "Support Bot",
+        Description: "Customer support assistant",
+        LLMSettings: &burki.LLMSettings{
+            SystemPrompt: "You are a helpful customer support agent.",
+            Temperature:  0.7,
+        },
+        TTSSettings: &burki.TTSSettings{
+            Provider: "elevenlabs",
+            VoiceID:  "rachel",
+        },
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("Created assistant: %s\n", assistant.Name)
+}
+```
+</CodeGroup>
+
+---
+
+## Real-time Streaming
+
+All SDKs support WebSocket streaming for live transcripts and campaign progress:
+
+<CodeGroup>
+```python Python
+import asyncio
+from burki import BurkiClient
+
+async def stream_transcripts():
+    client = BurkiClient(api_key="your-api-key")
+    
+    # Stream live transcripts during a call
+    async with client.realtime.live_transcript(call_sid="CA123...") as stream:
+        async for event in stream:
+            print(f"[{event.speaker}]: {event.content}")
+
+asyncio.run(stream_transcripts())
+```
+
+```typescript JavaScript/TypeScript
+import { BurkiClient } from '@burki.dev/sdk';
+
+const client = new BurkiClient({ apiKey: 'your-api-key' });
+
+// Stream live transcripts during a call
+const stream = client.realtime.liveTranscript('CA123...');
+await stream.connect();
+
+for await (const event of stream) {
+  if (event.type === 'transcript') {
+    console.log(`[${event.speaker}]: ${event.content}`);
+  }
+}
+```
+
+```go Go
+// Stream live transcripts during a call
+stream := client.Realtime.LiveTranscript("CA123...")
+if err := stream.Connect(); err != nil {
+    log.Fatal(err)
+}
+defer stream.Close()
+
+for {
+    select {
+    case event := <-stream.Events:
+        switch e := event.(type) {
+        case *burki.TranscriptEvent:
+            fmt.Printf("[%s]: %s\n", e.Speaker, e.Content)
+        }
+    case err := <-stream.Errors:
+        log.Printf("Error: %v\n", err)
+    case <-stream.Done:
+        return
+    }
+}
+```
+</CodeGroup>
+
+---
+
+## Authentication
+
+All SDKs authenticate using your Burki API key. You can generate API keys from your [dashboard](https://burki.dev/dashboard).
+
+<Warning>
+Treat your API keys like passwords! Never share them publicly or commit them to version control.
+</Warning>
+
+### Environment Variables
+
+For security, we recommend using environment variables:
+
+<CodeGroup>
+```python Python
+import os
+from burki import BurkiClient
+
+client = BurkiClient(api_key=os.environ["BURKI_API_KEY"])
+```
+
+```typescript JavaScript/TypeScript
+import { BurkiClient } from '@burki.dev/sdk';
+
+const client = new BurkiClient({ 
+  apiKey: process.env.BURKI_API_KEY 
+});
+```
+
+```go Go
+client := burki.NewClient(os.Getenv("BURKI_API_KEY"))
+```
+</CodeGroup>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="/sdks/python">
+    Complete Python SDK documentation with all methods and examples
+  </Card>
+  <Card title="JavaScript SDK" icon="js" href="/sdks/javascript">
+    TypeScript-first SDK with full type definitions
+  </Card>
+  <Card title="Go SDK" icon="golang" href="/sdks/go">
+    Idiomatic Go SDK with channel-based streaming
+  </Card>
+  <Card title="Real-time Streaming" icon="bolt" href="/sdks/realtime">
+    WebSocket streaming for live transcripts and campaigns
+  </Card>
+</CardGroup>
+
+---
+
+## Getting Help
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Complete REST API documentation
+  </Card>
+  <Card title="Support" icon="envelope" href="mailto:support@burki.dev">
+    Contact our support team
+  </Card>
+</CardGroup>

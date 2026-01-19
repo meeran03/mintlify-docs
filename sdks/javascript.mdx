@@ -1,0 +1,941 @@
+---
+title: JavaScript/TypeScript SDK
+description: "Official TypeScript-first SDK for the Burki Voice AI Platform"
+---
+
+<Info>
+The Burki JavaScript SDK is written in TypeScript and provides full type definitions for all models and methods. It works seamlessly in Node.js and browser environments.
+</Info>
+
+## Installation
+
+```bash
+npm install @burki.dev/sdk
+```
+
+Or with yarn:
+
+```bash
+yarn add @burki.dev/sdk
+```
+
+**Requirements:** Node.js 18+ or modern browser
+
+---
+
+## Quick Start
+
+```typescript
+import { BurkiClient } from '@burki.dev/sdk';
+
+// Initialize the client
+const client = new BurkiClient({ apiKey: 'your-api-key' });
+
+// List all assistants
+const assistants = await client.assistants.list();
+for (const assistant of assistants) {
+  console.log(`${assistant.id}: ${assistant.name}`);
+}
+
+// Create a new assistant
+const assistant = await client.assistants.create({
+  name: 'Support Bot',
+  description: 'Customer support assistant',
+  llmSettings: {
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    systemPrompt: 'You are a helpful customer support agent.'
+  },
+  ttsSettings: {
+    provider: 'elevenlabs',
+    voiceId: 'rachel'
+  }
+});
+```
+
+---
+
+## Configuration
+
+### Basic Configuration
+
+```typescript
+const client = new BurkiClient({ apiKey: 'your-api-key' });
+```
+
+### Custom Base URL
+
+```typescript
+const client = new BurkiClient({
+  apiKey: 'your-api-key',
+  baseUrl: 'https://custom.burki.dev'
+});
+```
+
+### Timeout Settings
+
+```typescript
+const client = new BurkiClient({
+  apiKey: 'your-api-key',
+  timeout: 60000 // 60 seconds in milliseconds
+});
+```
+
+### Using Environment Variables
+
+```typescript
+const client = new BurkiClient({ 
+  apiKey: process.env.BURKI_API_KEY! 
+});
+```
+
+---
+
+## Resources
+
+<Tabs>
+  <Tab title="Assistants">
+
+The JavaScript SDK provides the most comprehensive assistant management API.
+
+### List Assistants
+
+```typescript
+// Basic list
+const assistants = await client.assistants.list();
+
+// With options
+const activeAssistants = await client.assistants.list({
+  activeOnly: true,
+  includeStats: true,
+  limit: 50
+});
+```
+
+### Get an Assistant
+
+```typescript
+// By ID
+const assistant = await client.assistants.get(123);
+
+// By phone number
+const assistant = await client.assistants.getByPhone('+14155551234');
+```
+
+### Create an Assistant
+
+```typescript
+const assistant = await client.assistants.create({
+  name: 'My Bot',
+  description: 'A helpful assistant',
+  llmSettings: { 
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    systemPrompt: 'You are helpful.'
+  },
+  ttsSettings: {
+    provider: 'elevenlabs',
+    voiceId: 'rachel'
+  }
+});
+```
+
+### Update an Assistant
+
+```typescript
+const updated = await client.assistants.update(123, { 
+  name: 'Updated Bot',
+  description: 'Updated description'
+});
+```
+
+### Quick Status Update
+
+```typescript
+// Activate
+await client.assistants.updateStatus(123, true);
+
+// Deactivate
+await client.assistants.updateStatus(123, false);
+```
+
+### Delete an Assistant
+
+```typescript
+await client.assistants.delete(123);
+```
+
+### Additional Methods
+
+```typescript
+// Get assistant count
+const count = await client.assistants.getCount(true); // Active only
+
+// Export assistants
+const csvBlob = await client.assistants.export({ format: 'csv' });
+
+// Get cloned voices
+const voices = await client.assistants.getClonedVoices({ 
+  provider: 'elevenlabs' 
+});
+
+// Get available LLM providers
+const providers = await client.assistants.getProviders();
+
+// Get organization info
+const orgInfo = await client.assistants.getOrganizationInfo();
+```
+
+  </Tab>
+  <Tab title="Calls">
+
+Comprehensive call management with analytics and data export.
+
+### Initiate an Outbound Call
+
+```typescript
+const response = await client.calls.initiate({
+  fromPhoneNumber: '+14155559999',
+  toPhoneNumber: '+14155551234',
+  welcomeMessage: 'Hello! This is a follow-up call.',
+  agenda: 'Discuss the recent proposal'
+});
+```
+
+### List Calls
+
+```typescript
+const calls = await client.calls.list({
+  status: 'completed',
+  dateFrom: '2026-01-01',
+  limit: 50
+});
+```
+
+### Get Call Details
+
+```typescript
+// By ID
+const call = await client.calls.get(123);
+
+// By SID
+const call = await client.calls.getBySid('CA123...');
+```
+
+### Update Call Metadata
+
+```typescript
+await client.calls.updateMetadata(123, { 
+  customField: 'value',
+  priority: 'high'
+});
+```
+
+### Get Transcripts
+
+```typescript
+// By call ID
+const transcripts = await client.calls.getTranscripts(123);
+
+// By SID
+const transcripts = await client.calls.getTranscriptsBySid('CA123...');
+
+// Export transcripts
+const txtBlob = await client.calls.exportTranscripts(123, { format: 'txt' });
+```
+
+### Get Recordings
+
+```typescript
+const recordings = await client.calls.getRecordings(123);
+
+// Get direct recording URL
+const url = client.calls.getRecordingUrl(123, 456);
+```
+
+### Get Call Metrics
+
+```typescript
+const metrics = await client.calls.getMetrics(123);
+console.log(`Duration: ${metrics.duration}s`);
+console.log(`Avg latency: ${metrics.avgLatency}ms`);
+```
+
+### Get Chat Messages
+
+```typescript
+// Get the LLM conversation
+const messages = await client.calls.getMessages(123);
+```
+
+### Get Webhook Logs
+
+```typescript
+const logs = await client.calls.getWebhookLogs(123);
+```
+
+### Terminate a Call
+
+```typescript
+await client.calls.terminate('CA123...');
+```
+
+### Analytics & Stats
+
+```typescript
+// Get analytics (1d, 7d, 30d, 90d)
+const analytics = await client.calls.getAnalytics('7d');
+
+// Get basic stats
+const stats = await client.calls.getStats();
+
+// Search calls
+const results = await client.calls.search('customer name');
+
+// Export calls
+const csvBlob = await client.calls.export({ 
+  format: 'csv', 
+  status: 'completed' 
+});
+```
+
+  </Tab>
+  <Tab title="Phone Numbers">
+
+Full phone number lifecycle management including webhooks.
+
+### List Phone Numbers
+
+```typescript
+const numbers = await client.phoneNumbers.list();
+```
+
+### Search Available Numbers
+
+```typescript
+const available = await client.phoneNumbers.search({
+  provider: 'twilio',
+  countryCode: 'US',
+  areaCode: '415'
+});
+```
+
+### Purchase a Number
+
+```typescript
+const result = await client.phoneNumbers.purchase({
+  phoneNumber: '+14155551234',
+  provider: 'twilio',
+  friendlyName: 'Support Line'
+});
+```
+
+### Release a Number
+
+```typescript
+await client.phoneNumbers.release('+14155551234');
+```
+
+### Assign/Unassign
+
+```typescript
+// Assign to assistant
+await client.phoneNumbers.assign(123, { assistantId: 456 });
+
+// Unassign
+await client.phoneNumbers.unassign(123);
+```
+
+### Get Available Countries
+
+```typescript
+const countries = await client.phoneNumbers.getCountries('telnyx');
+```
+
+### Diagnose Connection (Telnyx)
+
+```typescript
+const diagnosis = await client.phoneNumbers.diagnose('+14155551234');
+```
+
+### Webhook Management
+
+```typescript
+// Get webhooks
+const webhooks = await client.phoneNumbers.getWebhooks('+14155551234');
+
+// Update webhooks
+await client.phoneNumbers.updateWebhooks({
+  phoneNumber: '+14155551234',
+  voiceWebhookUrl: 'https://example.com/voice',
+  statusCallbackUrl: 'https://example.com/status'
+});
+```
+
+### Verified Caller IDs
+
+```typescript
+// Sync verified caller IDs
+await client.phoneNumbers.syncVerifiedCallerIds();
+
+// Add a verified caller ID
+await client.phoneNumbers.addVerifiedCallerId({
+  phoneNumber: '+14155551234',
+  friendlyName: 'My Phone'
+});
+```
+
+  </Tab>
+  <Tab title="Documents (RAG)">
+
+Upload and manage knowledge base documents.
+
+### Upload a Document (Browser)
+
+```typescript
+const file = new File(['content'], 'knowledge.pdf', { 
+  type: 'application/pdf' 
+});
+const document = await client.documents.upload(123, file, 'knowledge.pdf');
+```
+
+### Upload from URL
+
+```typescript
+const document = await client.documents.uploadFromUrl({
+  assistantId: 123,
+  url: 'https://example.com/document.pdf'
+});
+```
+
+### List Documents
+
+```typescript
+const documents = await client.documents.list(123);
+for (const doc of documents) {
+  console.log(`${doc.filename}: ${doc.status}`);
+}
+```
+
+### Check Processing Status
+
+```typescript
+const status = await client.documents.getStatus(456);
+console.log(`Status: ${status.processingStatus}`);
+console.log(`Chunks: ${status.chunkCount}`);
+```
+
+### Reprocess a Document
+
+```typescript
+await client.documents.reprocess(456);
+```
+
+### Delete a Document
+
+```typescript
+await client.documents.delete(456);
+```
+
+  </Tab>
+  <Tab title="Tools">
+
+Create, manage, and assign custom tools.
+
+### List Tools
+
+```typescript
+const tools = await client.tools.list();
+```
+
+### Get a Tool
+
+```typescript
+const tool = await client.tools.get(123);
+```
+
+### Create an HTTP Tool
+
+```typescript
+const tool = await client.tools.create({
+  name: 'check_inventory',
+  toolType: 'http',
+  description: 'Check product inventory',
+  httpConfig: {
+    method: 'GET',
+    url: 'https://api.example.com/inventory',
+    headers: {
+      'Authorization': 'Bearer {{API_KEY}}'
+    }
+  }
+});
+```
+
+### Update a Tool
+
+```typescript
+await client.tools.update(123, { 
+  description: 'Updated description' 
+});
+```
+
+### Delete a Tool
+
+```typescript
+await client.tools.delete(123);
+```
+
+### Assign/Unassign Tools
+
+```typescript
+// Assign tool to assistant
+await client.tools.assign(123, 456);
+
+// Unassign tool from assistant
+await client.tools.unassign(123, 456);
+```
+
+### Discover AWS Lambda Functions
+
+```typescript
+const lambdas = await client.tools.discoverLambda('us-east-1');
+for (const fn of lambdas) {
+  console.log(`${fn.functionName} (${fn.runtime})`);
+}
+```
+
+  </Tab>
+  <Tab title="SMS">
+
+Complete SMS management with queue support.
+
+### Send an SMS
+
+```typescript
+const response = await client.sms.send({
+  fromPhoneNumber: '+14155559999',
+  toPhoneNumber: '+14155551234',
+  message: 'Hello from Burki!',
+  queue: true // Use rate-limited queue
+});
+```
+
+### Get Message Status
+
+```typescript
+const status = await client.sms.getStatus('msg_123');
+```
+
+### Cancel a Queued Message
+
+```typescript
+await client.sms.cancel('msg_123');
+```
+
+### Get Queue Statistics
+
+```typescript
+const stats = await client.sms.getQueueStats();
+console.log(`Pending: ${stats.pending}`);
+console.log(`Sent: ${stats.sent}`);
+```
+
+### Conversation Management
+
+```typescript
+// List conversations
+const conversations = await client.sms.listConversations({
+  assistantId: 123,
+  status: 'active'
+});
+
+// Get a conversation
+const conversation = await client.sms.getConversation('conv_123');
+
+// Get messages in a conversation
+const messages = await client.sms.getMessages('conv_123');
+
+// Get related conversations (unified voice + SMS)
+const related = await client.sms.getRelatedConversations('conv_123');
+
+// Delete/archive a conversation
+await client.sms.deleteConversation('conv_123');
+
+// Export a conversation
+const txtBlob = await client.sms.exportConversation('conv_123', { 
+  format: 'txt' 
+});
+```
+
+  </Tab>
+  <Tab title="Campaigns">
+
+Full campaign lifecycle management.
+
+### List Campaigns
+
+```typescript
+const campaigns = await client.campaigns.list({ status: 'running' });
+```
+
+### Get a Campaign
+
+```typescript
+const campaign = await client.campaigns.get(123);
+```
+
+### Create a Campaign
+
+```typescript
+const campaign = await client.campaigns.create({
+  name: 'Outreach Campaign',
+  assistantId: 123,
+  contacts: [
+    { 
+      phoneNumber: '+14155551234', 
+      name: 'John',
+      variables: { company: 'Acme' }
+    },
+    { 
+      phoneNumber: '+14155555678', 
+      name: 'Jane' 
+    }
+  ],
+  settings: {
+    maxConcurrentCalls: 5,
+    callsPerMinute: 10
+  }
+});
+```
+
+### Update a Campaign
+
+```typescript
+await client.campaigns.update(123, { name: 'Updated Campaign' });
+```
+
+### Delete a Campaign
+
+```typescript
+await client.campaigns.delete(123);
+```
+
+### Campaign Control
+
+```typescript
+// Start
+await client.campaigns.start(123);
+
+// Pause
+await client.campaigns.pause(123);
+
+// Resume
+await client.campaigns.resume(123);
+
+// Cancel
+await client.campaigns.cancel(123);
+```
+
+### Get Progress
+
+```typescript
+const progress = await client.campaigns.getProgress(123);
+console.log(`Completed: ${progress.completedContacts}/${progress.totalContacts}`);
+console.log(`Success rate: ${progress.successRate}%`);
+```
+
+### Contact Management
+
+```typescript
+// Get contacts
+const contacts = await client.campaigns.getContacts(123, { 
+  status: 'pending' 
+});
+
+// Add contacts
+await client.campaigns.addContacts(123, [
+  { phoneNumber: '+14155559999', name: 'New Contact' }
+]);
+```
+
+  </Tab>
+</Tabs>
+
+---
+
+## Real-time Streaming
+
+The JavaScript SDK uses async iterators for WebSocket streaming.
+
+### Live Transcript Streaming
+
+```typescript
+const stream = client.realtime.liveTranscript('CA123...');
+await stream.connect();
+
+for await (const event of stream) {
+  switch (event.type) {
+    case 'transcript':
+      console.log(`[${event.speaker}]: ${event.content}`);
+      break;
+    case 'call_status':
+      console.log(`Call status: ${event.status}`);
+      if (event.status === 'completed') {
+        stream.disconnect();
+      }
+      break;
+    case 'error':
+      console.error(`Error: ${event.message}`);
+      break;
+  }
+}
+```
+
+### Campaign Progress Streaming
+
+```typescript
+const stream = client.realtime.campaignProgress(123);
+await stream.connect();
+
+for await (const event of stream) {
+  switch (event.type) {
+    case 'progress':
+      console.log(`Progress: ${event.completedContacts}/${event.totalContacts}`);
+      break;
+    case 'contact_completed':
+      console.log(`Completed call to ${event.phoneNumber}`);
+      break;
+    case 'campaign_completed':
+      console.log(`Campaign finished! Success rate: ${event.successRate}%`);
+      stream.disconnect();
+      break;
+  }
+}
+```
+
+### Connection Management
+
+```typescript
+const stream = client.realtime.liveTranscript('CA123...');
+
+// Connect
+await stream.connect();
+
+// Send ping to keep connection alive
+stream.sendPing();
+
+// Request current status
+stream.requestStatus();
+
+// Disconnect when done
+stream.disconnect();
+```
+
+---
+
+## TypeScript Support
+
+The SDK provides full type definitions for all models and methods:
+
+```typescript
+import type {
+  Assistant,
+  AssistantCreateParams,
+  AssistantUpdateParams,
+  Call,
+  CallListParams,
+  Campaign,
+  CampaignCreateParams,
+  PhoneNumber,
+  PhoneNumberSearchParams,
+  Tool,
+  ToolCreateParams,
+  Document,
+  TranscriptEvent,
+  CallStatusEvent,
+  CampaignProgressEvent
+} from '@burki.dev/sdk';
+
+// Use types for better IDE support
+const createParams: AssistantCreateParams = {
+  name: 'My Bot',
+  llmSettings: { model: 'gpt-4o-mini' }
+};
+
+const assistant: Assistant = await client.assistants.create(createParams);
+```
+
+---
+
+## Error Handling
+
+The SDK provides typed exceptions for different error scenarios:
+
+```typescript
+import {
+  BurkiClient,
+  AuthenticationError,
+  NotFoundError,
+  ValidationError,
+  RateLimitError,
+  ServerError,
+  WebSocketError
+} from '@burki.dev/sdk';
+
+const client = new BurkiClient({ apiKey: 'your-api-key' });
+
+try {
+  const assistant = await client.assistants.get(999);
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    console.error('Invalid API key');
+  } else if (error instanceof NotFoundError) {
+    console.error('Assistant not found');
+  } else if (error instanceof ValidationError) {
+    console.error(`Validation error: ${error.message}`);
+    console.error(`Field errors: ${JSON.stringify(error.errors)}`);
+  } else if (error instanceof RateLimitError) {
+    console.error(`Rate limited. Retry after ${error.retryAfter} seconds`);
+  } else if (error instanceof ServerError) {
+    console.error('Server error occurred');
+  } else if (error instanceof WebSocketError) {
+    console.error('WebSocket connection error');
+  }
+}
+```
+
+### Exception Types
+
+| Exception | Description |
+|-----------|-------------|
+| `AuthenticationError` | Invalid or missing API key |
+| `NotFoundError` | Resource not found (404) |
+| `ValidationError` | Invalid request parameters (400) |
+| `RateLimitError` | Too many requests (429) |
+| `ServerError` | Internal server error (5xx) |
+| `WebSocketError` | WebSocket connection error |
+
+---
+
+## Complete Example
+
+Here's a complete example demonstrating the SDK's capabilities:
+
+```typescript
+import { BurkiClient, NotFoundError } from '@burki.dev/sdk';
+
+async function main() {
+  const client = new BurkiClient({ 
+    apiKey: process.env.BURKI_API_KEY! 
+  });
+
+  // 1. Create an assistant
+  const assistant = await client.assistants.create({
+    name: 'Sales Assistant',
+    description: 'Outbound sales assistant',
+    llmSettings: {
+      model: 'gpt-4o-mini',
+      temperature: 0.8,
+      systemPrompt: `You are a friendly sales representative for Acme Inc.
+        Your goal is to schedule product demos with interested prospects.
+        Be personable, handle objections gracefully, and focus on value.`
+    },
+    ttsSettings: {
+      provider: 'elevenlabs',
+      voiceId: 'adam'
+    }
+  });
+  console.log(`Created assistant: ${assistant.name}`);
+
+  // 2. Purchase and assign a phone number
+  const available = await client.phoneNumbers.search({
+    provider: 'twilio',
+    countryCode: 'US',
+    areaCode: '415'
+  });
+
+  if (available.length > 0) {
+    const purchased = await client.phoneNumbers.purchase({
+      phoneNumber: available[0].phoneNumber,
+      provider: 'twilio',
+      friendlyName: 'Sales Line'
+    });
+    
+    await client.phoneNumbers.assign(purchased.id, { 
+      assistantId: assistant.id 
+    });
+    console.log(`Assigned ${purchased.phoneNumber} to assistant`);
+  }
+
+  // 3. Upload product documentation
+  const doc = await client.documents.uploadFromUrl({
+    assistantId: assistant.id,
+    url: 'https://acme.com/product-guide.pdf'
+  });
+  console.log(`Uploaded document: ${doc.filename}`);
+
+  // 4. Create an outbound campaign
+  const campaign = await client.campaigns.create({
+    name: 'Q1 Outreach',
+    assistantId: assistant.id,
+    contacts: [
+      { phoneNumber: '+14155551234', name: 'John Smith', variables: { company: 'TechCorp' }},
+      { phoneNumber: '+14155555678', name: 'Jane Doe', variables: { company: 'StartupXYZ' }},
+    ],
+    settings: {
+      maxConcurrentCalls: 2,
+      callsPerMinute: 5
+    }
+  });
+  console.log(`Created campaign: ${campaign.name}`);
+
+  // 5. Start campaign and monitor progress
+  await client.campaigns.start(campaign.id);
+  console.log('Campaign started!');
+
+  const stream = client.realtime.campaignProgress(campaign.id);
+  await stream.connect();
+
+  for await (const event of stream) {
+    if (event.type === 'progress') {
+      console.log(`Progress: ${event.completedContacts}/${event.totalContacts}`);
+    } else if (event.type === 'contact_completed') {
+      console.log(`Completed: ${event.phoneNumber} - ${event.outcome}`);
+    } else if (event.type === 'campaign_completed') {
+      console.log(`\nCampaign finished!`);
+      console.log(`Success rate: ${event.successRate}%`);
+      console.log(`Total calls: ${event.totalContacts}`);
+      stream.disconnect();
+      break;
+    }
+  }
+
+  // 6. Export results
+  const exportData = await client.calls.export({
+    format: 'csv',
+    assistantId: assistant.id
+  });
+  console.log('Exported call data');
+}
+
+main().catch(console.error);
+```
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="/sdks/python">
+    Check out the Python SDK
+  </Card>
+  <Card title="Go SDK" icon="golang" href="/sdks/go">
+    Idiomatic Go SDK with channels
+  </Card>
+  <Card title="Real-time Streaming" icon="bolt" href="/sdks/realtime">
+    Deep dive into WebSocket streaming
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Complete REST API documentation
+  </Card>
+</CardGroup>
