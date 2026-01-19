@@ -1,14 +1,47 @@
 ---
 title: STT Providers & Settings
+description: Configure Speech-to-Text providers including Deepgram and Azure Speech for real-time transcription
 ---
 
 <Callout type="info">
-Speech-to-Text (STT) converts what callers say into text for your AI to understand. Burki Voice AI uses Deepgram for high-quality, real-time transcription.
+Speech-to-Text (STT) converts what callers say into text for your AI to understand. Burki Voice AI supports multiple STT providers—choose based on your needs for speed, language support, or enterprise features.
 </Callout>
 
 ---
 
-## Deepgram Models Comparison
+## Provider Comparison
+
+| Feature | Deepgram | Azure Speech |
+|---------|----------|--------------|
+| **Speed** | Ultra-fast (~100ms) | Fast (~200ms) |
+| **Languages** | 30+ | 100+ |
+| **Models** | Nova 2, Nova 3 | Standard, Enhanced, Neural |
+| **Term Boosting** | Keywords, Keyterms | Phrase Lists |
+| **Best For** | Phone calls, Speed | Enterprise, Multi-language |
+| **Diarization** | ✅ | ✅ |
+| **Real-Time** | ✅ | ✅ |
+
+<CardGroup cols={2}>
+  <Card title="⚡ Deepgram" icon="bolt" href="#deepgram">
+    **Ultra-Low Latency**
+    
+    ~100ms response time, optimized for phone calls. Nova-3 keyterms for English, Nova-2 for multi-language.
+  </Card>
+  
+  <Card title="☁️ Azure Speech" icon="cloud" href="/stt-providers/azure">
+    **Enterprise Scale**
+    
+    100+ languages, Microsoft ecosystem integration, phrase lists for term boosting, custom speech models.
+  </Card>
+</CardGroup>
+
+---
+
+## Deepgram
+
+Deepgram is the default STT provider, optimized for speed and phone call quality.
+
+### Models
 
 | Model     | Features                    | Keywords | Keyterms | Best For                  |
 |-----------|----------------------------|----------|----------|---------------------------|
@@ -22,31 +55,82 @@ Speech-to-Text (STT) converts what callers say into text for your AI to understa
 **Recommended:** Use Nova-3 for English calls (supports keyterms) or Nova-2 for other languages (supports keywords).
 </Callout>
 
+### Configuration
+
+```json
+{
+  "stt_settings": {
+    "provider": "deepgram",
+    "model": "nova-3",
+    "language": "en-US"
+  }
+}
+```
+
+---
+
+## Azure Speech
+
+<Accordion title="Azure Speech Configuration">
+Azure Speech provides enterprise-grade speech recognition with broad language support and Microsoft ecosystem integration.
+
+**Key Features:**
+- 100+ languages and regional variants
+- Phrase lists for domain-specific term boosting
+- Custom speech models for specialized vocabulary
+- Speaker diarization support
+
+**Setup:**
+1. Create Azure Speech resource in [Azure Portal](https://portal.azure.com)
+2. Get your subscription key and region
+3. Configure in assistant settings
+
+**Configuration:**
+```json
+{
+  "stt_settings": {
+    "provider": "azure",
+    "model": "standard",
+    "language": "en-US",
+    "azure_config": {
+      "subscription_key": "your_key",
+      "region": "eastus"
+    }
+  }
+}
+```
+
+<Card title="📖 Full Azure Documentation" icon="book" href="/stt-providers/azure">
+  See the complete Azure Speech STT guide for models, languages, configuration options, and best practices.
+</Card>
+</Accordion>
+
 ---
 
 ## Key Settings
 
 <Accordion title="Model & Language">
-- **Model:** Choose based on your needs (Nova-3 recommended for English)
+- **Provider:** Choose Deepgram for speed or Azure for enterprise features
+- **Model:** Choose based on your needs (Nova-3 for English, Standard for multi-language)
 - **Language:** Select from common options or enter a custom language code
-- **Custom Language:** Enter any Deepgram-supported language code (e.g., `fr-FR`, `es-ES`)
+- **Custom Language:** Enter any supported language code (e.g., `fr-FR`, `es-ES`)
 </Accordion>
 
 <Accordion title="Advanced Timing Controls">
-These settings control how Deepgram detects when someone has finished speaking. Getting these right is crucial for natural conversation flow.
+These settings control how the STT provider detects when someone has finished speaking. Getting these right is crucial for natural conversation flow.
 
 ### Endpointing (Silence Threshold)
-**What it does**: How long Deepgram waits after detecting silence before considering speech has ended.
+**What it does**: How long the provider waits after detecting silence before considering speech has ended.
 
 **Technical Details**:
 - **Measured in**: Milliseconds
-- **Default**: 10ms (Deepgram's minimal endpointing for real-time applications)
+- **Default**: 10ms (minimal endpointing for real-time applications)
 - **Range**: 10ms - 2000ms (recommended)
 - **Config Path**: `stt_settings.endpointing.silence_threshold`
 
 **Real Example**:
 - 10ms: Very responsive (default) - might cut off slow speakers
-- 500ms: "I need help with..." → 0.5s silence → Deepgram says "speech ended"
+- 500ms: "I need help with..." → 0.5s silence → Provider says "speech ended"
 - 1000ms: More patient (good for people who pause while thinking)
 
 **When to Adjust**:
@@ -55,7 +139,7 @@ These settings control how Deepgram detects when someone has finished speaking. 
 - **Much higher (1500ms+)**: For people with speech difficulties
 
 ### Min Silence Duration  
-**What it does**: Internal timeout for utterance processing when Deepgram doesn't send `speech_final` (not sent to Deepgram API).
+**What it does**: Internal timeout for utterance processing when the provider doesn't send `speech_final` (not sent to provider API).
 
 **Technical Details**:
 - **Measured in**: Milliseconds
@@ -75,7 +159,7 @@ These settings control how Deepgram detects when someone has finished speaking. 
 - **Match with conversation style**: Shorter for rapid-fire Q&A, longer for detailed discussions
 
 ### Utterance End Timeout
-**What it does**: Maximum time Deepgram waits for a complete utterance before sending UtteranceEnd event.
+**What it does**: Maximum time the provider waits for a complete utterance before sending UtteranceEnd event.
 
 **Technical Details**:
 - **Measured in**: Milliseconds  
@@ -85,7 +169,7 @@ These settings control how Deepgram detects when someone has finished speaking. 
 - **API Parameter**: `utterance_end_ms`
 
 **Real Example**:
-- 1000ms: If someone starts talking but doesn't finish within 1 second, Deepgram sends UtteranceEnd (default)
+- 1000ms: If someone starts talking but doesn't finish within 1 second, provider sends UtteranceEnd (default)
 - 500ms: Quick timeout (might cut off long sentences)
 - 2000ms: Patient timeout (good for complex responses)
 
@@ -126,7 +210,7 @@ These settings control how Deepgram detects when someone has finished speaking. 
 </Card>
 
 <Callout type="warning">
-**Critical**: These settings work together with [Call Management interruption settings](/call-management). **Endpointing** controls Deepgram's responsiveness, **Min Silence Duration** controls internal timeout handling, and both affect conversation flow timing.
+**Critical**: These settings work together with [Call Management interruption settings](/call-management). **Endpointing** controls provider responsiveness, **Min Silence Duration** controls internal timeout handling, and both affect conversation flow timing.
 </Callout>
 </Accordion>
 
@@ -140,18 +224,23 @@ These settings control how Deepgram detects when someone has finished speaking. 
 </Accordion>
 
 <Accordion title="Keywords & Keyterms">
-**Keywords** (Nova-2, Nova, Enhanced, Base):
+**Keywords** (Deepgram Nova-2, Nova, Enhanced, Base):
 - Boost recognition of specific words
 - Format: `word:boost_factor` (e.g., `Deepgram:2.0, API:1.5`)
 - Great for company names, technical terms
 
-**Keyterms** (Nova-3 only, English only):
+**Keyterms** (Deepgram Nova-3 only, English only):
 - Advanced keyword detection
 - Format: `word1, word2, word3`
 - More sophisticated than keywords
 
+**Phrase Lists** (Azure Speech):
+- Boost recognition of specific terms
+- Format: Comma-separated list
+- Works with all Azure models and languages
+
 <Callout type="tip">
-Use keywords/keyterms for your company name, product names, and industry-specific terms to improve accuracy.
+Use keywords/keyterms/phrase lists for your company name, product names, and industry-specific terms to improve accuracy.
 </Callout>
 </Accordion>
 
@@ -178,7 +267,7 @@ Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes
 
 <Accordion title="Common STT Issues & Solutions">
 **Speech Detection Problems:**
-- **AI misses words:** Enable denoising or add keywords for important terms
+- **AI misses words:** Enable denoising or add keywords/phrase lists for important terms
 - **Cuts off callers mid-sentence:** Increase endpointing (10ms → 500ms) and utterance end timeout
 - **Long awkward pauses:** Decrease min silence duration for faster internal processing
 - **Interrupts slow speakers:** Increase endpointing and min silence duration  
@@ -186,13 +275,17 @@ Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes
 
 **Language & Recognition:**
 - **Wrong language detected:** Set correct language code or use "custom" option
-- **Technical terms not recognized:** Add them as keywords/keyterms with boost factors
+- **Technical terms not recognized:** Add them as keywords/keyterms/phrase lists with boost factors
 - **Company names garbled:** Add company/product names to keywords list
 
 **Audio Quality:**
 - **Noisy background:** Enable audio denoising and increase VAD turnoff
 - **Poor phone connection:** Enable denoising and use more conservative timing settings
 - **Multiple speakers:** Use higher silence thresholds to avoid cross-talk issues
+
+**Provider-Specific:**
+- **Deepgram connection issues:** Check DEEPGRAM_API_KEY environment variable
+- **Azure authentication failed:** Verify subscription key and region match your Speech resource
 
 <Callout type="tip">
 **Testing Strategy**: Record test calls with different timing settings and listen to the conversation flow. What feels natural to you will feel natural to callers.
@@ -205,16 +298,17 @@ Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes
 
 - **Start with defaults** and adjust based on testing
 - **Test with real calls** in your target environment
-- **Use keywords** for your business-specific terminology
+- **Use term boosting** (keywords/keyterms/phrase lists) for your business-specific terminology
 - **Enable denoising** if you expect background noise
 - **Monitor call quality** and adjust timing as needed
+- **Choose the right provider** based on your primary needs (speed vs. language support)
 
 ---
 
 ## How STT Works with Call Management
 
 <Card title="🔗 STT + Call Management = Natural Conversations" icon="link">
-  **STT Settings** control when Deepgram detects speech has ended.
+  **STT Settings** control when the provider detects speech has ended.
   
   **Call Management Settings** control how your AI responds to that detected speech.
   
@@ -233,4 +327,4 @@ Burki Voice AI includes **RNNoise** for real-time audio denoising, which removes
 
 <Callout type="info">
 **Next Step**: Configure [Call Management settings](/call-management) to control conversation flow after STT detects speech.
-</Callout> 
+</Callout>

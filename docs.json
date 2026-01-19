@@ -53,7 +53,14 @@
                 ],
                 "icon": "microphone"
               },
-              "stt-providers"
+              {
+                "group": "STT Providers",
+                "pages": [
+                  "stt-providers",
+                  "stt-providers/azure"
+                ],
+                "icon": "ear-listen"
+              }
             ]
           },
           {

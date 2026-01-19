@@ -1,0 +1,465 @@
+---
+title: "Azure Speech STT"
+description: "Enterprise-grade speech-to-text with 100+ languages, phrase lists, and Microsoft ecosystem integration"
+---
+
+<Card title="☁️ Azure Speech: Enterprise Scale" icon="cloud">
+  Microsoft's neural STT service with 100+ languages and regional variants. Seamless integration with Azure ecosystem, phrase lists for term boosting, and enterprise-grade reliability. Perfect for organizations already using Microsoft services or requiring broad language support.
+</Card>
+
+## Quick Setup
+
+<Steps>
+  <Step title="Create Azure Speech Resource">
+    1. Go to [Azure Portal](https://portal.azure.com)
+    2. Create a new **Speech** resource
+    3. Select your subscription, resource group, and region
+    4. Note your **Key** and **Region** from the resource's Keys and Endpoint page
+  </Step>
+  <Step title="Configure in Burki">
+    1. Go to **AI Configuration** → **STT** tab
+    2. Select **Azure** as the provider
+    3. Enter your **Subscription Key** and **Region** (e.g., `eastus`, `westus2`)
+  </Step>
+  <Step title="Choose Model & Language">
+    Select your preferred model and language from the dropdowns
+  </Step>
+</Steps>
+
+<Callout type="info">
+**Free Tier**: Azure offers 5 hours of audio per month free for speech-to-text. See [Azure Pricing](#pricing-overview) for details.
+</Callout>
+
+---
+
+## Available Models
+
+<CardGroup cols={3}>
+  <Card title="🎯 Standard" icon="bullseye">
+    **General Purpose**
+    
+    Balanced accuracy and performance for most use cases
+    
+    **Languages**: 30+
+    **Best for**: General transcription
+  </Card>
+  
+  <Card title="⚡ Enhanced" icon="bolt">
+    **Improved Accuracy**
+    
+    Better recognition for major languages
+    
+    **Languages**: 18
+    **Best for**: High-accuracy needs
+  </Card>
+  
+  <Card title="🧠 Neural" icon="brain">
+    **Highest Quality**
+    
+    State-of-the-art neural recognition
+    
+    **Languages**: 16
+    **Best for**: Premium applications
+  </Card>
+</CardGroup>
+
+<Callout type="tip">
+**Recommendation**: Start with **Standard** for broad language support, or use **Neural** for English-focused applications requiring the highest accuracy.
+</Callout>
+
+---
+
+## Language Support
+
+Azure Speech STT supports 100+ languages and regional variants. Here are the most commonly used:
+
+<Accordion title="Full Language List">
+| Language | Code | Standard | Enhanced | Neural |
+|----------|------|----------|----------|--------|
+| English (US) | `en-US` | ✅ | ✅ | ✅ |
+| English (UK) | `en-GB` | ✅ | ✅ | ✅ |
+| English (Australia) | `en-AU` | ✅ | ✅ | ✅ |
+| English (Canada) | `en-CA` | ✅ | ✅ | ✅ |
+| English (India) | `en-IN` | ✅ | ✅ | ✅ |
+| Spanish (Spain) | `es-ES` | ✅ | ✅ | ✅ |
+| Spanish (Mexico) | `es-MX` | ✅ | ✅ | ✅ |
+| French (France) | `fr-FR` | ✅ | ✅ | ✅ |
+| French (Canada) | `fr-CA` | ✅ | ✅ | ✅ |
+| German | `de-DE` | ✅ | ✅ | ✅ |
+| Italian | `it-IT` | ✅ | ✅ | ✅ |
+| Portuguese (Brazil) | `pt-BR` | ✅ | ✅ | ✅ |
+| Portuguese (Portugal) | `pt-PT` | ✅ | ✅ | ✅ |
+| Japanese | `ja-JP` | ✅ | ✅ | ✅ |
+| Korean | `ko-KR` | ✅ | ✅ | ✅ |
+| Chinese (Mandarin) | `zh-CN` | ✅ | ✅ | ✅ |
+| Chinese (Hong Kong) | `zh-HK` | ✅ | ✅ | – |
+| Chinese (Taiwan) | `zh-TW` | ✅ | ✅ | – |
+| Arabic (Saudi Arabia) | `ar-SA` | ✅ | – | – |
+| Hindi | `hi-IN` | ✅ | – | – |
+| Dutch | `nl-NL` | ✅ | – | – |
+| Russian | `ru-RU` | ✅ | – | – |
+| Swedish | `sv-SE` | ✅ | – | – |
+| Danish | `da-DK` | ✅ | – | – |
+| Norwegian | `no-NO` | ✅ | – | – |
+| Finnish | `fi-FI` | ✅ | – | – |
+| Polish | `pl-PL` | ✅ | – | – |
+| Turkish | `tr-TR` | ✅ | – | – |
+| Hebrew | `he-IL` | ✅ | – | – |
+| Thai | `th-TH` | ✅ | – | – |
+</Accordion>
+
+<Callout type="info">
+**100+ More Languages**: Azure supports many additional languages and regional variants. Visit the [Azure Language Support](https://docs.microsoft.com/azure/cognitive-services/speech-service/language-support) page for the complete list.
+</Callout>
+
+---
+
+## Configuration Options
+
+### Basic Configuration
+
+```json
+{
+  "stt_settings": {
+    "provider": "azure",
+    "model": "standard",
+    "language": "en-US"
+  }
+}
+```
+
+### Full Configuration
+
+```json
+{
+  "stt_settings": {
+    "provider": "azure",
+    "model": "standard",
+    "language": "en-US",
+    "punctuate": true,
+    "interim_results": true,
+    "smart_format": true,
+    "endpointing": 10,
+    "utterance_end_ms": 1000,
+    "vad_events": true,
+    "keyterms": ["Burki", "AI assistant", "customer support"]
+  }
+}
+```
+
+### Per-Assistant Azure Credentials
+
+You can configure Azure credentials per-assistant instead of using environment variables:
+
+```json
+{
+  "stt_settings": {
+    "provider": "azure",
+    "azure_config": {
+      "subscription_key": "your_subscription_key",
+      "region": "eastus"
+    }
+  }
+}
+```
+
+---
+
+## Phrase Lists (Keyterms)
+
+Phrase lists boost recognition of specific terms—perfect for company names, product names, and industry terminology.
+
+<Tabs>
+  <Tab title="Dashboard">
+    In **AI Configuration** → **STT** → **Keywords/Keyterms**:
+    
+    Enter terms separated by commas:
+    ```
+    Burki, AI assistant, voice platform, customer success
+    ```
+  </Tab>
+  
+  <Tab title="API">
+    ```json
+    {
+      "stt_settings": {
+        "provider": "azure",
+        "keyterms": [
+          "Burki",
+          "AI assistant", 
+          "voice platform",
+          "customer success"
+        ]
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+<Callout type="tip">
+**Best Practice**: Add your company name, product names, and any domain-specific terminology to phrase lists for improved recognition accuracy.
+</Callout>
+
+---
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="🎯 Phrase Lists" icon="list">
+    **Term Boosting**
+    
+    Boost recognition of specific words and phrases for your domain
+  </Card>
+  
+  <Card title="👥 Speaker Diarization" icon="users">
+    **Speaker Identification**
+    
+    Distinguish between multiple speakers in a conversation
+  </Card>
+  
+  <Card title="🔊 Multi-Channel" icon="volume-high">
+    **Stereo Support**
+    
+    Process audio with separate channels for each participant
+  </Card>
+  
+  <Card title="⚡ Real-Time" icon="bolt">
+    **Low Latency**
+    
+    Real-time transcription with interim results
+  </Card>
+</CardGroup>
+
+---
+
+## Timing Controls
+
+Azure Speech STT supports timing controls to optimize speech detection:
+
+<Accordion title="Endpointing (Silence Threshold)">
+**What it does**: How long to wait after detecting silence before considering speech has ended.
+
+**Default**: 10ms (minimal endpointing)
+**Range**: 10ms - 2000ms
+
+**When to Adjust**:
+- **Lower (10-100ms)**: For fast talkers or quick interactions
+- **Higher (500-1000ms)**: For elderly callers or complex topics
+- **Much higher (1500ms+)**: For people with speech difficulties
+
+```json
+{
+  "stt_settings": {
+    "endpointing": 500
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Utterance End Timeout">
+**What it does**: Maximum time to wait for a complete utterance before triggering end-of-speech.
+
+**Default**: 1000ms
+**Range**: 500ms - 5000ms
+
+**When to Adjust**:
+- **Lower (500-800ms)**: For short, quick interactions
+- **Higher (1500-3000ms)**: For detailed conversations
+
+```json
+{
+  "stt_settings": {
+    "utterance_end_ms": 1500
+  }
+}
+```
+</Accordion>
+
+<Accordion title="VAD Events">
+**What it does**: Enables Voice Activity Detection for enhanced speech detection.
+
+**Default**: Enabled
+
+**Benefits**:
+- Better speech detection in noisy environments
+- Backup mechanism when normal detection fails
+- Essential for background noise scenarios
+
+```json
+{
+  "stt_settings": {
+    "vad_events": true
+  }
+}
+```
+</Accordion>
+
+---
+
+## Provider Comparison
+
+| Feature | Azure Speech | Deepgram |
+|---------|--------------|----------|
+| **Languages** | 100+ | 30+ |
+| **Latency** | ~200ms | ~100ms |
+| **Term Boosting** | Phrase Lists | Keywords/Keyterms |
+| **Diarization** | ✅ | ✅ |
+| **Custom Models** | ✅ (Custom Speech) | Limited |
+| **Real-Time** | ✅ | ✅ |
+| **Multi-Channel** | ✅ | ✅ |
+| **Best For** | Enterprise, Multi-language | Speed, Phone calls |
+
+<Callout type="info">
+**When to Choose Azure**: Broad language support, Microsoft ecosystem integration, enterprise features, or custom speech models.
+
+**When to Choose Deepgram**: Ultra-low latency, phone call optimization, or Nova-3 keyterms for English.
+</Callout>
+
+---
+
+## Regional Selection
+
+<Callout type="tip">
+**Latency Optimization**: Choose the Azure region closest to your deployment for optimal latency.
+</Callout>
+
+| Region | Location | Best For |
+|--------|----------|----------|
+| `eastus` | East US | North America (East) |
+| `eastus2` | East US 2 | North America (East) - Backup |
+| `westus2` | West US 2 | North America (West) |
+| `westeurope` | Netherlands | Europe |
+| `northeurope` | Ireland | Europe - Backup |
+| `southeastasia` | Singapore | Asia-Pacific |
+| `australiaeast` | Australia East | Australia/Oceania |
+
+---
+
+## Environment Variables
+
+```bash
+# Required Azure Speech credentials
+AZURE_SPEECH_KEY=your_subscription_key
+AZURE_SPEECH_REGION=eastus
+```
+
+<Callout type="warning">
+**Security**: Never commit API keys to version control. Use environment variables or secure secrets management.
+</Callout>
+
+---
+
+## Pricing Overview
+
+| Tier | Hours/Month | Price |
+|------|-------------|-------|
+| **Free** | 5 hours | $0 |
+| **Standard** | Pay-as-you-go | $1 per audio hour |
+
+<Callout type="info">
+**Enterprise**: Contact Azure for custom pricing on high-volume usage and reserved capacity. Custom Speech model training has separate pricing.
+</Callout>
+
+---
+
+## Common Issues & Solutions
+
+<Accordion title="Authentication Failed">
+**Problem**: API returns 401 Unauthorized
+
+**Solutions**:
+- Verify `AZURE_SPEECH_KEY` is correct
+- Ensure the key is from your Speech resource (not another Azure service)
+- Check that the region matches your Speech resource's region
+- Verify your Azure subscription is active
+</Accordion>
+
+<Accordion title="Region Mismatch">
+**Problem**: Connection fails or returns errors
+
+**Solutions**:
+- Double-check the region code (e.g., `eastus` not `east-us`)
+- Ensure the region is available for Speech services
+- Try a different region if experiencing connectivity issues
+</Accordion>
+
+<Accordion title="Language Detection Issues">
+**Problem**: Wrong language transcribed
+
+**Solutions**:
+- Explicitly set the language code in configuration
+- Use the correct regional variant (e.g., `es-ES` vs `es-MX`)
+- Ensure your model supports the selected language
+</Accordion>
+
+<Accordion title="Poor Recognition Accuracy">
+**Problem**: Transcription quality is low
+
+**Solutions**:
+- Add domain-specific terms to phrase lists
+- Try a different model (Enhanced or Neural for supported languages)
+- Ensure audio quality is good (minimal background noise)
+- Enable audio denoising in Burki settings
+</Accordion>
+
+<Accordion title="SDK Not Installed">
+**Problem**: Azure Speech SDK import fails
+
+**Solution**:
+```bash
+pip install azure-cognitiveservices-speech
+```
+</Accordion>
+
+---
+
+## Best Practices
+
+<Cards>
+  <Card title="🌍 Regional Selection" icon="globe">
+    Deploy in the Azure region closest to your users for minimal latency
+  </Card>
+  <Card title="📝 Phrase Lists" icon="list">
+    Add company names, products, and industry terms for better recognition
+  </Card>
+  <Card title="🎯 Language Precision" icon="language">
+    Use specific regional variants (e.g., `en-GB` vs `en-US`) for best accuracy
+  </Card>
+  <Card title="⚡ Timing Tuning" icon="clock">
+    Adjust endpointing and utterance timeouts based on your caller demographics
+  </Card>
+</Cards>
+
+---
+
+## See Also
+
+<CardGroup cols={3}>
+  <Card title="⚡ Need Speed?" href="/stt-providers">
+    **Deepgram** - Ultra-low ~100ms latency, optimized for phone calls
+  </Card>
+  
+  <Card title="🔧 Timing Controls" href="/stt-providers#advanced-timing-controls">
+    **Advanced Settings** - Fine-tune speech detection timing
+  </Card>
+  
+  <Card title="📞 Call Management" href="/call-management">
+    **Conversation Flow** - Configure interruption and timeout settings
+  </Card>
+</CardGroup>
+
+<Card title="🔗 Additional Resources" icon="link">
+  **Azure Portal**: [portal.azure.com](https://portal.azure.com)
+  
+  **Language Support**: [Azure STT Language List](https://docs.microsoft.com/azure/cognitive-services/speech-service/language-support)
+  
+  **Documentation**: [Azure Speech Service Docs](https://docs.microsoft.com/azure/cognitive-services/speech-service/)
+  
+  **Pricing**: [Azure Speech Pricing](https://azure.microsoft.com/pricing/details/cognitive-services/speech-services/)
+</Card>
+
+---
+
+<Card title="🚀 Ready to Use Azure Speech STT?" icon="rocket">
+  Head back to your [assistant configuration](/ai-configuration) and set up Azure Speech for enterprise-grade speech-to-text!
+</Card>
