@@ -1,0 +1,277 @@
+---
+title: ElevenLabs Scribe v2
+description: Configure ElevenLabs Scribe v2 Realtime for ultra-low latency speech-to-text with 90+ language support
+---
+
+<Callout type="info">
+ElevenLabs Scribe v2 Realtime is an ultra-low latency STT provider with ~150ms response time, 93.5% accuracy, and support for 90+ languages. It uses advanced Voice Activity Detection (VAD) for intelligent speech boundary detection.
+</Callout>
+
+---
+
+## Overview
+
+| Feature | Details |
+|---------|---------|
+| **Model** | `scribe_v2_realtime` |
+| **Latency** | ~150ms |
+| **Accuracy** | 93.5% |
+| **Languages** | 90+ |
+| **VAD Support** | ✅ Advanced |
+| **Word Timestamps** | ✅ Optional |
+| **Language Detection** | ✅ Optional |
+
+---
+
+## Quick Start
+
+1. **Get API Key**: Sign up at [ElevenLabs](https://elevenlabs.io) and get your API key
+2. **Add to Provider Keys**: Go to **Settings** → **Provider Keys** and add your ElevenLabs API key
+3. **Configure STT**: In your assistant settings, select ElevenLabs as the STT provider
+
+```json
+{
+  "stt_settings": {
+    "provider": "elevenlabs",
+    "model": "scribe_v2_realtime",
+    "language": "en"
+  }
+}
+```
+
+---
+
+## Configuration Options
+
+### Basic Settings
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | string | `scribe_v2_realtime` | The STT model to use |
+| `language` | string | `en` | Language code (ISO 639-1 format) |
+
+### VAD Settings
+
+Voice Activity Detection (VAD) controls how the STT provider detects when someone has finished speaking.
+
+| Parameter | Type | Default | Range | Description |
+|-----------|------|---------|-------|-------------|
+| `commit_strategy` | string | `vad` | `vad`, `manual` | How transcripts are committed |
+| `vad_threshold` | float | `0.4` | 0.1 - 0.9 | VAD sensitivity (lower = more sensitive) |
+| `vad_silence_threshold_secs` | float | `1.5` | 0.3 - 3.0 | Silence duration to commit transcript |
+| `min_speech_duration_ms` | int | `100` | 50 - 2000 | Minimum speech duration to consider |
+| `min_silence_duration_ms` | int | `100` | 50 - 2000 | Minimum silence duration to consider |
+
+### Additional Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `include_timestamps` | boolean | `true` | Include word-level timestamps |
+| `include_language_detection` | boolean | `false` | Include detected language in response |
+
+---
+
+## Full Configuration Example
+
+```json
+{
+  "stt_settings": {
+    "provider": "elevenlabs",
+    "model": "scribe_v2_realtime",
+    "language": "en",
+    "elevenlabs_config": {
+      "commit_strategy": "vad",
+      "vad_threshold": 0.4,
+      "vad_silence_threshold_secs": 1.5,
+      "min_speech_duration_ms": 100,
+      "min_silence_duration_ms": 100,
+      "include_timestamps": true,
+      "include_language_detection": false
+    }
+  }
+}
+```
+
+---
+
+## VAD Commit Strategy
+
+ElevenLabs Scribe v2 uses a VAD-based commit strategy by default, which automatically detects when speech has ended and commits the transcript.
+
+<Accordion title="VAD vs Manual Commit">
+**VAD (Voice Activity Detection) - Recommended:**
+- Automatically detects speech boundaries
+- Commits transcript when silence is detected
+- Best for natural conversation flow
+- Configurable sensitivity and timing
+
+**Manual Commit:**
+- You control when transcripts are committed
+- Useful for specific use cases where you need precise control
+- Requires handling commit signals in your application
+
+<Callout type="tip">
+For phone calls, VAD commit strategy is recommended as it provides the most natural conversation experience.
+</Callout>
+</Accordion>
+
+---
+
+## VAD Tuning Guide
+
+<Accordion title="Adjusting VAD for Different Scenarios">
+
+### Fast-Paced Conversations
+```json
+{
+  "vad_threshold": 0.3,
+  "vad_silence_threshold_secs": 0.8,
+  "min_speech_duration_ms": 50,
+  "min_silence_duration_ms": 50
+}
+```
+- Lower silence threshold for quicker responses
+- More sensitive VAD detection
+
+### Patient/Thoughtful Speakers
+```json
+{
+  "vad_threshold": 0.5,
+  "vad_silence_threshold_secs": 2.0,
+  "min_speech_duration_ms": 150,
+  "min_silence_duration_ms": 150
+}
+```
+- Higher silence threshold to avoid cutting off
+- More patience for pauses during thinking
+
+### Noisy Environments
+```json
+{
+  "vad_threshold": 0.6,
+  "vad_silence_threshold_secs": 1.5,
+  "min_speech_duration_ms": 200,
+  "min_silence_duration_ms": 200
+}
+```
+- Higher VAD threshold to filter noise
+- Longer minimum durations to avoid false triggers
+
+</Accordion>
+
+---
+
+## Supported Languages
+
+ElevenLabs Scribe v2 supports 90+ languages. Use the ISO 639-1 language code:
+
+<Accordion title="Common Language Codes">
+
+| Language | Code | Language | Code |
+|----------|------|----------|------|
+| English | `en` | Spanish | `es` |
+| French | `fr` | German | `de` |
+| Italian | `it` | Portuguese | `pt` |
+| Dutch | `nl` | Polish | `pl` |
+| Russian | `ru` | Japanese | `ja` |
+| Korean | `ko` | Chinese | `zh` |
+| Arabic | `ar` | Hindi | `hi` |
+| Turkish | `tr` | Swedish | `sv` |
+
+<Callout type="info">
+For the full list of supported languages, visit the [ElevenLabs documentation](https://elevenlabs.io/docs).
+</Callout>
+</Accordion>
+
+---
+
+## Word-Level Timestamps
+
+When `include_timestamps` is enabled, each word in the transcript includes timing information:
+
+```json
+{
+  "text": "Hello, how can I help you today?",
+  "words": [
+    { "word": "Hello", "start": 0.0, "end": 0.45 },
+    { "word": "how", "start": 0.52, "end": 0.68 },
+    { "word": "can", "start": 0.70, "end": 0.85 },
+    { "word": "I", "start": 0.87, "end": 0.92 },
+    { "word": "help", "start": 0.95, "end": 1.15 },
+    { "word": "you", "start": 1.18, "end": 1.32 },
+    { "word": "today", "start": 1.35, "end": 1.72 }
+  ]
+}
+```
+
+<Callout type="tip">
+Word timestamps are useful for analytics, keyword spotting, and advanced conversation analysis.
+</Callout>
+
+---
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start with Defaults" icon="play">
+    The default VAD settings work well for most phone call scenarios. Only adjust after testing.
+  </Card>
+  
+  <Card title="Test with Real Calls" icon="phone">
+    Record test calls and listen to the conversation flow. Adjust VAD settings based on actual user experience.
+  </Card>
+  
+  <Card title="Match Call Style" icon="sliders">
+    Fast customer service? Lower thresholds. Complex discussions? Higher thresholds and more patience.
+  </Card>
+  
+  <Card title="Enable Denoising" icon="waveform">
+    For noisy environments, enable audio denoising in your STT settings alongside VAD tuning.
+  </Card>
+</CardGroup>
+
+---
+
+## Troubleshooting
+
+<Accordion title="Common Issues">
+
+**Transcripts cut off mid-sentence:**
+- Increase `vad_silence_threshold_secs` (try 2.0 seconds)
+- Increase `min_silence_duration_ms`
+
+**Long pauses before AI responds:**
+- Decrease `vad_silence_threshold_secs` (try 1.0 seconds)
+- Lower `vad_threshold` for more sensitive detection
+
+**Background noise triggering false transcripts:**
+- Increase `vad_threshold` (try 0.6)
+- Increase `min_speech_duration_ms`
+- Enable audio denoising
+
+**Wrong language detected:**
+- Set the correct language code explicitly
+- Disable `include_language_detection` if not needed
+
+**Connection issues:**
+- Verify your ElevenLabs API key in **Settings** → **Provider Keys**
+- Check your account has sufficient credits
+
+</Accordion>
+
+---
+
+## Comparison with Other Providers
+
+| Feature | ElevenLabs Scribe v2 | Deepgram | Azure Speech |
+|---------|---------------------|----------|--------------|
+| Latency | ~150ms | ~100ms | ~200ms |
+| Languages | 90+ | 30+ | 100+ |
+| VAD | Advanced | Basic | Standard |
+| Word Timestamps | ✅ | ✅ | ✅ |
+| Term Boosting | ❌ | ✅ Keywords | ✅ Phrase Lists |
+| Best For | Multi-language, VAD | Speed, English | Enterprise |
+
+<Callout type="info">
+Choose ElevenLabs Scribe v2 when you need excellent multi-language support with advanced VAD capabilities. Choose Deepgram for the absolute lowest latency, or Azure for enterprise features and custom models.
+</Callout>

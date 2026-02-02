@@ -56,6 +56,7 @@
                 "group": "STT Providers",
                 "pages": [
                   "stt-providers",
+                  "stt-providers/elevenlabs",
                   "stt-providers/azure"
                 ],
                 "icon": "ear-listen"

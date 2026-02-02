@@ -11,21 +11,27 @@ Speech-to-Text (STT) converts what callers say into text for your AI to understa
 
 ## Provider Comparison
 
-| Feature | Deepgram | Azure Speech |
-|---------|----------|--------------|
-| **Speed** | Ultra-fast (~100ms) | Fast (~200ms) |
-| **Languages** | 30+ | 100+ |
-| **Models** | Nova 2, Nova 3 | Standard, Enhanced, Neural |
-| **Term Boosting** | Keywords, Keyterms | Phrase Lists |
-| **Best For** | Phone calls, Speed | Enterprise, Multi-language |
-| **Diarization** | ✅ | ✅ |
-| **Real-Time** | ✅ | ✅ |
+| Feature | Deepgram | ElevenLabs Scribe v2 | Azure Speech |
+|---------|----------|---------------------|--------------|
+| **Speed** | Ultra-fast (~100ms) | Ultra-fast (~150ms) | Fast (~200ms) |
+| **Languages** | 30+ | 90+ | 100+ |
+| **Models** | Nova 2, Nova 3 | Scribe v2 Realtime | Standard, Enhanced, Neural |
+| **Term Boosting** | Keywords, Keyterms | ❌ | Phrase Lists |
+| **Best For** | Phone calls, Speed | Multi-language, VAD | Enterprise, Multi-language |
+| **Diarization** | ✅ | ❌ | ✅ |
+| **Real-Time** | ✅ | ✅ | ✅ |
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="⚡ Deepgram" icon="bolt" href="#deepgram">
     **Ultra-Low Latency**
     
     ~100ms response time, optimized for phone calls. Nova-3 keyterms for English, Nova-2 for multi-language.
+  </Card>
+  
+  <Card title="🎙️ ElevenLabs Scribe v2" icon="waveform-lines" href="/stt-providers/elevenlabs">
+    **Multi-Language Excellence**
+    
+    ~150ms latency, 90+ languages, advanced VAD-based speech detection, 93.5% accuracy.
   </Card>
   
   <Card title="☁️ Azure Speech" icon="cloud" href="/stt-providers/azure">
@@ -66,6 +72,46 @@ Deepgram is the default STT provider, optimized for speed and phone call quality
   }
 }
 ```
+
+---
+
+## ElevenLabs Scribe v2
+
+<Accordion title="ElevenLabs Scribe v2 Configuration">
+ElevenLabs Scribe v2 Realtime provides ultra-low latency speech recognition with excellent multi-language support and advanced voice activity detection.
+
+**Key Features:**
+- Ultra-low latency (~150ms) with 93.5% accuracy
+- 90+ languages supported
+- Advanced VAD-based commit strategy
+- Word-level timestamps support
+- Automatic language detection
+
+**Setup:**
+1. Sign up at [ElevenLabs](https://elevenlabs.io)
+2. Get your API key from the dashboard
+3. Configure in assistant settings
+
+**Configuration:**
+```json
+{
+  "stt_settings": {
+    "provider": "elevenlabs",
+    "model": "scribe_v2_realtime",
+    "language": "en",
+    "elevenlabs_config": {
+      "commit_strategy": "vad",
+      "vad_threshold": 0.4,
+      "vad_silence_threshold_secs": 1.5
+    }
+  }
+}
+```
+
+<Card title="📖 Full ElevenLabs Documentation" icon="book" href="/stt-providers/elevenlabs">
+  See the complete ElevenLabs Scribe v2 guide for VAD settings, language options, and best practices.
+</Card>
+</Accordion>
 
 ---
 

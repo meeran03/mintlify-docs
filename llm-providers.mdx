@@ -17,7 +17,8 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 | Gemini     | Gemini 2.0 Flash      | Fast       | Multimodal | $$        | Google's latest        |
 | xAI        | Grok Beta, Grok 2     | Very Fast  | Good       | $         | Real-time, less strict |
 | Groq       | Llama 3.3, 3.1        | Ultra Fast | Good       | $         | Speed-focused          |
-| Custom     | Any                   | ?          | ?          | ?         | Bring your own!        |
+| Custom     | Any                   | ?          | ?          | ?         | Bring your own (HTTP)  |
+| Custom WebSocket | Any            | Ultra Fast | ?          | ?         | Lowest latency option  |
 
 ---
 
@@ -71,12 +72,308 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 <Callout type="tip">Groq is all about speed—perfect for high-volume or latency-sensitive apps.</Callout>
 </Accordion>
 
-<Accordion title="Custom Endpoint">
+<Accordion title="Custom Endpoint (HTTP)">
 1. Enter your custom API endpoint URL
 2. (Optional) Add an API key if required
 3. Specify the model name
 
 <Callout type="warning">Custom endpoints are for advanced users. Make sure your API is OpenAI-compatible!</Callout>
+</Accordion>
+
+<Accordion title="Custom WebSocket (Lowest Latency)">
+Use a persistent WebSocket connection to your own LLM endpoint for the lowest possible latency. This is ideal for self-hosted models or custom inference servers.
+
+**Key Benefits:**
+- **Persistent Connection**: Maintains connection throughout the entire call—no connection overhead per request
+- **Pre-warming**: Sends initialization data before the first transcript, allowing your server to pre-load context
+- **Automatic Reconnection**: Exponential backoff with configurable retry attempts
+- **HTTP Fallback**: Falls back to HTTP if WebSocket disconnects
+
+**Setup:**
+1. Enter your WebSocket URL (e.g., `wss://api.example.com/ws/completions`)
+2. (Optional) Add a fallback HTTP URL for reliability
+3. (Optional) Add an API key if required
+
+**Configuration:**
+```json
+{
+  "llm_provider": "custom_websocket",
+  "llm_provider_config": {
+    "ws_url": "wss://api.example.com/ws/completions",
+    "fallback_base_url": "https://api.example.com/v1",
+    "api_key": "your_api_key",
+    "reconnect_attempts": 3,
+    "reconnect_delay": 1.0,
+    "ping_interval": 30
+  }
+}
+```
+
+---
+
+### WebSocket Protocol Specification
+
+#### Connection
+
+Burki connects to `{ws_url}/{call_id}` for each call. For example, if your `ws_url` is `wss://api.example.com/ws/completions` and the call ID is `call_abc123`, the connection URL will be:
+
+```
+wss://api.example.com/ws/completions/call_abc123
+```
+
+---
+
+#### Messages FROM Burki (Your Server Receives)
+
+Your server will receive these JSON messages:
+
+<Accordion title="1. Init Message (Pre-warming)">
+Sent immediately after connection, before any transcripts. Use this to pre-load context, do DB lookups, and prepare for fast responses.
+
+```json
+{
+  "type": "init",
+  "call_id": "call_abc123",
+  "phoneNumber": { "number": "+1234567890" },
+  "call": {
+    "customer": { "number": "+0987654321" },
+    "phoneCallProviderId": "call_abc123"
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `type` | Always `"init"` |
+| `call_id` | Unique identifier for this call |
+| `phoneNumber.number` | The phone number being called (your assistant's number) |
+| `call.customer.number` | The caller's phone number |
+| `call.phoneCallProviderId` | Provider-specific call ID |
+
+**Your server should respond with:**
+```json
+{
+  "type": "session_ready",
+  "call_id": "call_abc123"
+}
+```
+</Accordion>
+
+<Accordion title="2. Transcript Message (LLM Request)">
+Sent when the caller speaks. This is the main request for LLM completion.
+
+```json
+{
+  "type": "transcript",
+  "request_id": "req_call_abc123_1_1706832000000",
+  "messages": [
+    { "role": "system", "content": "You are a helpful assistant..." },
+    { "role": "user", "content": "Hello, I need help with my order." }
+  ],
+  "phoneNumber": { "number": "+1234567890" },
+  "call": {
+    "phoneCallProviderId": "call_abc123",
+    "customer": { "number": "+0987654321" }
+  },
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "transfer_call",
+        "description": "Transfer the call to a human agent",
+        "parameters": { "type": "object", "properties": {} }
+      }
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `type` | Always `"transcript"` |
+| `request_id` | Unique ID for this request (use in responses) |
+| `messages` | OpenAI-compatible message array |
+| `tools` | Optional array of available function tools |
+</Accordion>
+
+<Accordion title="3. Ping Message (Keep-alive)">
+Sent periodically to keep the connection alive.
+
+```json
+{
+  "type": "ping",
+  "timestamp": 1706832000000
+}
+```
+
+**Your server should respond with:**
+```json
+{
+  "type": "pong"
+}
+```
+</Accordion>
+
+<Accordion title="4. Cancel Message">
+Sent when the user interrupts or the request should be cancelled.
+
+```json
+{
+  "type": "cancel",
+  "request_id": "req_call_abc123_1_1706832000000"
+}
+```
+
+**Your server should:**
+1. Stop generating for this `request_id`
+2. Optionally respond with:
+```json
+{
+  "type": "cancelled",
+  "request_id": "req_call_abc123_1_1706832000000"
+}
+```
+</Accordion>
+
+---
+
+#### Messages TO Burki (Your Server Sends)
+
+Your server should send these JSON messages:
+
+<Accordion title="1. Session Ready">
+Confirm that pre-warming is complete and the session is ready.
+
+```json
+{
+  "type": "session_ready",
+  "call_id": "call_abc123"
+}
+```
+</Accordion>
+
+<Accordion title="2. Streaming Response Chunks (OpenAI-compatible)">
+Stream LLM responses using OpenAI-compatible format. Each chunk must include the `request_id`.
+
+**Text content chunk:**
+```json
+{
+  "request_id": "req_call_abc123_1_1706832000000",
+  "choices": [{
+    "delta": { "content": "Hello! " },
+    "finish_reason": null
+  }]
+}
+```
+
+**Final chunk (end of response):**
+```json
+{
+  "request_id": "req_call_abc123_1_1706832000000",
+  "choices": [{
+    "delta": {},
+    "finish_reason": "stop"
+  }]
+}
+```
+</Accordion>
+
+<Accordion title="3. Tool Call Response">
+If your LLM decides to call a tool (like transfer_call, end_call, or send_dtmf):
+
+**Tool call start:**
+```json
+{
+  "request_id": "req_call_abc123_1_1706832000000",
+  "choices": [{
+    "delta": {
+      "tool_calls": [{
+        "id": "tool_123",
+        "function": {
+          "name": "transfer_call",
+          "arguments": ""
+        }
+      }]
+    },
+    "finish_reason": null
+  }]
+}
+```
+
+**Tool call arguments (can be streamed in chunks):**
+```json
+{
+  "request_id": "req_call_abc123_1_1706832000000",
+  "choices": [{
+    "delta": {
+      "tool_calls": [{
+        "function": {
+          "arguments": "{\"destination\": \"+1555"
+        }
+      }]
+    },
+    "finish_reason": null
+  }]
+}
+```
+
+**Tool call complete:**
+```json
+{
+  "request_id": "req_call_abc123_1_1706832000000",
+  "choices": [{
+    "delta": {},
+    "finish_reason": "tool_calls"
+  }]
+}
+```
+</Accordion>
+
+<Accordion title="4. Pong Response">
+Response to ping for keep-alive.
+
+```json
+{
+  "type": "pong"
+}
+```
+</Accordion>
+
+<Accordion title="5. Error Response">
+If something goes wrong:
+
+```json
+{
+  "request_id": "req_call_abc123_1_1706832000000",
+  "error": {
+    "message": "Internal server error",
+    "code": "internal_error"
+  }
+}
+```
+</Accordion>
+
+---
+
+### Available Built-in Tools
+
+When Burki sends a transcript request, it may include tools that your LLM can call:
+
+| Tool Name | Description | Arguments |
+|-----------|-------------|-----------|
+| `transfer_call` | Transfer to another number | `destination` (phone number) |
+| `end_call` | End the current call | None |
+| `send_dtmf` | Send DTMF tones | `digits` (string of digits) |
+
+---
+
+<Callout type="tip">
+The WebSocket connects to `{ws_url}/{call_id}` for each call, allowing your server to route and manage connections per-call. The `init` message is sent before any audio is processed, giving you time to warm up caches.
+</Callout>
+
+<Callout type="warning">
+Custom WebSocket is for advanced users running their own inference infrastructure. Your server must implement the full message protocol described above. All responses must be valid JSON and include the `request_id` for transcript responses.
+</Callout>
 </Accordion>
 
 ---
