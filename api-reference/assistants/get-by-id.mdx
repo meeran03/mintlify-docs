@@ -27,14 +27,20 @@ openapi: 'GET /api/v1/assistants/{assistant_id}'
   </p>
 </section>
 
-### Path Parameters
+<section aria-labelledby="get-assistant-path-params">
+  <h2 id="get-assistant-path-params">Path parameters</h2>
+  <ul>
+    <li>
+      <code>assistant_id</code> (string, <strong>required</strong>): The assistant ID from create or list.
+    </li>
+  </ul>
+</section>
 
-- `assistant_id` (string, **required**): The unique identifier for the assistant you want to retrieve. This ID is returned when you create an assistant or list all assistants.
-
-### Response
-
-If an assistant with the specified ID is found, the response will be a JSON object containing the full details of that assistant. This is the same object structure you receive when listing multiple assistants.
-
+<section aria-labelledby="get-assistant-response">
+  <h2 id="get-assistant-response">Response</h2>
+  <p>
+    When the ID exists, the API returns one assistant object. The shape matches each item from the list endpoint.
+  </p>
 ```json Response
 {
   "id": "asst_a1b2c3d4e5f67890",
@@ -78,5 +84,7 @@ If an assistant with the specified ID is found, the response will be a JSON obje
   "updated_at": "2023-10-26T10:00:00Z"
 }
 ```
+
+</section>
 
 </article>
