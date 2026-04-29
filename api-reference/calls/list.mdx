@@ -58,7 +58,7 @@ The response is a paginated object containing the call items and pagination meta
       "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "assistant_id": 123,
       "assistant_name": "ServiceBot",
-      "assistant_graph_name": "Customer Support Flow",
+      "flow_name": "Customer Support Flow",
       "to_phone_number": "+15551234567",
       "customer_phone_number": "+15559876543",
       "status": "completed",
@@ -102,7 +102,7 @@ The response is a paginated object containing the call items and pagination meta
 | `call_sid` | string | Telephony provider's call SID |
 | `assistant_id` | integer | ID of the assistant that handled the call |
 | `assistant_name` | string | Name of the assistant |
-| `assistant_graph_name` | string | Name of the assistant graph (if call was routed through a graph) |
+| `flow_name` | string | Name of the ConversationFlow (if call was routed through a flow) |
 | `to_phone_number` | string | The phone number that was called (your number) |
 | `customer_phone_number` | string | The customer's phone number |
 | `status` | string | Call status: `ongoing`, `completed`, `failed` |
@@ -236,5 +236,5 @@ def calculate_total_costs(assistant_id, date_from, date_to):
 ## Notes
 
 - Results are ordered by `started_at` descending (newest first)
-- The `assistant_graph_name` field is only populated when the call was routed through an assistant graph
+- The `flow_name` field is only populated when the call was routed through a ConversationFlow
 - Cost fields may be `null` for calls that are still ongoing or if cost tracking is not enabled

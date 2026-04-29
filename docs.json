@@ -81,7 +81,7 @@
               "messaging",
               "phone-number-management",
               "campaigns",
-              "assistant-graphs",
+              "conversation-flows",
               "rag",
               "call-management",
               "tools",
@@ -266,18 +266,9 @@
             ]
           },
           {
-            "group": "Assistant Graphs",
+            "group": "Conversation Flows",
             "pages": [
-              "api-reference/assistant-graphs/create",
-              "api-reference/assistant-graphs/list",
-              "api-reference/assistant-graphs/get",
-              "api-reference/assistant-graphs/update",
-              "api-reference/assistant-graphs/structure",
-              "api-reference/assistant-graphs/delete",
-              "api-reference/assistant-graphs/sessions",
-              "api-reference/assistant-graphs/phone-numbers",
-              "api-reference/assistant-graphs/analytics",
-              "api-reference/assistant-graphs/test"
+              "api-reference/flows/overview"
             ]
           }
         ]

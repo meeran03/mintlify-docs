@@ -1,0 +1,127 @@
+---
+title: 'Conversation Flows API'
+description: 'Create, update, list, delete, and assign phone numbers to ConversationFlows.'
+---
+
+Conversation Flows are available under `/api/v1/flows`. They replace the removed `/api/v1/assistant-graphs` endpoints.
+
+## Flow Object
+
+```json
+{
+  "id": 42,
+  "organization_id": 1,
+  "base_assistant_id": 123,
+  "name": "Customer Support Flow",
+  "graph": {
+    "begin_node": "start",
+    "global_prompt": "Be concise.",
+    "nodes": {
+      "start": {
+        "type": "conversation",
+        "prompt": "Greet the caller.",
+        "transitions": [
+          {
+            "kind": "prompt",
+            "to": "support",
+            "when": "The caller needs support."
+          }
+        ]
+      },
+      "support": {
+        "type": "conversation",
+        "prompt": "Help the caller with support questions."
+      }
+    }
+  },
+  "is_active": true,
+  "created_at": "2026-04-29T14:00:00Z",
+  "updated_at": "2026-04-29T14:00:00Z"
+}
+```
+
+## List Flows
+
+<api method="GET" endpoint="/api/v1/flows" />
+
+Query parameters:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `active_only` | boolean | Defaults to `true`. When true, returns only active flows. |
+
+```bash
+curl "https://api.burki.dev/api/v1/flows?active_only=true" \
+  -H "Authorization: Bearer $BURKI_API_KEY"
+```
+
+## Create Flow
+
+<api method="POST" endpoint="/api/v1/flows" />
+
+```json
+{
+  "name": "Customer Support Flow",
+  "base_assistant_id": 123,
+  "graph": {
+    "begin_node": "start",
+    "nodes": {
+      "start": {
+        "type": "conversation",
+        "prompt": "Greet the caller and ask how you can help."
+      }
+    }
+  },
+  "is_active": true
+}
+```
+
+`base_assistant_id` and `graph` can be omitted to let the backend create a starter assistant and one-node starter flow.
+
+## Get Flow
+
+<api method="GET" endpoint="/api/v1/flows/{flow_id}" />
+
+```bash
+curl https://api.burki.dev/api/v1/flows/42 \
+  -H "Authorization: Bearer $BURKI_API_KEY"
+```
+
+## Update Flow
+
+<api method="PUT" endpoint="/api/v1/flows/{flow_id}" />
+
+Send any subset of `name`, `base_assistant_id`, `graph`, and `is_active`.
+
+```bash
+curl -X PUT https://api.burki.dev/api/v1/flows/42 \
+  -H "Authorization: Bearer $BURKI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"is_active": false}'
+```
+
+## Delete Flow
+
+<api method="DELETE" endpoint="/api/v1/flows/{flow_id}" />
+
+Deleting a flow removes the flow record and clears phone-number assignments through database foreign keys.
+
+## Assign Phone Number
+
+<api method="POST" endpoint="/api/v1/flows/{flow_id}/phone-numbers/{phone_number_id}/assign" />
+
+Assigns a phone number to a flow and clears any direct assistant assignment.
+
+```bash
+curl -X POST https://api.burki.dev/api/v1/flows/42/phone-numbers/7/assign \
+  -H "Authorization: Bearer $BURKI_API_KEY"
+```
+
+## Unassign Phone Number
+
+<api method="POST" endpoint="/api/v1/flows/{flow_id}/phone-numbers/{phone_number_id}/unassign" />
+
+```bash
+curl -X POST https://api.burki.dev/api/v1/flows/42/phone-numbers/7/unassign \
+  -H "Authorization: Bearer $BURKI_API_KEY"
+```

@@ -17,7 +17,7 @@ The request body is a JSON object specifying the details of the outbound call.
 
 ### Required Parameters
 
-- `from_phone_number` (string, **required**): The phone number to call from, in E.164 format. This number must be assigned to an assistant or assistant graph in your organization.
+- `from_phone_number` (string, **required**): The phone number to call from, in E.164 format. This number must be assigned to an assistant or ConversationFlow in your organization.
 - `to_phone_number` (string, **required**): The destination phone number to call, in E.164 format.
 
 ### Optional Parameters
@@ -32,8 +32,8 @@ The request body is a JSON object specifying the details of the outbound call.
 The system determines which assistant handles the call using the following priority:
 
 1. **If `assistant_id` is provided**: Use the specified assistant (must belong to your organization)
-2. **If `from_phone_number` is assigned to an assistant**: Use that assistant
-3. **If `from_phone_number` is assigned to an assistant graph**: Use the entry point assistant from the graph
+2. **If `from_phone_number` is assigned to a ConversationFlow**: Use the flow's base assistant and live flow runtime
+3. **If `from_phone_number` is assigned to an assistant**: Use that assistant
 
 <Warning>
 If no assistant can be resolved through the above logic, the request will fail with a 404 error.

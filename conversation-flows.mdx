@@ -1,0 +1,56 @@
+---
+title: 'Conversation Flows'
+description: 'Build RetellAI-style call flows with conversation nodes, global prompts, variables, and LLM-decided transitions.'
+---
+
+Conversation Flows let one base assistant route a call through multiple conversation nodes. Each node has its own prompt and optional transitions. During the call, the LLM chooses transitions by calling generated tools such as `transition_to_billing` or `transition_to_support`.
+
+Flows replace the older Assistant Graph system. The new model is intentionally smaller: one JSON document, one base assistant for voice/STT/TTS/tools, Redis-backed live state, and API-first editing.
+
+## Flow Shape
+
+```json
+{
+  "begin_node": "start",
+  "global_prompt": "Be concise and helpful.",
+  "nodes": {
+    "start": {
+      "type": "conversation",
+      "prompt": "Greet the caller and ask how you can help.",
+      "transitions": [
+        {
+          "kind": "prompt",
+          "to": "support",
+          "when": "The caller needs product support."
+        }
+      ]
+    },
+    "support": {
+      "type": "conversation",
+      "prompt": "Help the caller with support questions."
+    }
+  }
+}
+```
+
+## Runtime Behavior
+
+- `begin_node` is the first node for every call.
+- `global_prompt` is applied to every node.
+- Node prompts are combined with the base assistant prompt.
+- Transition tools are generated only for the current node's outgoing transitions.
+- Dynamic variables such as `{{from_number}}` are read-only and interpolated into prompts.
+- Existing assistant tools such as `endCall`, transfer, DTMF, SMS, and custom tools still come from the base assistant.
+
+## Phone Number Assignment
+
+Phone numbers can be assigned to either a single assistant or a ConversationFlow. A flow assignment stores `flow_id` on the phone number and clears the direct assistant assignment.
+
+Use the Flow phone-number endpoints to bind numbers to flows:
+
+```bash
+curl -X POST https://api.burki.dev/api/v1/flows/42/phone-numbers/7/assign \
+  -H "Authorization: Bearer $BURKI_API_KEY"
+```
+
+See the [Conversation Flows API reference](/api-reference/flows/overview) for CRUD and assignment endpoints.

@@ -22,7 +22,7 @@ This is one of the most powerful features of Burki - it allows you to trigger AI
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `from_phone_number` | string | Yes | Phone number to call from (E.164 format). Must be assigned to an assistant in your organization. |
+| `from_phone_number` | string | Yes | Phone number to call from (E.164 format). Must be assigned to an assistant or ConversationFlow in your organization. |
 | `to_phone_number` | string | Yes | Destination phone number (E.164 format). |
 | `assistant_id` | integer | No | Override the default assistant. If not provided, uses the assistant assigned to `from_phone_number`. |
 | `welcome_message` | string | No | Custom greeting for this call. Supports `{{variable}}` template syntax. |
@@ -34,8 +34,8 @@ This is one of the most powerful features of Burki - it allows you to trigger AI
 The system determines which assistant handles the call:
 
 1. **If `assistant_id` is provided**: Uses that specific assistant
-2. **If phone number has a direct assistant**: Uses the assigned assistant
-3. **If phone number has an assistant graph**: Uses the graph's entry point assistant
+2. **If phone number has a ConversationFlow**: Uses the flow's base assistant and live flow runtime
+3. **If phone number has a direct assistant**: Uses the assigned assistant
 
 ## Examples
 
