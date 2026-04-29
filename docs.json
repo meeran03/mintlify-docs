@@ -6,8 +6,8 @@
   "seo": {
     "metatags": {
       "og:site_name": "Burki Voice AI Docs",
-      "canonical": "https://docs.burki.dev/",
-      "og:url": "https://docs.burki.dev/",
+      "canonical": "https://docs.burki.dev",
+      "og:url": "https://docs.burki.dev",
       "og:type": "website"
     }
   },
