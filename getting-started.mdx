@@ -7,6 +7,17 @@ description: "Set up your Burki account and configure AI providers"
 This guide covers account setup and provider configuration. If you haven't created an account yet, start with the [Quickstart](/quickstart) guide.
 </Info>
 
+## Overview
+
+Burki separates **account and organization setup** from **assistant configuration**. Your organization owns billing, team
+members, shared phone numbers, and assistant resources. Each assistant then chooses telephony, speech-to-text, reasoning, and
+text-to-speech providers, plus optional tools, webhooks, and knowledge sources. This guide walks through creating the org,
+inviting collaborators, and selecting managed versus bring-your-own provider modes so you can standardize patterns across
+teams without re-implementing telephony or streaming audio.
+
+Expect to spend most of your time on provider credentials, model selection, and call behavior—not on wiring raw carrier APIs.
+When you are ready to automate provisioning, use the REST API and webhooks documented in the API reference.
+
 ---
 
 ## Account Setup
