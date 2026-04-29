@@ -4,6 +4,18 @@ description: "Stream real-time transcripts of ongoing calls via WebSocket for mo
 sidebarTitle: Live transcript guide
 ---
 
+<section aria-labelledby="live-transcript-summary" className="mb-6">
+  <h2 id="live-transcript-summary">Live transcript streaming</h2>
+  <p>
+    Connect over <strong>WebSocket</strong> to receive transcript segments while a call is still in progress. This complements REST endpoints that return transcripts after a call ends.
+  </p>
+  <ul>
+    <li><strong>Authentication:</strong> use your Burki API key on the socket (query, header, or subprotocol as documented below).</li>
+    <li><strong>Best for:</strong> live supervision, quality assurance, compliance alerts, and real-time captions.</li>
+    <li><strong>Requires:</strong> a valid <code>call_sid</code> for an active or recent call your org can access.</li>
+  </ul>
+</section>
+
 <Callout type="info">
 The Live Transcript WebSocket allows you to receive real-time transcripts as they are generated during calls. Perfect for call monitoring dashboards, live supervision, and real-time analytics.
 </Callout>

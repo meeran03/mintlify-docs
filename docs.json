@@ -334,6 +334,12 @@
       "enabled": false
     }
   },
+  "redirects": [
+    {
+      "source": "/advanced-configuration",
+      "destination": "/ai-configuration"
+    }
+  ],
   "navbar": {
     "links": [
       {

@@ -15,7 +15,15 @@ openapi: 'GET /api/v1/calls/analytics'
   </ul>
 </section>
 
-This endpoint provides detailed analytics and trends for the calls within your organization over a specified time period.
+<section aria-labelledby="call-analytics-api-behavior">
+  <h2 id="call-analytics-api-behavior">How this endpoint behaves</h2>
+  <p>
+    Analytics aggregate calls for your organization over the selected <code>period</code>. Metrics include totals, completion and failure counts, duration, daily rollups, and top assistants.
+  </p>
+  <p>
+    Pair this endpoint with list and detail call APIs when you need to drill down from a dashboard summary into individual call records.
+  </p>
+</section>
 
 ### Query Parameters
 

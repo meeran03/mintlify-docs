@@ -15,7 +15,15 @@ openapi: 'GET /api/v1/assistants'
   </ul>
 </section>
 
-This endpoint retrieves a list of all assistants belonging to your organization. The results are paginated to make handling large numbers of assistants easier.
+<section aria-labelledby="list-assistants-api-behavior">
+  <h2 id="list-assistants-api-behavior">How this endpoint behaves</h2>
+  <p>
+    Results include every assistant in the authenticated organization. Use <code>skip</code> and <code>limit</code> to page through large directories without loading everything at once.
+  </p>
+  <p>
+    Each item in the array uses the same assistant object shape as the get-by-id response, so you can reuse one client model across list and detail views.
+  </p>
+</section>
 
 ### Query Parameters
 

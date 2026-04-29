@@ -16,7 +16,15 @@ openapi: 'POST /api/v1/tools'
   </ul>
 </section>
 
-This endpoint allows you to create a new custom tool for your organization. Tools can be endpoint-based (HTTP API calls), Python functions, or AWS Lambda functions.
+<section aria-labelledby="create-tool-api-behavior">
+  <h2 id="create-tool-api-behavior">How this endpoint behaves</h2>
+  <p>
+    You register a tool once per organization, then attach it to one or more assistants. Supported tool types are HTTP endpoints, Python functions, and AWS Lambda functions.
+  </p>
+  <p>
+    Each tool carries a name, description, and configuration block. The assistant uses that metadata when deciding whether to invoke the tool during a conversation.
+  </p>
+</section>
 
 ### Request Body
 

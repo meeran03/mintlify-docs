@@ -16,7 +16,15 @@ openapi: 'GET /api/v1/tools'
   </ul>
 </section>
 
-This endpoint retrieves a paginated list of all tools in your organization with advanced filtering, sorting, and search capabilities.
+<section aria-labelledby="list-tools-api-behavior">
+  <h2 id="list-tools-api-behavior">How this endpoint behaves</h2>
+  <p>
+    The list is paginated and supports search, filters, and sort order. Use it for admin screens, audits, and attaching existing tools to assistants without creating duplicates.
+  </p>
+  <p>
+    Tool records include type, status, and usage-oriented sort fields so you can find stale or high-traffic tools quickly.
+  </p>
+</section>
 
 ### Query Parameters
 

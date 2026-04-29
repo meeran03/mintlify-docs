@@ -16,9 +16,15 @@ openapi: 'POST /api/v1/assistants'
   </ul>
 </section>
 
-This endpoint allows you to create a new, fully configured voice AI assistant. The parameters available via the API directly correspond to the settings you can configure in the assistant creation form in the web UI.
-
-A successful request will create the assistant within your organization and return the full assistant object, including its unique ID.
+<section aria-labelledby="create-assistant-api-behavior">
+  <h2 id="create-assistant-api-behavior">How this endpoint maps to the product</h2>
+  <p>
+    The JSON body mirrors the assistant creation form in the Burki dashboard. The same groups appear in the API: basic info, LLM, TTS, STT, interruptions, tools, and telephony.
+  </p>
+  <p>
+    A successful request creates the assistant in your organization and returns the full record, including the assistant ID for updates, phone-number assignment, and routing.
+  </p>
+</section>
 
 ### Request Body
 

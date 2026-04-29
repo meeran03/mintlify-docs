@@ -15,7 +15,15 @@ openapi: 'GET /api/v1/assistants/{assistant_id}'
   </ul>
 </section>
 
-This endpoint retrieves a single assistant by its unique ID. You can use this to fetch the complete and up-to-date configuration of a specific assistant.
+<section aria-labelledby="get-assistant-api-behavior">
+  <h2 id="get-assistant-api-behavior">How this endpoint behaves</h2>
+  <p>
+    Pass the assistant identifier you received from create or list. The response is the same assistant shape as in list responses, with the full configuration for that record.
+  </p>
+  <p>
+    Use this call before editing an assistant in your own UI, before assigning numbers, or when debugging why a live call used certain model or voice settings.
+  </p>
+</section>
 
 ### Path Parameters
 
