@@ -228,63 +228,61 @@ Call Management controls the **conversation flow** during phone calls. It's sepa
 
 ## Common Configuration Scenarios
 
-<Tabs>
-  <Tab title="Customer Service">
-    **Goal**: Helpful but efficient support
-    
-    ```yaml
-    Interruption Threshold: 3 words
-    Min Speaking Time: 0.5 seconds
-    Interruption Cooldown: 2.0 seconds
-    Idle Timeout: 30 seconds
-    Max Idle Messages: 3
-    ```
-    
-    **Why**: Balanced responsiveness with professional patience
-  </Tab>
-  
-  <Tab title="Sales Calls">
-    **Goal**: Let prospects talk, show you're listening
-    
-    ```yaml
-    Interruption Threshold: 2 words
-    Min Speaking Time: 0.3 seconds
-    Interruption Cooldown: 1.5 seconds
-    Idle Timeout: 45 seconds
-    Max Idle Messages: 4
-    ```
-    
-    **Why**: Very responsive to show engagement, patient to let them think
-  </Tab>
-  
-  <Tab title="Appointment Booking">
-    **Goal**: Clear information exchange
-    
-    ```yaml
-    Interruption Threshold: 4 words
-    Min Speaking Time: 1.0 seconds
-    Interruption Cooldown: 2.5 seconds
-    Idle Timeout: 20 seconds
-    Max Idle Messages: 2
-    ```
-    
-    **Why**: AI needs to finish instructions, but move efficiently through booking
-  </Tab>
-  
-  <Tab title="Tech Support">
-    **Goal**: Handle frustrated callers patiently
-    
-    ```yaml
-    Interruption Threshold: 2 words
-    Min Speaking Time: 0.4 seconds
-    Interruption Cooldown: 3.0 seconds
-    Idle Timeout: 40 seconds
-    Max Idle Messages: 4
-    ```
-    
-    **Why**: Very responsive to interruptions, longer cooldowns for emotional regulation
-  </Tab>
-</Tabs>
+### Customer Service
+
+**Goal**: Helpful but efficient support
+
+```yaml
+Interruption Threshold: 3 words
+Min Speaking Time: 0.5 seconds
+Interruption Cooldown: 2.0 seconds
+Idle Timeout: 30 seconds
+Max Idle Messages: 3
+```
+
+**Why**: Balanced responsiveness with professional patience
+
+### Sales Calls
+
+**Goal**: Let prospects talk, show you're listening
+
+```yaml
+Interruption Threshold: 2 words
+Min Speaking Time: 0.3 seconds
+Interruption Cooldown: 1.5 seconds
+Idle Timeout: 45 seconds
+Max Idle Messages: 4
+```
+
+**Why**: Very responsive to show engagement, patient to let them think
+
+### Appointment Booking
+
+**Goal**: Clear information exchange
+
+```yaml
+Interruption Threshold: 4 words
+Min Speaking Time: 1.0 seconds
+Interruption Cooldown: 2.5 seconds
+Idle Timeout: 20 seconds
+Max Idle Messages: 2
+```
+
+**Why**: AI needs to finish instructions, but move efficiently through booking
+
+### Tech Support
+
+**Goal**: Handle frustrated callers patiently
+
+```yaml
+Interruption Threshold: 2 words
+Min Speaking Time: 0.4 seconds
+Interruption Cooldown: 3.0 seconds
+Idle Timeout: 40 seconds
+Max Idle Messages: 4
+```
+
+**Why**: Very responsive to interruptions, longer cooldowns for emotional regulation
 
 ---
 
