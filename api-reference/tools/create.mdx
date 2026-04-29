@@ -3,6 +3,18 @@ title: 'Create Tool'
 openapi: 'POST /api/v1/tools'
 ---
 
+<section aria-labelledby="create-tool-overview">
+  <h2 id="create-tool-overview">Create a Callable Tool</h2>
+  <p>
+    Tools let assistants take action during a conversation. Use this endpoint to register HTTP endpoints, Python functions, or AWS Lambda functions that the AI can call when it needs external data or business logic.
+  </p>
+  <ul>
+    <li>Expose customer lookup, scheduling, payment, quoting, or ticketing workflows.</li>
+    <li>Define a JSON schema so the assistant knows which arguments to collect.</li>
+    <li>Keep sensitive credentials out of prompts and route them through tool configuration instead.</li>
+  </ul>
+</section>
+
 This endpoint allows you to create a new custom tool for your organization. Tools can be endpoint-based (HTTP API calls), Python functions, or AWS Lambda functions.
 
 ### Request Body

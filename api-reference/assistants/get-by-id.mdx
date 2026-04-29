@@ -3,6 +3,18 @@ title: 'Get Assistant by ID'
 openapi: 'GET /api/v1/assistants/{assistant_id}'
 ---
 
+<section aria-labelledby="get-assistant-overview">
+  <h2 id="get-assistant-overview">Retrieve One Assistant</h2>
+  <p>
+    Use this endpoint to load the current configuration for a single assistant before showing an edit screen, debugging call behavior, or syncing settings into another system.
+  </p>
+  <ul>
+    <li>Fetch model, voice, speech, interruption, and tool settings in one response.</li>
+    <li>Confirm whether an assistant is active before routing live calls to it.</li>
+    <li>Use the returned ID and timestamps to compare configuration changes over time.</li>
+  </ul>
+</section>
+
 This endpoint retrieves a single assistant by its unique ID. You can use this to fetch the complete and up-to-date configuration of a specific assistant.
 
 ### Path Parameters

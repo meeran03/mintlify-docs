@@ -298,6 +298,11 @@
           "anchor": "Community",
           "href": "https://discord.gg/burki",
           "icon": "discord"
+        },
+        {
+          "anchor": "LLMs.txt",
+          "href": "https://docs.burki.dev/llms.txt",
+          "icon": "file-text"
         }
       ]
     }
@@ -305,6 +310,21 @@
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
+  },
+  "api": {
+    "openapi": "api-reference/openapi.json",
+    "playground": {
+      "display": "simple"
+    },
+    "examples": {
+      "defaults": "required",
+      "autogenerate": false
+    }
+  },
+  "integrations": {
+    "telemetry": {
+      "enabled": false
+    }
   },
   "navbar": {
     "links": [

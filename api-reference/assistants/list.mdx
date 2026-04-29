@@ -3,6 +3,18 @@ title: 'List Assistants'
 openapi: 'GET /api/v1/assistants'
 ---
 
+<section aria-labelledby="list-assistants-overview">
+  <h2 id="list-assistants-overview">List Organization Assistants</h2>
+  <p>
+    Use this endpoint to build assistant dashboards, selection menus, audits, and sync jobs. It returns the assistants your authenticated organization can access.
+  </p>
+  <ul>
+    <li>Page through large assistant lists with <code>skip</code> and <code>limit</code>.</li>
+    <li>Show assistant names, active status, and provider settings in your own UI.</li>
+    <li>Use the returned IDs with the get, update, phone-number, and call APIs.</li>
+  </ul>
+</section>
+
 This endpoint retrieves a list of all assistants belonging to your organization. The results are paginated to make handling large numbers of assistants easier.
 
 ### Query Parameters
