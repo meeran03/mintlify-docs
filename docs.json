@@ -2,6 +2,13 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Burki Voice AI Docs",
+  "description": "Documentation for building, configuring, and integrating production-ready Burki voice AI assistants.",
+  "seo": {
+    "metatags": {
+      "og:url": "https://docs.burki.dev",
+      "og:site_name": "Burki Voice AI Docs"
+    }
+  },
   "colors": {
     "primary": "#10B981",
     "light": "#A3FFAE",
