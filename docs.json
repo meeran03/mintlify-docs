@@ -5,7 +5,6 @@
   "description": "Documentation for building, configuring, and integrating production-ready Burki voice AI assistants.",
   "seo": {
     "metatags": {
-      "og:url": "https://docs.burki.dev",
       "og:site_name": "Burki Voice AI Docs"
     }
   },
