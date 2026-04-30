@@ -1,15 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background circle -->
-  <circle cx="16" cy="16" r="16" fill="#0D1117"/>
-  
-  <!-- Voice wave pattern -->
-  <g opacity="0.9">
-    <!-- Main sound wave -->
-    <path d="M6 16 Q8 12 10 16 Q12 20 14 16 Q16 12 18 16 Q20 20 22 16 Q24 12 26 16" stroke="#10B981" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-    <!-- Secondary wave -->
-    <path d="M7 16 Q9 14 11 16 Q13 18 15 16 Q17 14 19 16 Q21 18 23 16 Q25 14 27 16" stroke="#10B981" stroke-width="1" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <rect width="32" height="32" rx="8" fill="#050505" />
+  <g transform="translate(6 6) scale(0.04)">
+    <path d="M227.28 0H400.66C448.955 0 490 40.2944 490 90C490 139.706 448.955 180 400.66 180H227.28C312.961 171.532 312.961 8.46779 227.28 0Z" fill="#FFFFFF" />
+    <path d="M262.72 180H69.3397C31.0445 180 9.15527e-05 209.101 9.15527e-05 245C9.15527e-05 280.899 31.0445 310 69.3397 310H262.72C177.039 303.884 177.039 186.116 262.72 180Z" fill="#FFFFFF" />
+    <path d="M227.28 310H400.66C448.955 310 490 350.294 490 400C490 449.706 448.955 490 400.66 490H227.28C312.961 481.532 312.961 318.468 227.28 310Z" fill="#FFFFFF" />
   </g>
-  
-  <!-- AI accent dot -->
-  <circle cx="24" cy="12" r="1.5" fill="#10B981" opacity="0.8"/>
 </svg>
