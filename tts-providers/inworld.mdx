@@ -4,7 +4,7 @@ description: "AI-powered TTS with emotional expression, multilingual support, an
 ---
 
 <Card title="🎭 Inworld.ai: AI-Powered Expression" icon="masks-theater">
-  Advanced AI-driven TTS with emotional markup, context awareness, and support for 11 languages. Perfect for gaming, entertainment, and expressive customer interactions.
+  Advanced AI-driven TTS with emotional markup, context awareness, and support for 11-15 languages depending on the selected model. Perfect for gaming, entertainment, and expressive customer interactions.
 </Card>
 
 ## Quick Setup
@@ -22,7 +22,7 @@ description: "AI-powered TTS with emotional expression, multilingual support, an
     3. Paste your Bearer token in the **TTS API Key** field
   </Step>
   <Step title="Choose Model & Voice">
-    Select TTS-1 or TTS-1-Max model and your preferred voice
+    Select an exact model ID such as `inworld-tts-1`, `inworld-tts-1-max`, `inworld-tts-1.5-max`, or `inworld-tts-1.5-mini`.
   </Step>
 </Steps>
 
@@ -33,7 +33,7 @@ description: "AI-powered TTS with emotional expression, multilingual support, an
 ## Available Models
 
 <CardGroup cols={2}>
-  <Card title="🎪 TTS-1" icon="star">
+  <Card title="🎪 inworld-tts-1" icon="star">
     **~200ms latency**
     
     Flagship model with realistic, context-aware synthesis
@@ -42,7 +42,7 @@ description: "AI-powered TTS with emotional expression, multilingual support, an
     **Best for**: Production applications, customer service
   </Card>
   
-  <Card title="🔬 TTS-1-Max" icon="flask">
+  <Card title="🔬 inworld-tts-1-max" icon="flask">
     **~250ms latency**
     
     Larger, more expressive model (experimental)
@@ -50,11 +50,35 @@ description: "AI-powered TTS with emotional expression, multilingual support, an
     **Languages**: 11 supported languages
     **Best for**: Creative content, gaming, entertainment
   </Card>
+
+  <Card title="✨ inworld-tts-1.5-max" icon="sparkles">
+    **~200ms latency**
+    
+    Rich, expressive, contextually aware 1.5 generation model
+    
+    **Languages**: 15 supported languages
+    **Best for**: Expressive production applications
+  </Card>
+
+  <Card title="⚡ inworld-tts-1.5-mini" icon="bolt">
+    **~120ms latency**
+    
+    Ultra-fast, lower-cost 1.5 generation model
+    
+    **Languages**: 15 supported languages
+    **Best for**: Latency-sensitive calls
+  </Card>
 </CardGroup>
 
 <Callout type="tip">
-**Recommendation**: Use **TTS-1** for most applications. Try **TTS-1-Max** for more expressive, creative content.
+**Recommendation**: Use `inworld-tts-1.5-mini` when latency is the priority, `inworld-tts-1.5-max` for richer expression, or `inworld-tts-1` for the stable default path.
 </Callout>
+
+## Supported Language Codes
+
+`inworld-tts-1` and `inworld-tts-1-max` support `en`, `zh`, `ko`, `nl`, `fr`, `es`, `ja`, `de`, `it`, `pl`, and `pt`.
+
+`inworld-tts-1.5-max` and `inworld-tts-1.5-mini` additionally support `hi`, `ru`, `he`, and `ar`.
 
 ## Multilingual Voice Library
 
@@ -379,7 +403,7 @@ curl -X POST "https://api.inworld.ai/v1/text-to-speech/stream" \
     ```
     
     **Best voices**: Ashley (EN), Lupita (ES), Hélène (FR)
-    **Model**: TTS-1 for consistency
+    **Model**: `inworld-tts-1` for consistency
   </Tab>
   
   <Tab title="Gaming/Entertainment">
@@ -389,7 +413,7 @@ curl -X POST "https://api.inworld.ai/v1/text-to-speech/stream" \
     ```
     
     **Best voices**: Hades (commanding), Aria (heroic)
-    **Model**: TTS-1-Max for maximum expression
+    **Model**: `inworld-tts-1.5-max` for maximum expression
   </Tab>
   
   <Tab title="Educational Content">
@@ -399,7 +423,7 @@ curl -X POST "https://api.inworld.ai/v1/text-to-speech/stream" \
     ```
     
     **Best voices**: Alex (EN), Mathieu (FR), Yichen (ZH)
-    **Model**: TTS-1 for clarity
+    **Model**: `inworld-tts-1` for clarity
   </Tab>
   
   <Tab title="Multilingual Business">
@@ -411,7 +435,7 @@ curl -X POST "https://api.inworld.ai/v1/text-to-speech/stream" \
     ```
     
     **Strategy**: Use native voices for each language
-    **Model**: TTS-1 for business consistency
+    **Model**: `inworld-tts-1` for business consistency
   </Tab>
 </Tabs>
 
@@ -565,7 +589,7 @@ def get_cached_voice(voice_id, language):
 **Solutions**:
 - Verify emotion tag spelling (case-sensitive)
 - Check if the voice supports the specific emotion
-- Try with TTS-1-Max model for stronger expression
+- Try with `inworld-tts-1.5-max` for stronger expression
 - Ensure tags are properly formatted: `[emotion]`
 </Accordion>
 

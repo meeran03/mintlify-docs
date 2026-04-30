@@ -1,0 +1,42 @@
+---
+title: 'Get SMS Status'
+openapi: 'GET /sms/{message_id}/status'
+---
+
+Check the current status of a queued SMS message.
+
+Use the `message_id` returned by [Send SMS](/api-reference/messaging/send-sms). For queued sends, this is Burki's internal queue UUID. When the provider returns its own ID, it appears as `provider_message_id`.
+
+### Path Parameters
+
+- `message_id` (string, **required**): The Burki message ID returned by `POST /sms/send`.
+
+### Response
+
+```json Response
+{
+  "message_id": "8ad70ee5-3d47-4fa4-a6ab-c9f2238d5f54",
+  "status": "sent",
+  "provider_message_id": "SM1234567890abcdef",
+  "error": null,
+  "updated_at": "2026-04-30T10:15:00Z"
+}
+```
+
+### Status Values
+
+| Status | Description |
+|--------|-------------|
+| `queued` | Message is waiting in Burki's provider queue |
+| `sending` | Message is currently being sent |
+| `sent` | Provider accepted or delivered the message |
+| `failed` | Sending failed; inspect `error` |
+| `cancelled` | Message was cancelled before delivery |
+
+### Error Responses
+
+```json 404
+{
+  "detail": "Message 8ad70ee5-3d47-4fa4-a6ab-c9f2238d5f54 not found"
+}
+```

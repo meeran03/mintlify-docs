@@ -1,0 +1,184 @@
+---
+title: SMS Conversations API
+description: "List, inspect, export, archive, and debug SMS conversation threads."
+sidebarTitle: SMS conversations
+---
+
+SMS conversations are stored as SMS-channel call records. Use these endpoints to build inboxes, customer timelines, exports, and conversation cleanup flows.
+
+```text
+Base path: /api/v1/sms-conversations
+```
+
+Authentication uses the standard flexible auth path: API key, JWT bearer token, or dashboard session.
+
+## Conversation Object
+
+```json
+{
+  "id": 101,
+  "session_id": "sms:+15559876543:+15551234567",
+  "assistant_id": 123,
+  "assistant_name": "Support Bot",
+  "customer_phone_number": "+15559876543",
+  "assistant_phone_number": "+15551234567",
+  "status": "active",
+  "message_count": 8,
+  "started_at": "2026-04-30T10:00:00Z",
+  "last_activity": "2026-04-30T10:14:00Z",
+  "ended_at": null,
+  "channel": "sms"
+}
+```
+
+## List Conversations
+
+```http
+GET /api/v1/sms-conversations/?skip=0&limit=100&status=active&assistant_id=123
+Authorization: Bearer YOUR_TOKEN
+```
+
+| Query Parameter | Type | Description |
+|-----------------|------|-------------|
+| `skip` | integer | Records to skip |
+| `limit` | integer | Records to return (`1-1000`) |
+| `status` | string | `active` or `completed` |
+| `assistant_id` | integer | Filter by assistant |
+| `customer_phone` | string | Filter by customer phone |
+| `date_from` | string | ISO timestamp lower bound |
+| `date_to` | string | ISO timestamp upper bound |
+
+Deleted/archived SMS threads are excluded.
+
+## Get Conversation
+
+```http
+GET /api/v1/sms-conversations/{conversation_id}
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns one conversation object or `404`.
+
+## Get Messages
+
+```http
+GET /api/v1/sms-conversations/{conversation_id}/messages
+Authorization: Bearer YOUR_TOKEN
+```
+
+```json Response
+[
+  {
+    "id": 1,
+    "conversation_id": 101,
+    "role": "user",
+    "content": "Can I reschedule?",
+    "timestamp": "2026-04-30T10:05:00Z",
+    "message_index": 1,
+    "llm_provider": null,
+    "llm_model": null
+  },
+  {
+    "id": 2,
+    "conversation_id": 101,
+    "role": "assistant",
+    "content": "Sure. What day works best?",
+    "timestamp": "2026-04-30T10:05:05Z",
+    "message_index": 2,
+    "llm_provider": "openai",
+    "llm_model": "gpt-4o-mini"
+  }
+]
+```
+
+## Related Conversations
+
+```http
+GET /api/v1/sms-conversations/{conversation_id}/related
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns recent related call/SMS records for the same customer and assistant context.
+
+```json Response
+[
+  {
+    "id": 101,
+    "call_sid": "sms_101",
+    "channel": "sms",
+    "direction": "inbound",
+    "status": "active",
+    "duration": null,
+    "message_count": 8,
+    "started_at": "2026-04-30T10:00:00Z",
+    "ended_at": null,
+    "is_current": true
+  }
+]
+```
+
+## Export Conversation
+
+```http
+GET /api/v1/sms-conversations/{conversation_id}/export?format=json
+Authorization: Bearer YOUR_TOKEN
+```
+
+Supported `format` values: `txt`, `csv`, `json`.
+
+This endpoint returns a file download with `Content-Disposition`, not a JSON wrapper.
+
+## Archive Conversation
+
+```http
+DELETE /api/v1/sms-conversations/{conversation_id}
+Authorization: Bearer YOUR_TOKEN
+```
+
+Archiving an SMS conversation:
+
+- Marks the SMS call record as deleted via `call_meta.sms_deleted`.
+- Deletes chat messages for the SMS conversation.
+- Deletes SMS audit and message logs linked to that conversation.
+- Clears related Redis keys on a best-effort basis.
+- Allows future messages between the same numbers to start a fresh conversation.
+
+```json Response
+{
+  "success": true,
+  "message": "SMS conversation archived successfully"
+}
+```
+
+## SMS Sessions
+
+Session endpoints expose Redis-backed active SMS session state.
+
+```http
+GET /api/v1/sms-sessions/
+DELETE /api/v1/sms-sessions/
+POST /api/v1/sms-sessions/cleanup
+DELETE /api/v1/sms-sessions/{phone_number}/{assistant_id}
+```
+
+`GET /api/v1/sms-sessions/` returns:
+
+```json Response
+{
+  "success": true,
+  "data": {
+    "active_sessions": 12,
+    "ttl_seconds": 86400
+  }
+}
+```
+
+`DELETE /api/v1/sms-sessions/` clears sessions:
+
+```json Response
+{
+  "success": true,
+  "message": "SMS sessions cleared",
+  "cleared_count": 12
+}
+```

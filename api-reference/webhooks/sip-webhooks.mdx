@@ -1,0 +1,90 @@
+---
+title: SIP Webhooks and Prewarm
+description: "SIP bridge webhook, status, and prewarm endpoints."
+sidebarTitle: SIP webhooks
+---
+
+Burki exposes root-level SIP endpoints used by SIP carriers and the SIP bridge. These endpoints do not use the `/api/v1` prefix.
+
+```text
+https://api.burki.dev/sip-webhook
+https://api.burki.dev/sip-status
+https://api.burki.dev/sip-prewarm
+```
+
+## SIP Webhook
+
+```http
+POST /sip-webhook
+```
+
+Receives SIP inbound call and provider event payloads. This endpoint is called by the SIP bridge/provider layer, not by normal application clients.
+
+## SIP Status
+
+```http
+POST /sip-status
+```
+
+Receives SIP status callbacks for call lifecycle tracking.
+
+## SIP Prewarm
+
+```http
+POST /sip-prewarm
+Content-Type: application/json
+```
+
+The SIP bridge calls this endpoint before media streaming so Burki can prepare call context.
+
+### Request
+
+```json Request
+{
+  "call_sid": "sip-20260430-abc123",
+  "from_number": "+15559876543",
+  "to_number": "+15551234567",
+  "outbound": false,
+  "assistant_id": 123,
+  "welcome_message": "Thanks for calling. How can I help?",
+  "agenda": "Customer support intake",
+  "variables": {
+    "customer_id": "cust_123"
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `call_sid` | string | Yes | Burki/SIP call identifier used for the stream |
+| `from_number` | string | No | Caller phone number |
+| `to_number` | string | No | Destination or assistant phone number |
+| `outbound` | boolean | No | Whether this is an outbound SIP call |
+| `assistant_id` | integer | No | Assistant to prepare |
+| `welcome_message` | string | No | Optional first assistant message |
+| `agenda` | string | No | Optional call agenda/instructions |
+| `variables` | object or JSON string | No | Runtime variables for the call |
+
+### Response
+
+```json Response
+{
+  "call_sid": "sip-20260430-abc123",
+  "prewarmed": true
+}
+```
+
+### Error Responses
+
+```json 400
+{
+  "error": "call_sid required"
+}
+```
+
+## Operational Notes
+
+- `/sip-webhook` and `/sip-status` are CSRF-exempt provider endpoints.
+- `/sip-prewarm` is intended for SIP bridge integrations before media streaming.
+- SIP bridge synchronization uses `SIP_BRIDGE_URL` and `SIP_BRIDGE_API_KEY` on the backend.
+- The bridge sync API receives org config at `POST {SIP_BRIDGE_URL}/api/sync-organization`.

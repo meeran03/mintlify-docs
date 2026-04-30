@@ -5,6 +5,8 @@ openapi: 'POST /api/v1/calls/{call_sid}/terminate'
 
 Immediately terminate an ongoing call. This endpoint allows you to programmatically hang up a call that is currently in progress.
 
+This endpoint requires an authenticated, verified user account.
+
 ## Use Cases
 
 - **Admin intervention**: Manually end calls that need immediate termination
@@ -84,7 +86,7 @@ This endpoint works with all supported telephony providers:
 | Twilio | Uses Twilio's call update API |
 | Telnyx | Uses Telnyx Call Control API |
 | Vonage | Uses Vonage Voice API |
-| BYO SIP Trunk | Uses SIP CANCEL/BYE signaling |
+| SIP bridge | Uses the configured SIP bridge termination path |
 
 The system automatically detects which provider to use based on the call's metadata.
 

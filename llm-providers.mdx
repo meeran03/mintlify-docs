@@ -1,6 +1,6 @@
 ---
 title: LLM Providers
-description: "Compare and configure OpenAI, Anthropic, Gemini, xAI, Groq, custom HTTP, and custom WebSocket LLM providers in Burki."
+description: "Compare and configure OpenAI, Azure OpenAI, Anthropic, Gemini, xAI, Groq, custom HTTP, and custom WebSocket LLM providers in Burki."
 ---
 
 <Callout type="info">
@@ -11,15 +11,16 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 
 ## Provider Comparison
 
-| Provider   | Example Models         | Speed      | Quality    | Cost      | Notes                  |
-|------------|-----------------------|------------|------------|-----------|------------------------|
-| OpenAI     | GPT-4o, GPT-3.5-turbo | Fast       | Excellent  | $$        | Most popular, reliable |
-| Anthropic  | Claude 3.5, Haiku     | Fast       | Advanced   | $$        | Safety-focused         |
-| Gemini     | Gemini 2.0 Flash      | Fast       | Multimodal | $$        | Google's latest        |
-| xAI        | Grok Beta, Grok 2     | Very Fast  | Good       | $         | Real-time, less strict |
-| Groq       | Llama 3.3, 3.1        | Ultra Fast | Good       | $         | Speed-focused          |
-| Custom     | Any                   | ?          | ?          | ?         | Bring your own (HTTP)  |
-| Custom WebSocket | Any            | Ultra Fast | ?          | ?         | Lowest latency option  |
+| Provider | Provider Key | Example Models | Notes |
+|----------|--------------|----------------|-------|
+| OpenAI | `openai` | `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `gpt-3.5-turbo` | OpenAI client path, strong default choice |
+| Azure OpenAI | `azure` | Azure deployment name | Uses Azure endpoint + deployment as the model |
+| Anthropic | `anthropic` | `claude-3-5-sonnet-20241022`, `claude-3-haiku-20240307` | LangChain Anthropic integration |
+| Gemini | `gemini` | `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash`, Gemini 3 preview IDs | Google Generative AI integration |
+| xAI | `xai` | `grok-beta` | OpenAI-compatible xAI client |
+| Groq | `groq` | `llama-3.1-70b-versatile`, `llama-3.1-8b-instant` | Low-latency LangChain Groq integration |
+| Custom HTTP | `custom` | Any OpenAI-compatible model | Bring your own HTTP endpoint |
+| Custom WebSocket | `custom_websocket` | Any compatible streaming model | Lowest-latency custom inference path |
 
 ---
 
@@ -35,6 +36,27 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 <Callout type="tip">GPT-4o is best for complex conversations. GPT-3.5-turbo is cheaper for simple tasks.</Callout>
 </Accordion>
 
+<Accordion title="Azure OpenAI">
+1. Create an Azure OpenAI resource and deploy a model.
+2. Use `llm_provider: "azure"`.
+3. Set `base_url` to your Azure OpenAI endpoint.
+4. Set `model` to the Azure deployment name, not the marketing model name.
+5. Provide the Azure OpenAI API key.
+
+```json
+{
+  "llm_provider": "azure",
+  "llm_provider_config": {
+    "api_key": "your_azure_openai_key",
+    "base_url": "https://your-resource.openai.azure.com",
+    "model": "gpt-4o-production"
+  }
+}
+```
+
+<Callout type="tip">For Azure OpenAI, the `model` value should match your deployment name.</Callout>
+</Accordion>
+
 <Accordion title="Anthropic (Claude)">
 1. [Sign up for Anthropic](https://console.anthropic.com/)
 2. Create an API key
@@ -48,7 +70,7 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 1. [Sign up for Google AI Studio](https://aistudio.google.com/)
 2. Get your API key
 3. Paste your key in the LLM API Key field
-4. Choose a model (Gemini 2.0 Flash, 1.5 Pro, etc.)
+4. Choose a model (Gemini 2.5 Pro, 2.5 Flash, 2.0 Flash, or a configured preview model)
 5. Set the base URL (auto-filled for Gemini)
 
 <Callout type="tip">Gemini is multimodal—great for tasks involving text, images, and more.</Callout>
@@ -58,7 +80,7 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 1. [Sign up for xAI](https://console.x.ai/)
 2. Get your API key
 3. Paste your key in the LLM API Key field
-4. Choose a model (Grok Beta, Grok 2, etc.)
+4. Choose `grok-beta`
 5. Set the base URL (auto-filled for xAI)
 
 <Callout type="tip">Grok is fast and less restrictive—good for real-time or experimental use.</Callout>
@@ -68,7 +90,7 @@ Burki Voice AI lets you choose from the best language models (LLMs) on the marke
 1. [Sign up for Groq](https://console.groq.com/)
 2. Get your API key
 3. Paste your key in the LLM API Key field
-4. Choose a model (Llama 3.3 70B, 3.1 8B, etc.)
+4. Choose a configured Llama model such as `llama-3.1-70b-versatile` or `llama-3.1-8b-instant`
 
 <Callout type="tip">Groq is all about speed—perfect for high-volume or latency-sensitive apps.</Callout>
 </Accordion>

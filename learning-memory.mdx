@@ -364,6 +364,8 @@ The Learning Dashboard provides visual management of all features:
 
 ## API Reference
 
+For full request/response examples and the complete route surface, see [Learning and Memory API](/api-reference/learning/overview).
+
 ### Memory Endpoints
 
 | Method | Endpoint | Description |
@@ -374,6 +376,7 @@ The Learning Dashboard provides visual management of all features:
 | `PUT` | `/api/learning/memories/{id}` | Update a memory |
 | `DELETE` | `/api/learning/memories/{id}` | Soft-delete a memory |
 | `POST` | `/api/learning/memories/search` | Semantic search |
+| `GET` | `/api/learning/memories/{id}/edges` | Get graph relationships for a memory |
 
 ### Prompt Version Endpoints
 
@@ -383,8 +386,10 @@ The Learning Dashboard provides visual management of all features:
 | `POST` | `/api/learning/assistants/{id}/prompts` | Create new version |
 | `POST` | `/api/learning/assistants/{id}/prompts/{id}/approve` | Approve version |
 | `POST` | `/api/learning/assistants/{id}/prompts/{id}/start-canary` | Start canary rollout |
+| `PATCH` | `/api/learning/assistants/{id}/prompts/{id}/canary` | Update canary percentage |
 | `POST` | `/api/learning/assistants/{id}/prompts/{id}/promote` | Promote to production |
 | `POST` | `/api/learning/assistants/{id}/prompts/{id}/rollback` | Rollback version |
+| `GET` | `/api/learning/assistants/{id}/prompts/{id}/gates` | Inspect promotion gates |
 
 ### Eval Endpoints
 
@@ -392,8 +397,24 @@ The Learning Dashboard provides visual management of all features:
 |--------|----------|-------------|
 | `GET` | `/api/learning/assistants/{id}/eval-datasets` | List datasets |
 | `POST` | `/api/learning/assistants/{id}/eval-datasets` | Create dataset |
+| `POST` | `/api/learning/assistants/{id}/eval-datasets/import` | Import dataset and cases |
+| `POST` | `/api/learning/assistants/{id}/eval-datasets/{id}/publish` | Publish dataset |
 | `POST` | `/api/learning/assistants/{id}/eval-datasets/{id}/cases` | Add test case |
+| `PUT` | `/api/learning/assistants/{id}/eval-datasets/{id}/cases/{id}` | Update test case |
+| `DELETE` | `/api/learning/assistants/{id}/eval-datasets/{id}/cases/{id}` | Delete test case |
+| `POST` | `/api/learning/assistants/{id}/eval-datasets/{id}/cases/from-trace` | Create case from trace |
 | `POST` | `/api/learning/assistants/{id}/eval/run` | Run evaluation |
+
+### Stats, Graph, and Traces
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/learning/assistants/{id}/stats` | Assistant learning stats |
+| `GET` | `/api/learning/graph-stats` | Organization memory graph stats |
+| `GET` | `/api/learning/assistants/{id}/memory-graph` | Assistant memory graph |
+| `POST` | `/api/learning/assistants/{id}/dspy/optimize` | Run DSPy optimization |
+| `GET` | `/api/learning/call-traces` | List call traces |
+| `GET` | `/api/learning/call-traces/{id}` | Get full trace detail |
 
 ---
 

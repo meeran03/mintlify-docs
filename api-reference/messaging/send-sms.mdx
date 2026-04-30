@@ -71,7 +71,7 @@ When `queue: false`:
 - Message is sent immediately
 - Better for time-sensitive messages
 - May hit rate limits if sending many messages
-- Returns `status: "sent"` or `status: "failed"`
+- Returns `status: "sent"` on success; provider failures return an error response instead of a successful `failed` response
 
 ```json
 {
@@ -105,7 +105,7 @@ A successful request returns a `200 OK` status with details about the message.
 ```json
 {
   "success": true,
-  "message_id": "SM1234567890abcdef",
+  "message_id": "8ad70ee5-3d47-4fa4-a6ab-c9f2238d5f54",
   "message": "SMS queued successfully via telnyx",
   "provider": "telnyx",
   "status": "queued"
@@ -121,6 +121,8 @@ A successful request returns a `200 OK` status with details about the message.
 | `message` | string | Human-readable status message |
 | `provider` | string | Telephony provider used (`twilio`, `telnyx`, or `vonage`) |
 | `status` | string | Delivery status: `queued`, `sent`, or `failed` |
+
+For queued messages, `message_id` is Burki's queue UUID. After delivery, use the status endpoint to inspect the provider's message ID when available.
 
 ## Error Responses
 
@@ -139,6 +141,16 @@ Common causes:
 - Invalid phone number format (must be E.164)
 - Empty message content
 - Message exceeds 1600 characters
+
+### 403 Forbidden
+
+Returned when the authenticated user does not own the assistant or phone number used as `from_phone_number`.
+
+```json
+{
+  "detail": "Unauthorized: phone number belongs to different organization"
+}
+```
 
 ### 404 Not Found
 
@@ -231,6 +243,14 @@ curl -X POST "https://api.burki.dev/sms/send" \
     "message": "Hello from your AI assistant!"
   }'
 ```
+
+## Related Endpoints
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/sms/{message_id}/status` | Check queued, sent, failed, or cancelled status |
+| `DELETE` | `/sms/{message_id}` | Cancel a queued message before delivery |
+| `GET` | `/sms/queue/stats` | Inspect queue statistics by provider |
 
 ## Rate Limits
 

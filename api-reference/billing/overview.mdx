@@ -1,0 +1,307 @@
+---
+title: Billing API
+description: "Wallet, ledger, usage, statements, and managed-service billing endpoints."
+sidebarTitle: Billing API
+---
+
+The Billing API manages prepaid wallet balance, Stripe top-ups, auto top-up settings, ledger history, usage summaries, monthly charges, statements, and hybrid managed-service preferences.
+
+Billing endpoints use the `/v1/billing` prefix:
+
+```text
+https://api.burki.dev/v1/billing
+```
+
+<Warning>
+Billing endpoints use authenticated user context for the current organization. Wallet top-up and auto top-up require a verified user account.
+</Warning>
+
+## Get Wallet Balance
+
+```http
+GET /v1/billing/wallet
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns wallet balance, reserved funds, available balance, auto top-up settings, trial state, and current pricing knobs.
+
+```json Response
+{
+  "balance_cents": 2500,
+  "reserved_cents": 0,
+  "available_cents": 2500,
+  "balance_dollars": 25.0,
+  "available_dollars": 25.0,
+  "auto_topup_enabled": true,
+  "auto_topup_threshold_cents": 500,
+  "auto_topup_amount_cents": 2000,
+  "has_payment_method": true,
+  "trial_minutes_remaining": 143,
+  "trial_platform_minutes_remaining": 143,
+  "trial_carrier_minutes_remaining": 143,
+  "trial_status": "active",
+  "trial_number_free_until": "2026-05-30T00:00:00",
+  "pricing": {
+    "voice_platform_fee_cents_per_min": 3.0,
+    "sms_platform_fee_cents_per_segment": 0.1,
+    "managed_fee_percent": 15,
+    "number_mgmt_cents_per_number_per_month": 100
+  }
+}
+```
+
+## Create Wallet Top-Up
+
+```http
+POST /v1/billing/wallet/topup
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+Creates a Stripe PaymentIntent for adding funds to the wallet. Minimum amount is `$1.00`.
+
+```json Request
+{
+  "amount_cents": 2000
+}
+```
+
+```json Response
+{
+  "success": true,
+  "client_secret": "pi_123_secret_abc",
+  "payment_intent_id": "pi_123",
+  "amount_cents": 2000,
+  "error": null
+}
+```
+
+## Configure Auto Top-Up
+
+```http
+POST /v1/billing/wallet/auto-topup
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+Enable auto top-up by providing a threshold, amount, and payment method. Disable it with `enabled: false`.
+
+```json Request
+{
+  "enabled": true,
+  "threshold_cents": 500,
+  "amount_cents": 2000,
+  "payment_method_id": "pm_123"
+}
+```
+
+```json Response
+{
+  "success": true,
+  "message": "Auto top-up configured successfully"
+}
+```
+
+## Get Ledger Entries
+
+```http
+GET /v1/billing/ledger?limit=50&offset=0&type=charge&from_date=2026-04-01&to_date=2026-04-30
+Authorization: Bearer YOUR_TOKEN
+```
+
+| Query Parameter | Type | Description |
+|-----------------|------|-------------|
+| `limit` | integer | Number of entries to return (`1-100`, default `50`) |
+| `offset` | integer | Number of entries to skip |
+| `type` | string | Optional filter: `topup`, `charge`, `refund`, `adjustment`, or `grant` |
+| `from_date` | string | Start date in `YYYY-MM-DD` format |
+| `to_date` | string | End date in `YYYY-MM-DD` format |
+
+```json Response
+{
+  "entries": [
+    {
+      "id": "ledger_123",
+      "created_at": "2026-04-30T10:15:00",
+      "type": "charge",
+      "direction": "debit",
+      "amount_cents": 9,
+      "amount_dollars": 0.09,
+      "reference_type": "call",
+      "reference_id": "101",
+      "description": "Voice platform fee"
+    }
+  ],
+  "total": 1,
+  "limit": 50,
+  "offset": 0
+}
+```
+
+## Get Usage Summary
+
+```http
+GET /v1/billing/usage/summary?from_date=2026-04-01&to_date=2026-04-30
+Authorization: Bearer YOUR_TOKEN
+```
+
+```json Response
+{
+  "voice_minutes": 128,
+  "sms_segments": 54,
+  "total_events": 182,
+  "event_breakdown": {
+    "voice_call": 128,
+    "sms_sent": 54
+  }
+}
+```
+
+## Get Charges Summary
+
+```http
+GET /v1/billing/charges?month=2026-04-01
+Authorization: Bearer YOUR_TOKEN
+```
+
+```json Response
+{
+  "month": "2026-04-01",
+  "total_cents": 4821,
+  "total_dollars": 48.21,
+  "charge_count": 312,
+  "breakdown": {
+    "platform_fee": 384,
+    "pass_through": 3858,
+    "managed_fee": 579
+  }
+}
+```
+
+## List Statements
+
+```http
+GET /v1/billing/statements?limit=12
+Authorization: Bearer YOUR_TOKEN
+```
+
+```json Response
+{
+  "statements": [
+    {
+      "id": "stmt_123",
+      "month": "2026-04-01",
+      "total_platform_cents": 384,
+      "total_pass_through_cents": 3858,
+      "total_managed_fee_cents": 579,
+      "total_number_mgmt_cents": 100,
+      "total_cents": 4921,
+      "total_dollars": 49.21,
+      "total_voice_minutes": 128,
+      "total_sms_segments": 54,
+      "status": "finalized"
+    }
+  ]
+}
+```
+
+## Get Statement
+
+```http
+GET /v1/billing/statements/2026-04-01
+Authorization: Bearer YOUR_TOKEN
+```
+
+The `month` path parameter must be a date string in `YYYY-MM-DD` format. Burki normalizes it to the first day of that month.
+
+```json Response
+{
+  "statement": {
+    "id": "stmt_123",
+    "month": "2026-04-01",
+    "total_platform_cents": 384,
+    "total_pass_through_cents": 3858,
+    "total_managed_fee_cents": 579,
+    "total_number_mgmt_cents": 100,
+    "total_cents": 4921,
+    "total_dollars": 49.21,
+    "total_voice_minutes": 128,
+    "total_sms_segments": 54,
+    "status": "finalized"
+  },
+  "charges_breakdown": {
+    "platform_fee": 384,
+    "pass_through": 3858,
+    "managed_fee": 579
+  }
+}
+```
+
+## Managed Services
+
+```http
+GET /v1/billing/managed-services
+Authorization: Bearer YOUR_TOKEN
+```
+
+```json Response
+{
+  "llm": true,
+  "tts": true,
+  "stt": false,
+  "carrier": true,
+  "message": null
+}
+```
+
+Update hybrid mode preferences:
+
+```http
+PATCH /v1/billing/managed-services
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "llm": false,
+  "tts": true,
+  "stt": true,
+  "carrier": true
+}
+```
+
+```json Response
+{
+  "llm": false,
+  "tts": true,
+  "stt": true,
+  "carrier": true,
+  "message": "Managed services updated successfully"
+}
+```
+
+## Admin Credit Grants
+
+```http
+POST /v1/billing/admin/grant-credits
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+```
+
+This endpoint is restricted to users with admin role.
+
+```json Request
+{
+  "amount_cents": 1000,
+  "description": "Promotional credit"
+}
+```
+
+```json Response
+{
+  "success": true,
+  "message": "Granted $10.00 in credits",
+  "new_balance_cents": 3500
+}
+```

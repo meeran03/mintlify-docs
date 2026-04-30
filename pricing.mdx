@@ -120,11 +120,11 @@ The 15% managed fee only applies to services that Burki manages. BYO services ha
 Start building immediately with generous free credits:
 
 <CardGroup cols={3}>
-  <Card title="200 Minutes" icon="clock">
-    Platform fee waived for your first 200 connected minutes
+  <Card title="200 Connected Minutes" icon="clock">
+    Your unified trial bucket covers your first 200 connected minutes
   </Card>
-  <Card title="Carrier Subsidy" icon="phone">
-    200 carrier-free minutes on eligible routes (Burki Cloud)
+  <Card title="Managed Costs Covered" icon="phone">
+    For Burki-managed usage, provider pass-through is absorbed while trial minutes remain
   </Card>
   <Card title="Free Number" icon="hashtag">
     Trial phone number free for 30 days
@@ -135,12 +135,12 @@ Start building immediately with generous free credits:
 
 | Credit Type | Amount | Who Gets It |
 |-------------|--------|-------------|
-| Platform Minutes | 200 free minutes | Everyone |
-| Carrier Subsidy | 200 carrier-free minutes | Burki Cloud only |
-| Trial Phone Number | 30 days free | Burki Cloud only |
+| Connected-minute trial | 200 connected minutes | New accounts |
+| Managed provider coverage | Uses the same 200-minute trial bucket | Accounts using Burki-managed providers |
+| Trial Phone Number | 30 days free | Eligible trial accounts |
 
 <Info>
-During the free trial, Burki absorbs all managed AI costs (LLM, STT, TTS) for Burki Cloud users. You can test the full platform without any charges.
+During the free trial, Burki uses a single trial-minute bucket. Those minutes waive platform fees and, for Burki-managed usage, absorb managed AI and carrier pass-through while minutes remain.
 </Info>
 
 ---
@@ -156,10 +156,7 @@ Burki uses a prepaid wallet system:
 
 ### Minimum Balance Requirements
 
-| Mode | Minimum Balance to Make Calls |
-|------|------------------------------|
-| BYO | $0.03 (1 minute) |
-| Burki Cloud | $2.00 (accounts for AI costs) |
+After trial minutes are exhausted, calls require enough wallet balance to cover at least one billable platform minute. Managed pass-through costs and managed service fees are deducted as usage is rated.
 
 ---
 
@@ -167,7 +164,7 @@ Burki uses a prepaid wallet system:
 
 <AccordionGroup>
   <Accordion title="How is voice call duration calculated?">
-    We bill based on **connected minutes** only. Time is calculated from when the call is answered until it ends, rounded up to the nearest minute. Unanswered calls are not billed.
+    We bill based on **connected minutes** only. Time is calculated from when the call is answered until it ends. Any non-zero connected call is billed as at least 1 minute, and longer calls round up to the next full minute. Unanswered calls are not billed.
   </Accordion>
   
   <Accordion title="What counts as an SMS segment?">

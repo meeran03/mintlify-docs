@@ -1,6 +1,6 @@
 ---
 title: STT Providers & Settings
-description: Configure Speech-to-Text providers including Deepgram and Azure Speech for real-time transcription
+description: Configure Speech-to-Text providers including Deepgram, ElevenLabs, Azure, Uplift, Speechmatics, Telnyx, and Soniox for real-time transcription
 ---
 
 <Callout type="info">
@@ -11,15 +11,15 @@ Speech-to-Text (STT) converts what callers say into text for your AI to understa
 
 ## Provider Comparison
 
-| Feature | Deepgram | ElevenLabs Scribe v2 | Azure Speech |
-|---------|----------|---------------------|--------------|
-| **Speed** | Ultra-fast (~100ms) | Ultra-fast (~150ms) | Fast (~200ms) |
-| **Languages** | 30+ | 90+ | 100+ |
-| **Models** | Nova 2, Nova 3 | Scribe v2 Realtime | Standard, Enhanced, Neural |
-| **Term Boosting** | Keywords, Keyterms | ❌ | Phrase Lists |
-| **Best For** | Phone calls, Speed | Multi-language, VAD | Enterprise, Multi-language |
-| **Diarization** | ✅ | ❌ | ✅ |
-| **Real-Time** | ✅ | ✅ | ✅ |
+| Provider | Provider Key | Models | Best For | Notes |
+|----------|--------------|--------|----------|-------|
+| Deepgram | `deepgram` | `nova-3`, `nova-2`, `nova`, `enhanced`, `base`, `flux-general-*` | Fast phone calls, English keyterms, Flux conversational STT | Default STT provider |
+| ElevenLabs | `elevenlabs` | `scribe_v2_realtime` | Multi-language realtime recognition | Uses `elevenlabs_config` |
+| Azure Speech | `azure` | `standard`, `enhanced`, `neural` | Enterprise speech workloads | Available when Azure STT dependencies/config are present |
+| Uplift | `uplift` | `default`, `scribe`, `scribe-mini` | Urdu/South Asian language workflows | Defaults to `ur`, µ-law, 8 kHz when unset |
+| Speechmatics | `speechmatics` | `enhanced`, `standard` | Broad language coverage and hosted STT | Uses `speechmatics_config` |
+| Telnyx STT | `telnyx` | `deepgram/nova-3`, `deepgram/flux`, Google/Azure/Telnyx Whisper hosted models | Telnyx-hosted transcription with carrier key reuse | Defaults to `deepgram/nova-3` |
+| Soniox | `soniox` | `stt-rt-v4`, `stt-rt-v3` | Realtime STT with Soniox models | Uses `soniox_config` |
 
 <CardGroup cols={3}>
   <Card title="⚡ Deepgram" icon="bolt" href="#deepgram">
@@ -39,6 +39,23 @@ Speech-to-Text (STT) converts what callers say into text for your AI to understa
     
     100+ languages, Microsoft ecosystem integration, phrase lists for term boosting, custom speech models.
   </Card>
+  <Card title="🌐 Speechmatics" icon="language" href="#additional-supported-providers">
+    **Hosted STT**
+    
+    Enhanced and standard models with provider-specific config.
+  </Card>
+  
+  <Card title="📡 Telnyx STT" icon="tower-broadcast" href="#additional-supported-providers">
+    **Carrier-Hosted Models**
+    
+    Telnyx-hosted Deepgram, Google, Azure, and Whisper model routes.
+  </Card>
+  
+  <Card title="⚙️ Soniox / Uplift" icon="sliders" href="#additional-supported-providers">
+    **Specialized Realtime STT**
+    
+    Soniox realtime models and Uplift Scribe models.
+  </Card>
 </CardGroup>
 
 ---
@@ -56,6 +73,7 @@ Deepgram is the default STT provider, optimized for speed and phone call quality
 | Nova      | Keywords support           | ✅       | ❌       | Balanced performance      |
 | Enhanced  | Keywords support           | ✅       | ❌       | Legacy support            |
 | Base      | Keywords support           | ✅       | ❌       | Basic transcription       |
+| Flux (`flux-general-en`, `flux-general-es`, `flux-general-multi`) | Conversational realtime STT path | Provider-dependent | Provider-dependent | Fast turn-taking and mid-call Flux swaps |
 
 <Callout type="tip">
 **Recommended:** Use Nova-3 for English calls (supports keyterms) or Nova-2 for other languages (supports keywords).
@@ -153,11 +171,77 @@ Azure Speech provides enterprise-grade speech recognition with broad language su
 
 ---
 
+## Additional Supported Providers
+
+These providers are wired in the backend STT factory and can be selected by `stt_settings.provider`.
+
+### Uplift
+
+```json
+{
+  "stt_settings": {
+    "provider": "uplift",
+    "model": "scribe",
+    "language": "ur"
+  }
+}
+```
+
+Supported models: `default`, `scribe`, `scribe-mini`.
+
+### Speechmatics
+
+```json
+{
+  "stt_settings": {
+    "provider": "speechmatics",
+    "model": "enhanced",
+    "language": "en"
+  }
+}
+```
+
+Supported models: `enhanced`, `standard`. Provider-specific settings live under `speechmatics_config`.
+
+### Telnyx STT
+
+```json
+{
+  "stt_settings": {
+    "provider": "telnyx",
+    "model": "deepgram/nova-3",
+    "language": "en-US"
+  }
+}
+```
+
+Supported hosted model routes include `deepgram/nova-3`, `deepgram/nova-2`, `deepgram/flux`, Google, Azure, and Telnyx Whisper variants. Telnyx STT uses the organization's Telnyx API key or managed carrier key.
+
+### Soniox
+
+```json
+{
+  "stt_settings": {
+    "provider": "soniox",
+    "model": "stt-rt-v4",
+    "language": "en"
+  }
+}
+```
+
+Supported models: `stt-rt-v4`, `stt-rt-v3`. Provider-specific settings live under `soniox_config`.
+
+<Callout type="warning">
+OpenAI Whisper and Assembly appear in older enum/model mapping code but are not registered in the active STT factory. Do not configure them as live realtime STT providers unless the backend factory is updated.
+</Callout>
+
+---
+
 ## Key Settings
 
 <Accordion title="Model & Language">
-- **Provider:** Choose Deepgram for speed or Azure for enterprise features
-- **Model:** Choose based on your needs (Nova-3 for English, Standard for multi-language)
+- **Provider:** Choose from `deepgram`, `elevenlabs`, `azure`, `uplift`, `speechmatics`, `telnyx`, or `soniox`
+- **Model:** Choose based on your provider (`nova-3`, `flux-general-en`, `scribe_v2_realtime`, `standard`, `deepgram/nova-3`, `stt-rt-v4`, etc.)
 - **Language:** Select from common options or enter a custom language code
 - **Custom Language:** Enter any supported language code (e.g., `fr-FR`, `es-ES`)
 </Accordion>

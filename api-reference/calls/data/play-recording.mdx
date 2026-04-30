@@ -1,0 +1,36 @@
+---
+title: Play Call Recording
+description: "Stream a call recording through an authenticated API endpoint."
+sidebarTitle: Play recording
+---
+
+Use this endpoint when a client needs to stream a recording with bearer-token authentication instead of loading a raw storage URL directly.
+
+```http
+GET /api/v1/calls/{call_id}/recording/{recording_id}/play
+Authorization: Bearer YOUR_TOKEN
+```
+
+## Path Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `call_id` | integer | Burki call ID |
+| `recording_id` | integer | Recording ID linked to the call |
+
+## Response
+
+Returns audio bytes with the appropriate content type:
+
+- `audio/mpeg` for MP3 recordings
+- `audio/wav` for WAV recordings
+
+## Error Responses
+
+| Status | Cause |
+|--------|-------|
+| `202` | Recording is still processing |
+| `404` | Call, recording, or S3 recording file not found |
+| `500` | Error downloading the recording file |
+
+Recordings are only available when the call belongs to an assistant in the authenticated user's organization.

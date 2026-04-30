@@ -87,19 +87,26 @@ curl -X GET "https://api.burki.dev/api/v1/assistants/" \
   
   <Accordion title="Send SMS">
     ```bash
-    POST /api/v1/messaging/sms/send
+    POST /sms/send
     Content-Type: application/json
     
     {
-      "to": "+1234567890",
-      "from": "+0987654321",
-      "body": "Hello from Burki!"
+      "from_phone_number": "+10987654321",
+      "to_phone_number": "+1234567890",
+      "message": "Hello from Burki!"
     }
+    ```
+  </Accordion>
+  <Accordion title="Get Wallet Balance">
+    ```bash
+    GET /v1/billing/wallet
     ```
   </Accordion>
 </AccordionGroup>
 
 For the complete API reference, see [API Reference](/api-reference/introduction).
+
+Billing endpoints use the `/v1/billing` prefix. Assistant and call management endpoints use `/api/v1/...`, while outbound SMS uses `/sms/send`.
 
 ---
 

@@ -1,0 +1,126 @@
+---
+title: SMS Compliance API
+description: "Verify SMS use cases, check outbound eligibility, and inspect compliance status."
+sidebarTitle: SMS compliance
+---
+
+The SMS Compliance API manages verification for outbound messaging use cases.
+
+```text
+Base path: /v1/sms-compliance
+```
+
+<Warning>
+Unlike most messaging endpoints, SMS compliance routes use the auth API's JWT user dependency. Send a Bearer JWT access token. API keys and cookie-only sessions are not accepted by these routes unless your client also sends the JWT.
+</Warning>
+
+## Use Case Values
+
+Valid `use_case` values:
+
+- `customer_support`
+- `appointment_reminders`
+- `order_notifications`
+- `two_factor_auth`
+- `marketing`
+- `other`
+
+## Get Compliance Status
+
+```http
+GET /v1/sms-compliance/status/{phone_number_id}
+Authorization: Bearer JWT_TOKEN
+```
+
+```json Response
+{
+  "found": true,
+  "phone_number": "+15551234567",
+  "phone_number_id": 55,
+  "status": "approved",
+  "use_case": "appointment_reminders",
+  "submitted_at": "2026-04-20T10:00:00Z",
+  "approved_at": "2026-04-21T12:00:00Z",
+  "rejection_reason": null,
+  "can_send_outbound": true,
+  "is_toll_free": false
+}
+```
+
+## Submit Verification
+
+```http
+POST /v1/sms-compliance/submit
+Authorization: Bearer JWT_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "phone_number_id": 55,
+  "use_case": "appointment_reminders",
+  "business_name": "Acme Dental",
+  "business_description": "Dental clinic appointment reminders and patient follow-up",
+  "sample_messages": [
+    "Reminder: your appointment is tomorrow at 2 PM. Reply STOP to opt out."
+  ],
+  "website_url": "https://example.com",
+  "contact_email": "ops@example.com"
+}
+```
+
+`sample_messages` must contain 1-3 examples, each 10-320 characters.
+
+## Can Send
+
+```http
+GET /v1/sms-compliance/can-send/{phone_number_id}
+Authorization: Bearer JWT_TOKEN
+```
+
+```json Response
+{
+  "can_send": true,
+  "reason": "approved",
+  "status": "approved"
+}
+```
+
+## Compliance Summary
+
+```http
+GET /v1/sms-compliance/summary
+Authorization: Bearer JWT_TOKEN
+```
+
+```json Response
+{
+  "total_numbers": 4,
+  "approved": 2,
+  "pending": 1,
+  "rejected": 1,
+  "numbers": [
+    {
+      "phone_number_id": 55,
+      "phone_number": "+15551234567",
+      "status": "approved",
+      "use_case": "appointment_reminders"
+    }
+  ]
+}
+```
+
+## Admin Status Update
+
+```http
+PUT /v1/sms-compliance/admin/status/{phone_number_id}?new_status=approved
+Authorization: Bearer ADMIN_JWT
+```
+
+This endpoint requires `current_user.role == "admin"`.
+
+Use `rejection_reason` when setting a rejected status:
+
+```http
+PUT /v1/sms-compliance/admin/status/55?new_status=rejected&rejection_reason=Missing%20opt-out%20language
+```

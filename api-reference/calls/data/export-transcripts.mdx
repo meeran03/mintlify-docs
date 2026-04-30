@@ -24,27 +24,38 @@ The response from this endpoint will be a file download.
 You will receive a plain text file (`.txt`) with the conversation formatted for readability.
 
 ```text Text Content
-[2023-10-30T10:00:05Z] assistant: Hello, how can I help you today?
-[2023-10-30T10:00:10Z] user: Yes, I'd like to check the status of my order.
+[10:00:05] assistant: Hello, how can I help you today?
+[10:00:10] user: Yes, I'd like to check the status of my order.
 ```
 
 **If `format=json`:**
 
-You will receive a JSON file (`.json`) containing an array of transcript objects.
+You will receive a JSON file (`.json`) containing call metadata and a `transcripts` array.
 
 ```json JSON Content
-[
-  {
-    "speaker": "assistant",
-    "text": "Hello, how can I help you today?",
-    "timestamp": "2023-10-30T10:00:05Z"
-  },
-  {
-    "speaker": "user",
-    "text": "Yes, I'd like to check the status of my order.",
-    "timestamp": "2023-10-30T10:00:10Z"
-  }
-]
+{
+  "call_id": 101,
+  "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "started_at": "2023-10-30T10:00:00Z",
+  "transcripts": [
+    {
+      "speaker": "assistant",
+      "content": "Hello, how can I help you today?",
+      "timestamp": "2023-10-30T10:00:05Z",
+      "confidence": 0.95,
+      "segment_start": 0.0,
+      "segment_end": 2.5
+    },
+    {
+      "speaker": "user",
+      "content": "Yes, I'd like to check the status of my order.",
+      "timestamp": "2023-10-30T10:00:10Z",
+      "confidence": 0.93,
+      "segment_start": 4.1,
+      "segment_end": 7.2
+    }
+  ]
+}
 ```
 
 **If `format=csv`:**
@@ -52,7 +63,7 @@ You will receive a JSON file (`.json`) containing an array of transcript objects
 You will receive a CSV file (`.csv`) with the transcript data.
 
 ```csv CSV Content
-"timestamp","speaker","text"
-"2023-10-30T10:00:05Z","assistant","Hello, how can I help you today?"
-"2023-10-30T10:00:10Z","user","Yes, I'd like to check the status of my order."
+"Timestamp","Speaker","Content","Confidence"
+"2023-10-30T10:00:05Z","assistant","Hello, how can I help you today?","0.95"
+"2023-10-30T10:00:10Z","user","Yes, I'd like to check the status of my order.","0.93"
 ``` 

@@ -1,0 +1,96 @@
+---
+title: SMS 10DLC Campaign APIs
+description: "Carrier campaign helper APIs for Telnyx, Twilio, and Vonage SMS registration."
+sidebarTitle: SMS 10DLC
+---
+
+Burki exposes helper APIs for selecting and inspecting carrier 10DLC campaigns for Telnyx, Twilio, and Vonage.
+
+Authentication uses API key, JWT bearer token, or dashboard session. Each provider group requires the matching organization credentials.
+
+## Telnyx Campaigns
+
+Base path:
+
+```text
+/api/telnyx
+```
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/telnyx/brands` | List Telnyx brands |
+| `GET` | `/api/telnyx/campaigns?brand_id={brand_id}` | List campaigns for a brand |
+| `POST` | `/api/telnyx/campaign/select` | Select campaign and brand for new Telnyx numbers |
+| `GET` | `/api/telnyx/campaign/selected` | Get selected Telnyx campaign |
+| `GET` | `/api/telnyx/phone-number/{phone_number}/status` | Check Telnyx phone-number campaign status |
+
+```json Request
+{
+  "campaign_id": "campaign_123",
+  "brand_id": "brand_123"
+}
+```
+
+## Twilio 10DLC
+
+Base path:
+
+```text
+/api/twilio-10dlc
+```
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/twilio-10dlc/messaging-services` | List messaging services |
+| `GET` | `/api/twilio-10dlc/messaging-services/{service_sid}/campaigns` | List campaigns for a service |
+| `POST` | `/api/twilio-10dlc/messaging-service/select` | Select a default messaging service |
+| `GET` | `/api/twilio-10dlc/messaging-service/selected` | Get selected messaging service |
+| `POST` | `/api/twilio-10dlc/campaign/select` | Select campaign, messaging service, and brand |
+| `GET` | `/api/twilio-10dlc/campaign/selected` | Get selected Twilio campaign |
+
+```json Request
+{
+  "campaign_id": "QE1234567890abcdef",
+  "messaging_service_sid": "MG1234567890abcdef",
+  "brand_sid": "BN1234567890abcdef"
+}
+```
+
+## Vonage 10DLC
+
+Base path:
+
+```text
+/api/vonage-10dlc
+```
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/vonage-10dlc/brands` | List Vonage brands |
+| `GET` | `/api/vonage-10dlc/brands/{brand_id}/campaigns` | List campaigns for a brand |
+| `POST` | `/api/vonage-10dlc/campaign/select` | Select a Vonage campaign |
+| `GET` | `/api/vonage-10dlc/campaign/selected` | Get selected Vonage campaign |
+
+```json Request
+{
+  "campaign_id": "campaign_123",
+  "brand_id": "brand_123",
+  "usecase": "appointment_reminders",
+  "description": "Appointment reminder and customer support messages"
+}
+```
+
+## Common Errors
+
+| Status | Cause |
+|--------|-------|
+| `400` | Missing provider credentials or invalid selection |
+| `502` | Upstream provider returned an error |
+| `503` | Provider API unavailable |
+| `504` | Provider API timed out |
+
+## Related
+
+- [SMS Compliance API](/api-reference/messaging/sms-compliance)
+- [SMS Messaging](/messaging)
+- [Telephony Providers](/telephony-providers)

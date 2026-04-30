@@ -26,9 +26,18 @@ When using your own API keys, configure them in **Settings** → **Provider Keys
 |----------|-------------|
 | **OpenAI** | API Key |
 | **Anthropic** | API Key |
+| **Azure OpenAI** | API Key + Endpoint |
+| **Gemini** | API Key |
+| **xAI** | API Key |
+| **Groq** | API Key |
 | **ElevenLabs** | API Key |
 | **Cartesia** | API Key |
 | **Deepgram** | API Key |
+| **Azure Speech** | API Key + Region |
+| **Speechmatics** | API Key |
+| **Soniox** | API Key |
+| **Uplift** | API Key |
+| **Murf** | API Key |
 | **Twilio** | Account SID + Auth Token |
 | **Vonage** | API Key + API Secret |
 | **Telnyx** | API Key + Connection ID |
@@ -45,20 +54,20 @@ Each assistant can be configured with:
 - **Greeting Message** — First message spoken when a call connects
 
 ### AI Configuration
-- **LLM Provider** — OpenAI, Anthropic, Gemini, Groq, or xAI
+- **LLM Provider** — OpenAI, Azure OpenAI, Anthropic, Gemini, Groq, xAI, custom HTTP, or custom WebSocket
 - **LLM Model** — Specific model (e.g., gpt-4o, claude-3-sonnet)
 - **System Prompt** — Instructions defining the assistant's behavior
 - **Temperature** — Creativity level (0.0-1.0)
 
 ### Voice Configuration
-- **TTS Provider** — ElevenLabs, Cartesia, Deepgram, or Resemble
+- **TTS Provider** — ElevenLabs, Deepgram, Cartesia, Azure, Inworld, Resemble, OpenAI, Kokoro, Uplift, Murf, or Soniox
 - **Voice** — Specific voice ID or name
 - **Speed** — Speaking rate adjustment
 - **Stability** — Voice consistency (provider-dependent)
 
 ### Speech Recognition
-- **STT Provider** — Deepgram (recommended)
-- **Model** — Nova-3 or other available models
+- **STT Provider** — Deepgram (recommended), ElevenLabs, Azure, Uplift, Speechmatics, Telnyx, or Soniox
+- **Model** — Nova-3, Flux, Scribe v2, Azure, Telnyx-hosted, Soniox, or other provider models
 - **Language** — Primary language for recognition
 - **Keywords** — Important terms for better recognition
 

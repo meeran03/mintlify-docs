@@ -1,0 +1,199 @@
+---
+title: SIP Trunks API
+description: "Create, update, prioritize, enable, disable, and sync BYO SIP trunks."
+sidebarTitle: SIP trunks
+---
+
+The SIP Trunks API lets organization admins manage BYO SIP trunk gateways for outbound and inbound telephony through Burki's SIP bridge.
+
+All SIP trunk management endpoints require an authenticated organization admin.
+
+```text
+Base path: /api/v1/sip-trunks
+```
+
+<Warning>
+SIP trunk records include carrier credentials. Treat responses and request bodies as sensitive and avoid logging full payloads.
+</Warning>
+
+## SIP Trunk Object
+
+```json
+{
+  "id": "7f502da1-0f06-4e52-9262-4e625c53791a",
+  "name": "Primary Carrier",
+  "gateway": "sip.example-carrier.com",
+  "username": "sip-user",
+  "password": "sip-password",
+  "priority": 1,
+  "enabled": true,
+  "register": true,
+  "provider": "example-carrier"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Server-generated trunk UUID |
+| `name` | string | Unique trunk name within the organization |
+| `gateway` | string | SIP gateway hostname or IP |
+| `username` | string | SIP auth username |
+| `password` | string | SIP auth password |
+| `priority` | integer | Lower values are preferred first |
+| `enabled` | boolean | Whether the trunk is eligible for routing |
+| `register` | boolean | Whether FreeSWITCH should register to the gateway |
+| `provider` | string | Optional provider label |
+
+## List Trunks
+
+```http
+GET /api/v1/sip-trunks
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns trunks sorted by `priority`.
+
+```json Response
+[
+  {
+    "id": "7f502da1-0f06-4e52-9262-4e625c53791a",
+    "name": "Primary Carrier",
+    "gateway": "sip.example-carrier.com",
+    "username": "sip-user",
+    "password": "sip-password",
+    "priority": 1,
+    "enabled": true,
+    "register": true,
+    "provider": "example-carrier"
+  }
+]
+```
+
+## Create Trunk
+
+```http
+POST /api/v1/sip-trunks
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "name": "Primary Carrier",
+  "gateway": "sip.example-carrier.com",
+  "username": "sip-user",
+  "password": "sip-password",
+  "priority": 1,
+  "enabled": true,
+  "register": true,
+  "provider": "example-carrier"
+}
+```
+
+Returns `201 Created` with the created SIP trunk object.
+
+Duplicate names return `400 Bad Request`.
+
+## Get Trunk
+
+```http
+GET /api/v1/sip-trunks/{trunk_id}
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns one SIP trunk object or `404 Not Found`.
+
+## Update Trunk
+
+```http
+PUT /api/v1/sip-trunks/{trunk_id}
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+All fields are optional. Empty fields are ignored only if omitted; send the exact value you want persisted.
+
+```json Request
+{
+  "name": "Primary Carrier",
+  "gateway": "sip2.example-carrier.com",
+  "priority": 2,
+  "enabled": true
+}
+```
+
+Returns the updated trunk.
+
+## Delete Trunk
+
+```http
+DELETE /api/v1/sip-trunks/{trunk_id}
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns `204 No Content` on success.
+
+## Enable or Disable Trunk
+
+```http
+POST /api/v1/sip-trunks/{trunk_id}/enable
+Authorization: Bearer YOUR_TOKEN
+```
+
+```http
+POST /api/v1/sip-trunks/{trunk_id}/disable
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns the updated trunk object.
+
+## Sync to SIP Bridge
+
+```http
+POST /api/v1/sip-trunks/sync
+Authorization: Bearer YOUR_TOKEN
+```
+
+Pushes enabled trunk configuration to the SIP bridge. The API returns success if Burki updates its org config and starts bridge sync; bridge sync failures are logged server-side and should be checked in operations logs.
+
+```json Response
+{
+  "success": true,
+  "message": "Synced 2 enabled trunk(s) to bridge",
+  "total_trunks": 3,
+  "enabled_trunks": 2
+}
+```
+
+## Assign a Phone Number to a SIP Trunk
+
+Phone-number routing uses the organization phone-number update endpoint:
+
+```http
+PATCH /api/v1/assistants/organization/phone-numbers/{phone_number_id}
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "sip_trunk_id": "7f502da1-0f06-4e52-9262-4e625c53791a"
+}
+```
+
+Send an empty string to clear the SIP trunk assignment:
+
+```json
+{
+  "sip_trunk_id": ""
+}
+```
+
+## Error Responses
+
+| Status | Cause |
+|--------|-------|
+| `400` | Duplicate trunk name or invalid update |
+| `403` | Authenticated user is not an organization admin |
+| `404` | Organization or trunk not found |
+| `500` | Unexpected server error |

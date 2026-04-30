@@ -13,7 +13,7 @@ npm i -g mint
 Run the development server:
 
 ```bash
-cd mintlify-docs
+cd /Users/meeran/Startup/burki-docs
 mint dev
 ```
 

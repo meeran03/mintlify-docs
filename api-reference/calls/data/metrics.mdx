@@ -1,0 +1,98 @@
+---
+title: Call Metrics
+description: "Retrieve or recalculate per-call analytics and conversation quality metrics."
+sidebarTitle: Call metrics
+---
+
+Call metrics summarize response time, turn-taking, silence, word counts, engagement, confidence, and emotional trajectory metrics for one call.
+
+## Get Call Metrics
+
+```http
+GET /api/v1/calls/{call_id}/metrics
+Authorization: Bearer YOUR_TOKEN
+```
+
+If metrics are already stored, Burki returns them from the database. If they are missing, Burki calculates them from transcripts and stores them when possible.
+
+```json Response
+{
+  "avg_response_time": 1.42,
+  "fastest_response_time": 0.8,
+  "response_time_std": 0.31,
+  "conversation_flow_score": 82,
+  "engagement_score": 76,
+  "user_percentage": 47,
+  "ai_percentage": 53,
+  "user_turns": 12,
+  "ai_turns": 13,
+  "avg_customer_response_time": 1.8,
+  "avg_ai_response_time": 0.9,
+  "fastest_customer_response": 0.7,
+  "fastest_ai_response": 0.4,
+  "slowest_customer_response": 4.2,
+  "slowest_ai_response": 2.1,
+  "avg_customer_turn_duration": 3.6,
+  "avg_ai_turn_duration": 2.9,
+  "longest_customer_monologue": 18.2,
+  "longest_ai_monologue": 12.4,
+  "avg_silence_duration": 0.7,
+  "awkward_silences_count": 1,
+  "total_silence_time": 9.4,
+  "silence_percentage": 7.8,
+  "total_customer_words": 420,
+  "total_ai_words": 510,
+  "customer_words_per_minute": 112.5,
+  "ai_words_per_minute": 124.7,
+  "avg_customer_words_per_turn": 35.0,
+  "avg_ai_words_per_turn": 39.2,
+  "total_speaking_time_customer": 43.2,
+  "total_speaking_time_ai": 48.1,
+  "speaking_time_ratio": 0.9,
+  "interruption_count": 0,
+  "avg_confidence_customer": 0.94,
+  "avg_confidence_ai": 0.98,
+  "low_confidence_segments_count": 0,
+  "avg_user_frustration": 0.12,
+  "avg_user_stress": 0.18,
+  "interaction_sentiment_delta": 0.22,
+  "frustration_scores_ts": [
+    {
+      "t": 12.4,
+      "score": 0.1
+    }
+  ],
+  "stress_scores_ts": [
+    {
+      "t": 12.4,
+      "score": 0.2
+    }
+  ],
+  "price_sensitivity": 0.0,
+  "primary_intent": "reschedule_appointment",
+  "intent_resolved": true,
+  "ai_response_accuracy": 0.86
+}
+```
+
+## Recalculate Call Metrics
+
+```http
+PATCH /api/v1/calls/{call_id}/metrics
+Authorization: Bearer YOUR_TOKEN
+```
+
+Forces recalculation and overwrites existing metrics.
+
+Use this when:
+
+- Previous metrics were generated before an algorithm update.
+- LLM-based metrics used a misconfigured key.
+- You need to rerun analytics for the same transcript.
+
+## Error Responses
+
+| Status | Cause |
+|--------|-------|
+| `404` | Call was not found in the authenticated user's organization |
+| `500` | Unexpected metrics calculation or persistence error |

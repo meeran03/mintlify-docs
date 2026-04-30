@@ -1,0 +1,339 @@
+---
+title: Account and Organization API
+description: "Users, invitations, organization settings, API keys, provider credentials, fallback keys, and concurrency settings."
+sidebarTitle: Account & organization
+---
+
+Account and organization endpoints live under `/api/v1`.
+
+```text
+https://api.burki.dev/api/v1
+```
+
+Most endpoints accept API key, JWT bearer token, or dashboard session auth. Some sensitive endpoints require a verified user or organization admin.
+
+<Warning>
+Several organization endpoints accept or return secrets such as provider API keys, SIP credentials, carrier credentials, or one-time user API keys. Treat full responses as sensitive and avoid logging them.
+</Warning>
+
+## Current User
+
+### Get Current User
+
+```http
+GET /api/v1/users/me
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns the authenticated user profile.
+
+### Update Current User
+
+```http
+PUT /api/v1/users/me
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "first_name": "Ada",
+  "last_name": "Lovelace",
+  "email": "ada@example.com",
+  "preferences": {
+    "timezone": "America/New_York"
+  }
+}
+```
+
+### Change Password
+
+```http
+POST /api/v1/users/me/change-password
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "current_password": "old-password",
+  "new_password": "new-strong-password"
+}
+```
+
+OAuth users can set their first password with an empty `current_password`.
+
+## Organization Users and Invitations
+
+### List Users
+
+```http
+GET /api/v1/users
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns users in the current organization.
+
+### Invite User
+
+```http
+POST /api/v1/users/invite
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+```
+
+Admin only.
+
+```json Request
+{
+  "email": "teammate@example.com",
+  "first_name": "Grace",
+  "last_name": "Hopper",
+  "role": "user"
+}
+```
+
+### Validate Invitation
+
+```http
+GET /api/v1/users/invitation/{token}
+```
+
+This endpoint is public. The invitation token acts as bearer access to the invitation metadata.
+
+### Accept Invitation
+
+```http
+POST /api/v1/users/accept-invitation
+Content-Type: application/json
+```
+
+```json Request
+{
+  "token": "invitation-token",
+  "password": "new-strong-password",
+  "confirm_password": "new-strong-password"
+}
+```
+
+The response includes an access token. Store it like any other JWT.
+
+## Organization
+
+### Get Organization
+
+```http
+GET /api/v1/organization
+Authorization: Bearer YOUR_TOKEN
+```
+
+<Warning>
+The organization response can include stored provider credentials and API key configuration. Do not log full responses.
+</Warning>
+
+### Create Organization
+
+```http
+POST /api/v1/organization/create
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "name": "Acme Support",
+  "slug": "acme-support",
+  "description": "Support automation team",
+  "domain": "example.com"
+}
+```
+
+Trial credits are provisioned only for the user's first eligible organization.
+
+### Update Organization
+
+```http
+PUT /api/v1/organization
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+```
+
+Admin only. Supports organization metadata, settings, provider keys, carrier credentials, Vonage settings, and SIP trunk config.
+
+```json Request
+{
+  "name": "Acme Support",
+  "settings": {
+    "default_timezone": "America/New_York"
+  },
+  "api_keys": {
+    "openai": {
+      "api_key": "sk-..."
+    }
+  },
+  "sip_trunk_config": {
+    "sip_domain": "sip.example.com",
+    "inbound_enabled": true
+  }
+}
+```
+
+If HIPAA/BAA requirements block BYO activation, the backend may save keys but prevent activation until compliance requirements are met.
+
+### Validate Twilio Credentials
+
+```http
+POST /api/v1/organization/twilio/validate
+Authorization: Bearer ADMIN_TOKEN
+Content-Type: application/json
+```
+
+Admin only. Sends raw Twilio credentials for validation.
+
+```json Request
+{
+  "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "auth_token": "twilio-auth-token"
+}
+```
+
+## User API Keys
+
+### List API Keys
+
+```http
+GET /api/v1/users/me/api-keys
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns key metadata only, including `key_prefix`, never the full secret.
+
+### Create API Key
+
+```http
+POST /api/v1/users/me/api-keys
+Authorization: Bearer VERIFIED_USER_TOKEN
+Content-Type: application/json
+```
+
+Requires a verified user account.
+
+```json Request
+{
+  "name": "Production integration",
+  "permissions": {
+    "assistants": "read_write",
+    "calls": "read_write"
+  }
+}
+```
+
+```json Response
+{
+  "api_key": {
+    "id": 12,
+    "user_id": 17,
+    "name": "Production integration",
+    "key_prefix": "burki_live_abc123",
+    "last_used_at": null,
+    "usage_count": 0,
+    "is_active": true,
+    "permissions": {
+      "assistants": "read_write",
+      "calls": "read_write"
+    },
+    "rate_limit": null,
+    "created_at": "2026-04-30T10:00:00Z",
+    "updated_at": "2026-04-30T10:00:00Z"
+  },
+  "key": "burki_live_abc123_full_secret_shown_once"
+}
+```
+
+<Warning>
+The `key` field is shown only once. Store it immediately and never commit it to source control.
+</Warning>
+
+### Update or Delete API Key
+
+```http
+PUT /api/v1/users/me/api-keys/{key_id}
+DELETE /api/v1/users/me/api-keys/{key_id}
+```
+
+Both require a verified user account.
+
+## LLM Presets
+
+```http
+GET /api/v1/organization/llm-presets
+GET /api/v1/organization/llm-presets/{preset_id}/apply
+POST /api/v1/organization/llm-presets
+PUT /api/v1/organization/llm-presets/{preset_id}
+DELETE /api/v1/organization/llm-presets/{preset_id}
+```
+
+List responses mask stored API keys. The `apply` endpoint is admin-only and can return an unmasked stored API key when the preset includes one.
+
+## Configuration Status
+
+```http
+GET /api/v1/organization/configuration-status
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns organization provider configuration health and readiness status.
+
+## Fallback Keys
+
+```http
+GET /api/v1/organization/fallback-keys/{provider}
+POST /api/v1/organization/fallback-keys/{provider}
+PUT /api/v1/organization/fallback-keys/{provider}/{key_id}
+DELETE /api/v1/organization/fallback-keys/{provider}/{key_id}
+```
+
+`GET` returns metadata only. `POST` and `PUT` accept provider secrets.
+
+```json Request
+{
+  "name": "Deepgram backup key",
+  "api_key": "provider-secret",
+  "enabled": true,
+  "concurrent_limit": 20
+}
+```
+
+For updates, `api_key` changes only when a non-empty value is provided.
+
+## Concurrency Settings
+
+```http
+GET /api/v1/organization/concurrency-settings
+PUT /api/v1/organization/concurrency-settings
+```
+
+Admin only. Controls provider concurrency for TTS/STT.
+
+```json Request
+{
+  "tts": {
+    "elevenlabs": {
+      "enabled": true,
+      "concurrent_limit": 20
+    }
+  },
+  "stt": {
+    "deepgram": {
+      "enabled": true,
+      "concurrent_limit": 20
+    }
+  }
+}
+```
+
+## Related Docs
+
+- [BYO API Keys](/byo-api-keys)
+- [Billing API](/api-reference/billing/overview)
+- [SIP Trunks API](/api-reference/sip-trunks/overview)

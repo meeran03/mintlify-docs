@@ -15,10 +15,14 @@ Retrieve a paginated list of all calls for your organization. This endpoint prov
 | `status` | string | - | Filter by status: `ongoing`, `completed`, `failed` |
 | `assistant_id` | integer | - | Filter by specific assistant ID |
 | `customer_phone` | string | - | Filter by customer phone (supports partial match) |
+| `call_sid` | string | - | Filter by call SID/provider call identifier (supports partial match) |
+| `assistant_name` | string | - | Filter by assistant name (supports partial match and deleted-assistant snapshots) |
 | `date_from` | string | - | Filter calls started on/after this date (ISO 8601) |
 | `date_to` | string | - | Filter calls started on/before this date (ISO 8601) |
 | `min_duration` | integer | - | Minimum call duration in seconds |
 | `max_duration` | integer | - | Maximum call duration in seconds |
+
+Filters are combined with AND semantics. For example, `status=completed&assistant_name=support` returns completed calls whose assistant name matches `support`.
 
 ## Request Examples
 
@@ -99,7 +103,7 @@ The response is a paginated object containing the call items and pagination meta
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Internal call ID |
-| `call_sid` | string | Telephony provider's call SID |
+| `call_sid` | string | Burki call SID / provider call identifier |
 | `assistant_id` | integer | ID of the assistant that handled the call |
 | `assistant_name` | string | Name of the assistant |
 | `flow_name` | string | Name of the ConversationFlow (if call was routed through a flow) |

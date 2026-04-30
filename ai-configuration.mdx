@@ -21,10 +21,10 @@ When creating or editing an assistant, you'll see three main tabs:
 
   ### Key Settings
   <Checklist>
-  - **Provider:** Choose from OpenAI, Anthropic, Gemini, xAI, Groq, or a custom endpoint.
+  - **Provider:** Choose from OpenAI, Azure OpenAI, Anthropic, Gemini, xAI, Groq, custom HTTP, or custom WebSocket.
   - **API Key:** Paste your provider's API key (get it from their dashboard).
-  - **Model:** Pick the model (e.g., GPT-4o, Claude 3.5, Gemini 2.0 Flash).
-  - **Base URL:** (For some providers) Set a custom API endpoint.
+  - **Model:** Pick the model or deployment name (e.g., GPT-4o, Claude 3.5 Sonnet, Gemini 2.5 Flash, Groq Llama, or an Azure deployment).
+  - **Base URL:** Set a custom API endpoint for Azure OpenAI and custom/OpenAI-compatible providers.
   - **Temperature:** Controls creativity. Lower = more predictable, higher = more creative. <br/> <Callout type="tip">0.7 is a good starting point!</Callout>
   - **Max Tokens:** Limits response length. <br/> <Callout type="tip">1000 tokens ≈ 250 words. Good for phone calls.</Callout>
   - **System Prompt:** Set your AI's personality and instructions (e.g., "You are a friendly assistant...").
@@ -67,6 +67,18 @@ When creating or editing an assistant, you'll see three main tabs:
       
       Unlimited voice creation
     </Card>
+
+    <Card title="🧠 OpenAI TTS" href="/tts-providers/openai">
+      **OpenAI-Native Voices**
+      
+      `tts-1`, `tts-1-hd`, and `gpt-4o-mini-tts`
+    </Card>
+
+    <Card title="☁️ Azure / Cartesia" href="/tts-providers">
+      **Enterprise and Multilingual**
+      
+      Azure Speech, Cartesia, plus Kokoro, Murf, Soniox, and Uplift
+    </Card>
   </CardGroup>
 
   ### Configuration Overview
@@ -84,7 +96,7 @@ When creating or editing an assistant, you'll see three main tabs:
   
   **Customer Service:** ElevenLabs Bella or Inworld Ashley for warmth
   
-  **Multilingual:** ElevenLabs v3 or Inworld TTS-1 with native voices
+  **Multilingual:** ElevenLabs v3, Cartesia Sonic 3, or Inworld `inworld-tts-1.5-mini` with native voices
   
   **Brand Voice:** Resemble AI with custom voice training
   
@@ -107,7 +119,8 @@ When creating or editing an assistant, you'll see three main tabs:
 
   ### Key Settings
   <Checklist>
-  - **Model:** Nova-3, Nova-2, Enhanced, etc. (Deepgram)
+  - **Provider:** Choose Deepgram, ElevenLabs, Azure, Uplift, Speechmatics, Telnyx, or Soniox.
+  - **Model:** Choose a provider model such as `nova-3`, `flux-general-en`, `scribe_v2_realtime`, `standard`, `deepgram/nova-3`, or `stt-rt-v4`.
   - **Language:** Choose the spoken language (or enter a custom code)
   - **Advanced Timing Controls:** Fine-tune speech detection (see [STT Providers](/stt-providers) for details)
   - **Punctuation/Interim Results/Smart Format:** Make transcripts easier to read and use

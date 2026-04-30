@@ -22,13 +22,16 @@ https://api.burki.dev
 
 ## Authentication
 
-All Burki API endpoints are protected and require a valid API key to be included in all requests. Authentication is performed by passing a **Bearer Token** in the `Authorization` header of your HTTP requests.
+Most API endpoints accept a bearer token in the `Authorization` header:
 
-You can generate and manage your API keys from the **API Keys** section in your organization's dashboard at [burki.dev/dashboard](https://burki.dev/dashboard).
+- **API key** (recommended for server-to-server integrations)
+- **JWT access token** (for user-authenticated app sessions)
 
-### How to Use Your API Key
+Many dashboard-backed endpoints also support session auth when used from the web app, but external integrations should use API keys.
 
-To authenticate an API request, you must include an `Authorization` header with the value `Bearer YOUR_API_KEY`, where `YOUR_API_KEY` is the key you generated in the dashboard.
+You can generate and manage API keys in your dashboard at [burki.dev/dashboard](https://burki.dev/dashboard).
+
+### Bearer Authentication Example
 
 <CodeGroup>
 ```bash cURL
@@ -74,23 +77,33 @@ fetch('https://api.burki.dev/api/v1/assistants', {
 
 ## Response Format
 
-All responses are returned in JSON format with consistent structure:
+Responses are JSON, but shape varies by endpoint. Two common patterns:
 
-### Success Response
+### Resource/List Responses
+
+```json
+[
+  {
+    "id": 123,
+    "name": "Customer Service Bot"
+  }
+]
+```
 
 ```json
 {
-  "data": { ... },
-  "message": "Success"
+  "items": [],
+  "total": 0,
+  "skip": 0,
+  "limit": 100
 }
 ```
 
-### Error Response
+### Error Response (FastAPI style)
 
 ```json
 {
-  "detail": "Error description",
-  "status_code": 400
+  "detail": "Error description"
 }
 ```
 
@@ -102,45 +115,36 @@ All responses are returned in JSON format with consistent structure:
 | `401` | Unauthorized - Invalid or missing API key |
 | `403` | Forbidden - Insufficient permissions |
 | `404` | Not Found - Resource doesn't exist |
-| `429` | Too Many Requests - Rate limit exceeded |
+| `429` | Too Many Requests - Endpoint or account rate limit exceeded |
 | `500` | Internal Server Error |
 
 ## Rate Limits
 
-API requests are rate limited to ensure platform stability:
+Rate limiting is endpoint-specific and can vary by auth type and environment configuration.
 
-| Tier | Requests per minute |
-|------|---------------------|
-| Free Trial | 60 |
-| Standard | 300 |
-| Enterprise | Custom |
+- Expect `429 Too Many Requests` when limits are exceeded.
+- Some endpoints include `Retry-After` in the response headers.
+- Build clients with retry/backoff for transient limit errors.
 
-Rate limit headers are included in all responses:
-
-```
-X-RateLimit-Limit: 300
-X-RateLimit-Remaining: 299
-X-RateLimit-Reset: 1640000000
-```
+For critical workloads, contact Burki support for current limits and throughput planning.
 
 ## Pagination
 
-List endpoints support pagination with the following query parameters:
+Most list endpoints use `skip` + `limit` pagination:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `page` | Page number (1-indexed) | 1 |
-| `page_size` | Items per page | 20 |
+| `skip` | Number of records to skip | `0` |
+| `limit` | Maximum number of records to return | endpoint-specific |
 
-Paginated responses include metadata:
+Common paginated response shape:
 
 ```json
 {
-  "data": [...],
+  "items": [...],
   "total": 100,
-  "page": 1,
-  "page_size": 20,
-  "total_pages": 5
+  "skip": 0,
+  "limit": 100
 }
 ```
 
@@ -148,12 +152,15 @@ Paginated responses include metadata:
 
 Burki can send webhook notifications for various events. Configure webhooks in your dashboard under **Settings** → **Webhooks**.
 
-Supported events:
-- `call.started`
-- `call.ended`
-- `call.recording.ready`
-- `message.sent`
-- `message.received`
+Current webhook payloads are sent as typed JSON messages:
+
+- Voice call lifecycle webhooks use `message.type` values such as:
+  - `status-update`
+  - `end-of-call-report`
+- SMS webhooks use top-level `type` such as:
+  - `sms_received`
+
+Always parse webhook payloads by their explicit `type` field instead of assuming dotted event names.
 
 ## SDKs & Libraries
 

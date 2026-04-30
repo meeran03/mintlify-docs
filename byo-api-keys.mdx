@@ -47,6 +47,10 @@ flowchart TD
 
 This allows you to use BYO keys for specific assistants while others use managed keys.
 
+At the organization level, Burki also stores managed-service preferences for LLM, TTS, STT, and carrier usage. These are exposed through the billing managed-services API (`GET`/`PATCH /v1/billing/managed-services`) and determine which service categories Burki manages for hybrid billing.
+
+For organization-level API key, fallback key, and provider credential endpoints, see [Account and Organization API](/api-reference/account/overview). Assistant-level `byo_api_keys` and organization-level fallback keys are separate mechanisms: assistant keys override for a specific assistant, while fallback keys provide provider-level backup capacity for the organization.
+
 ---
 
 ## Supported Providers
@@ -59,9 +63,19 @@ Configure BYO keys for the following providers:
 | **Deepgram** | STT, TTS | `api_key` |
 | **Cartesia** | TTS | `api_key` |
 | **OpenAI** | TTS, LLM | `api_key` |
+| **Anthropic** | LLM | `api_key` |
+| **Gemini** | LLM | `api_key` |
+| **xAI** | LLM | `api_key` |
+| **Groq** | LLM | `api_key` |
 | **Azure Speech** | TTS, STT | `api_key`, `region` |
+| **Azure OpenAI** | LLM | `api_key`, `base_url`, deployment `model` |
 | **Inworld** | TTS | `bearer_token`, `workspace_id` |
 | **Resemble AI** | TTS | `api_key` |
+| **Speechmatics** | STT | `api_key` |
+| **Soniox** | STT, TTS | `api_key` |
+| **Uplift** | STT, TTS | `api_key` |
+| **Murf** | TTS | `api_key` |
+| **Telnyx** | STT, Telephony, SMS | Telnyx API key / org carrier credentials |
 
 ---
 

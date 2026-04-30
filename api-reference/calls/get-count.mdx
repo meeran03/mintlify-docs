@@ -7,12 +7,14 @@ This endpoint returns the total number of calls that match a given set of filter
 
 ### Query Parameters
 
-This endpoint supports the same filtering parameters as the [List Calls](/api-reference/calls/list) endpoint:
+This endpoint supports a subset of the [List Calls](/api-reference/calls/list) filters:
 
 - `status` (string, optional)
 - `assistant_id` (integer, optional)
 - `date_from` (string, optional)
 - `date_to` (string, optional)
+
+It does not support the search-style filters (`customer_phone`, `call_sid`, `assistant_name`) or duration filters. Use List Calls when you need those filters and read the `total` field from the paginated response.
 
 ### Response
 

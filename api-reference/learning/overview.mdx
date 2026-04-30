@@ -1,0 +1,235 @@
+---
+title: Learning and Memory API
+description: "Memory, prompt lifecycle, eval datasets, stats, graph, DSPy, and call trace APIs."
+sidebarTitle: Learning & memory
+---
+
+Learning and memory endpoints use the `/api/learning` prefix, not `/api/v1`.
+
+```text
+https://api.burki.dev/api/learning
+```
+
+Authentication uses the standard flexible auth path: API key, JWT bearer token, or dashboard session. Results are scoped to the authenticated user's organization.
+
+<Warning>
+Learning APIs may return customer conversation content, stable caller hashes, memories, prompts, and trace details. Treat these responses as sensitive operational data.
+</Warning>
+
+## Memories
+
+### List Memories
+
+```http
+GET /api/learning/memories
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns memory objects:
+
+```json Response
+[
+  {
+    "id": 42,
+    "fact": "Customer prefers morning appointment reminders",
+    "memory_type": "preference",
+    "memory_scope": "organization",
+    "subject_type": "caller",
+    "subject_id": "caller_hash_abc",
+    "confidence": 0.91,
+    "importance": 0.7,
+    "provenance": {
+      "source": "call_trace"
+    },
+    "created_at": "2026-04-30T10:00:00Z",
+    "access_count": 3
+  }
+]
+```
+
+### Get, Create, Update, Delete
+
+```http
+GET /api/learning/memories/{memory_id}
+POST /api/learning/memories
+PUT /api/learning/memories/{memory_id}
+DELETE /api/learning/memories/{memory_id}
+```
+
+Create/update request fields include `fact`, `memory_type`, `memory_scope`, `subject_type`, `subject_id`, `confidence`, and optional provenance/edit metadata. Updating `fact` causes the backend to clear the old embedding so it can be regenerated.
+
+### Search Memories
+
+```http
+POST /api/learning/memories/search
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+```json Request
+{
+  "query": "What appointment reminder preferences should I know?",
+  "caller_hash": "caller_hash_abc",
+  "assistant_id": 123,
+  "limit": 10
+}
+```
+
+```json Response
+{
+  "memories": [
+    {
+      "id": 42,
+      "fact": "Customer prefers morning appointment reminders",
+      "confidence": 0.91,
+      "source": "call_trace"
+    }
+  ],
+  "intent": "preference_lookup",
+  "traversal_path": [],
+  "retrieval_ms": 12.4
+}
+```
+
+### Memory Edges
+
+```http
+GET /api/learning/memories/{memory_id}/edges
+```
+
+Returns graph relationships for a memory.
+
+## Prompt Lifecycle
+
+Prompt endpoints are scoped to an assistant:
+
+```text
+/api/learning/assistants/{assistant_id}/prompts
+```
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/learning/assistants/{assistant_id}/prompts` | List prompt versions |
+| `GET` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}` | Get one prompt version, including full `system_prompt` |
+| `POST` | `/api/learning/assistants/{assistant_id}/prompts` | Create a prompt version |
+| `POST` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}/approve` | Approve a version |
+| `POST` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}/start-canary` | Start canary rollout |
+| `PATCH` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}/canary` | Update canary percentage |
+| `POST` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}/promote` | Promote canary/current version |
+| `POST` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}/rollback` | Roll back a version |
+| `GET` | `/api/learning/assistants/{assistant_id}/prompts/{version_id}/gates` | Inspect promotion gates |
+
+Create request:
+
+```json Request
+{
+  "system_prompt": "You are a helpful support assistant...",
+  "change_summary": "Tighten escalation behavior"
+}
+```
+
+Canary update request:
+
+```json Request
+{
+  "percentage": 25
+}
+```
+
+## Eval Datasets and Cases
+
+```text
+/api/learning/assistants/{assistant_id}/eval-datasets
+```
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/api/learning/assistants/{assistant_id}/eval-datasets` | List datasets |
+| `GET` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}` | Get dataset |
+| `POST` | `/api/learning/assistants/{assistant_id}/eval-datasets` | Create dataset |
+| `POST` | `/api/learning/assistants/{assistant_id}/eval-datasets/import` | Import dataset with cases |
+| `POST` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}/publish` | Publish dataset |
+| `GET` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}/cases` | List cases |
+| `POST` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}/cases` | Add case |
+| `PUT` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}/cases/{case_id}` | Update case |
+| `DELETE` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}/cases/{case_id}` | Delete case |
+| `POST` | `/api/learning/assistants/{assistant_id}/eval-datasets/{dataset_id}/cases/from-trace` | Create case from call trace |
+
+Add case request:
+
+```json Request
+{
+  "case_name": "Reschedule appointment",
+  "conversation": [
+    {
+      "role": "user",
+      "content": "I need to move my appointment"
+    }
+  ],
+  "expected_response": "Ask for the customer's preferred new day and time.",
+  "mock_tool_responses": {},
+  "difficulty": "medium"
+}
+```
+
+## Run Evals
+
+```http
+POST /api/learning/assistants/{assistant_id}/eval/run
+Authorization: Bearer YOUR_TOKEN
+Content-Type: application/json
+```
+
+Runs an evaluation against a dataset/prompt configuration.
+
+## Stats and Graph
+
+```http
+GET /api/learning/assistants/{assistant_id}/stats
+GET /api/learning/graph-stats
+GET /api/learning/assistants/{assistant_id}/memory-graph
+```
+
+Assistant stats include memory counts, prompt versions, active/canary versions, eval datasets, and last eval pass rate.
+
+## DSPy Optimization
+
+```http
+POST /api/learning/assistants/{assistant_id}/dspy/optimize
+Authorization: Bearer YOUR_TOKEN
+```
+
+Starts DSPy prompt optimization for an assistant.
+
+If `dspy-ai` is not installed in the backend environment, the endpoint returns `503 Service Unavailable`.
+
+## Call Traces
+
+```http
+GET /api/learning/call-traces
+GET /api/learning/call-traces/{trace_id}
+```
+
+List responses return shortened caller hashes. The detail endpoint can include full trace data, full `caller_hash`, turns, tool calls, and conversation content.
+
+```json Response
+{
+  "id": 77,
+  "assistant_id": 123,
+  "call_sid": "CAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "caller_hash": "abc123...",
+  "turns": [
+    {
+      "role": "user",
+      "content": "Can I reschedule?"
+    }
+  ],
+  "created_at": "2026-04-30T10:00:00Z"
+}
+```
+
+## Related
+
+- [Learning & Memory Guide](/learning-memory)
+- [Assistants API](/api-reference/assistants/create)
+- [Call Data](/api-reference/calls/data/get-transcripts-by-id)

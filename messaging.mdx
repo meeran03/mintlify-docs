@@ -4,18 +4,18 @@ description: "Send SMS and MMS messages through your AI assistants with multi-pr
 ---
 
 <Card title="SMS Messaging" icon="message">
-  Send text messages and multimedia content through your AI assistants using Twilio or Telnyx
+  Send text messages and multimedia content through your AI assistants using Twilio, Telnyx, or Vonage
 </Card>
 
 ## Overview
 
-The messaging system allows your AI assistants to send SMS and MMS messages to customers and users. The platform supports both Twilio and Telnyx as telephony providers, automatically selecting the appropriate provider based on your assistant configuration.
+The messaging system allows your AI assistants to send SMS and MMS messages to customers and users. The platform supports Twilio, Telnyx, and Vonage, automatically selecting the provider from the sending phone number's configured provider.
 
 ## Key Features
 
 <CardGroup cols={2}>
   <Card title="Multi-Provider Support" icon="network-wired">
-    Seamlessly switch between Twilio and Telnyx providers per assistant
+    Send through Twilio, Telnyx, or Vonage based on the provider attached to the sending phone number
   </Card>
   <Card title="MMS Support" icon="image">
     Send images, documents, and other media files alongside text messages
@@ -41,12 +41,14 @@ graph TD
     E --> F{Provider Type}
     F -->|Twilio| G[Send via Twilio API]
     F -->|Telnyx| H[Send via Telnyx API]
+    F -->|Vonage| V[Send via Vonage API]
     G --> I[Return Message ID & Status]
     H --> I
+    V --> I
 ```
 
 1. **Assistant Lookup**: The system identifies which assistant owns the `from_phone_number`
-2. **Provider Selection**: Automatically determines whether to use Twilio or Telnyx based on the assistant's configuration
+2. **Provider Selection**: Determines whether to use Twilio, Telnyx, or Vonage from the sender phone number's provider configuration
 3. **Message Delivery**: Sends the message through the appropriate provider's API
 4. **Response**: Returns confirmation with message ID and provider information
 
@@ -71,12 +73,9 @@ Each assistant can be configured with different telephony providers:
 }
 ```
 
-### Provider Priority
+### Provider Selection
 
-When an assistant has both Telnyx and Twilio configured:
-1. **Telnyx** is used by default (typically lower cost)
-2. **Twilio** is used as fallback if Telnyx is unavailable
-3. You can override this behavior per assistant
+The provider is determined by the owned phone number used as `from_phone_number`. If the number is a Telnyx number, Burki sends through Telnyx; if it is a Twilio or Vonage number, Burki uses that provider. This avoids guessing based on which credentials are present.
 
 ## Supported Message Types
 
@@ -218,12 +217,16 @@ schedule.every().day.at("18:00").do(send_appointment_reminder)
 Create two-way messaging workflows:
 
 ```python
-# Handle incoming SMS responses
-@app.post("/sms/webhook")
+# Handle normalized Burki SMS webhook payloads sent to your assistant's sms_webhook_url
+@app.post("/webhooks/sms")
 async def handle_incoming_sms(request):
-    sms_data = await request.json()
-    message = sms_data['message'].lower()
-    from_phone = sms_data['from']
+    payload = await request.json()
+    if payload.get("type") != "sms_received":
+        return {"ok": True}
+
+    sms_data = payload["data"]
+    message = sms_data["body"].lower()
+    from_phone = sms_data["from"]
     
     if 'confirm' in message:
         await send_sms({
@@ -279,15 +282,16 @@ except HTTPException as e:
 ### Rate Limiting
 
 Be mindful of rate limits:
-- **Twilio**: Up to 1 message per second by default (varies by account)
+- **Twilio**: Varies by account type and sender setup
 - **Telnyx**: Varies by account configuration
+- **Vonage**: Varies by account type and sender setup
 - **Best Practice**: Implement queuing for high-volume scenarios
 
 ## Getting Started
 
 <Steps>
   <Step title="Configure Your Assistant">
-    Set up your assistant with Twilio or Telnyx credentials in the dashboard.
+    Set up your assistant with Twilio, Telnyx, or Vonage credentials in the dashboard.
   </Step>
   
   <Step title="Assign Phone Numbers">
@@ -320,8 +324,20 @@ Be mindful of rate limits:
   <Card title="API Reference" icon="code" href="/api-reference/messaging/send-sms">
     Detailed API documentation for the SMS endpoint
   </Card>
+  <Card title="SMS Conversations" icon="comments" href="/api-reference/messaging/sms-conversations">
+    Conversation, session, export, and archive APIs
+  </Card>
+  <Card title="SMS Logs" icon="bug" href="/api-reference/messaging/sms-logs">
+    Delivery logs, stats, and debug timelines
+  </Card>
+  <Card title="SMS Compliance" icon="shield" href="/api-reference/messaging/sms-compliance">
+    Verify SMS use cases and outbound eligibility
+  </Card>
+  <Card title="SMS 10DLC" icon="id-card" href="/api-reference/messaging/sms-10dlc">
+    Carrier campaign helpers for Telnyx, Twilio, and Vonage
+  </Card>
   <Card title="Telephony Providers" icon="phone" href="/telephony-providers">
-    Learn about configuring Twilio and Telnyx providers
+    Learn about configuring Twilio, Telnyx, and Vonage providers
   </Card>
   <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
     Set up webhooks to handle incoming SMS responses

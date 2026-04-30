@@ -10,33 +10,27 @@ sidebarTitle: Live transcript WebSocket API
 
 ## WebSocket Endpoint
 
-**Endpoint:** `ws://your-domain.com/live-transcript/{call_sid}?token={api_key}`
+**Endpoint:** `wss://api.burki.dev/live-transcript/{call_sid}?token={api_key}`
 
 This WebSocket endpoint provides real-time streaming of call transcripts as they are generated. It's designed for building live monitoring dashboards, call supervision tools, and accessibility features.
 
 ### Path Parameters
 
-- `call_sid` (string, **required**): The Twilio Call SID of the call you want to monitor
+- `call_sid` (string, **required**): The Burki call SID you want to monitor
 
 ### Authentication
 
-**Required**: All connections must be authenticated using a valid API key.
+**Required**: All connections must be authenticated with a valid API key or JWT token.
 
 **Methods Supported:**
 
 1. **Query Parameter** (Recommended):
    ```
-   ws://your-domain.com/live-transcript/{call_sid}?token=your_api_key
+   wss://api.burki.dev/live-transcript/{call_sid}?token=your_api_key
    ```
 
-2. **Authorization Header**:
-   ```javascript
-   const websocket = new WebSocket(url, {
-     headers: {
-       'Authorization': 'Bearer your_api_key'
-     }
-   });
-   ```
+2. **Authorization Header** (non-browser clients):
+   Use this with server-side WebSocket clients (Node `ws`, Python `websockets`, etc.). Browsers do not allow custom `Authorization` headers on `new WebSocket(...)`.
 
 3. **WebSocket Subprotocol**:
    ```javascript
@@ -278,12 +272,6 @@ asyncio.run(listen_to_call("CA123abc...", "burki_your_api_key_here"))
 | 1006 | Abnormal closure |
 | 1008 | Authentication failed or access denied |
 | 1011 | Server error |
-
-## Rate Limits
-
-- **Connections per Call**: 10 concurrent connections maximum
-- **Messages per Second**: 100 messages per connection
-- **Connection Duration**: No limit (connections persist until call ends)
 
 ## Best Practices
 

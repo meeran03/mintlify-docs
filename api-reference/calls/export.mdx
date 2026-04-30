@@ -12,8 +12,13 @@ The response from this endpoint will be a file download.
 - `format` (string, optional, default: `csv`): The desired file format. Can be `csv` or `json`.
 - `status` (string, optional): Filter calls by their status.
 - `assistant_id` (integer, optional): Filter calls by a specific assistant.
+- `customer_phone` (string, optional): Filter by customer phone number.
+- `call_sid` (string, optional): Filter by Burki call SID / provider call identifier.
+- `assistant_name` (string, optional): Filter by assistant name.
 - `date_from` (string, optional): Filter calls from this date (ISO 8601 format).
 - `date_to` (string, optional): Filter calls to this date (ISO 8601 format).
+
+Export filters are combined with AND semantics.
 
 ### Response
 

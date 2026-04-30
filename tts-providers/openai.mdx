@@ -1,140 +1,88 @@
 ---
 title: "OpenAI TTS"
-description: "OpenAI Text-to-Speech integration (Coming Soon)"
+description: "Configure OpenAI text-to-speech with tts-1, tts-1-hd, and gpt-4o-mini-tts models."
 ---
 
-<Card title="Coming Soon" icon="rocket">
-  OpenAI TTS integration is planned for a future release. This page previews the expected capabilities.
+<Card title="OpenAI TTS" icon="comments">
+  OpenAI TTS is supported in Burki through the `openai` TTS provider. Use it when you already use OpenAI keys or want GPT-4o mini TTS voice instructions.
 </Card>
 
----
+## Quick Setup
 
-## Overview
+<Steps>
+  <Step title="Get API Key">
+    Create an OpenAI API key from the OpenAI dashboard.
+  </Step>
+  <Step title="Configure in Burki">
+    Select `openai` as the TTS provider and add the API key at the assistant or organization level.
+  </Step>
+  <Step title="Choose Model and Voice">
+    Pick a supported `model_id`, `voice_id`, and optional speed/instructions settings.
+  </Step>
+</Steps>
 
-OpenAI provides high-quality text-to-speech through their API with multiple models and natural-sounding voices.
+## Configuration
 
-### Available Models
+```json
+{
+  "tts_settings": {
+    "provider": "openai",
+    "voice_id": "alloy",
+    "model_id": "gpt-4o-mini-tts",
+    "provider_config": {
+      "speed": 1.0,
+      "instructions": "Speak warmly and clearly, like a helpful support agent."
+    }
+  }
+}
+```
 
-<Tabs>
-  <Tab title="TTS-1">
-    **Standard Quality Model**
-    
-    - **Latency**: ~400-600ms
-    - **Quality**: Good for most applications
-    - **Cost**: Lower cost per character
-    - **Best for**: General-purpose TTS, cost-sensitive applications
-  </Tab>
-  
-  <Tab title="TTS-1-HD">
-    **High Definition Model**
-    
-    - **Latency**: ~600-800ms
-    - **Quality**: Superior audio quality
-    - **Cost**: Higher cost per character
-    - **Best for**: Premium applications, content creation
-  </Tab>
-</Tabs>
+| Option | Type | Description |
+|--------|------|-------------|
+| `provider` | string | Use `openai` |
+| `voice_id` | string | OpenAI voice ID |
+| `model_id` | string | `tts-1`, `tts-1-hd`, `gpt-4o-mini-tts`, or pinned GPT-4o mini TTS snapshot |
+| `speed` | number | Speaking speed, clamped between `0.25` and `4.0` |
+| `instructions` | string | Voice style instructions for `gpt-4o-mini-tts*` models |
 
-### Voice Options
+## Supported Models
 
-<CardGroup cols={3}>
-  <Card title="Alloy" icon="user">
-    **Balanced and clear**
-    
-    Neutral voice suitable for most applications
-  </Card>
-  
-  <Card title="Echo" icon="user">
-    **Deep and resonant**
-    
-    Male voice with rich, deep tone
-  </Card>
-  
-  <Card title="Fable" icon="user">
-    **Warm and expressive**
-    
-    Engaging voice for storytelling
-  </Card>
-  
-  <Card title="Onyx" icon="user">
-    **Strong and authoritative**
-    
-    Confident male voice for professional use
-  </Card>
-  
-  <Card title="Nova" icon="user">
-    **Bright and energetic**
-    
-    Female voice with upbeat personality
-  </Card>
-  
-  <Card title="Shimmer" icon="user">
-    **Soft and gentle**
-    
-    Gentle female voice for calm interactions
-  </Card>
-</CardGroup>
+| Model ID | Notes |
+|----------|-------|
+| `tts-1` | Standard OpenAI TTS model optimized for speed |
+| `tts-1-hd` | Higher quality OpenAI TTS model |
+| `gpt-4o-mini-tts` | GPT-4o mini TTS model with instruction support |
+| `gpt-4o-mini-tts-2025-12-15` | Pinned GPT-4o mini TTS snapshot configured in the backend |
 
----
+## Supported Voices
 
-## Planned Features
+| Voice ID | Description |
+|----------|-------------|
+| `alloy` | Balanced and clear |
+| `echo` | Deep and resonant |
+| `fable` | Warm and expressive |
+| `onyx` | Strong and authoritative |
+| `nova` | Bright and energetic |
+| `shimmer` | Soft and gentle |
+| `ash` | Natural and conversational |
+| `ballad` | Melodic and expressive |
+| `coral` | Warm and friendly |
+| `sage` | Calm and wise |
+| `verse` | Smooth and articulate |
+| `marin` | Clear and professional |
+| `cedar` | Warm and natural |
 
-When integrated, OpenAI TTS will offer:
+## Runtime Behavior
 
-- **Multiple Models**: TTS-1 for speed, TTS-1-HD for quality
-- **6 Built-in Voices**: Alloy, Echo, Fable, Onyx, Nova, Shimmer
-- **Speed Control**: Adjust speaking rate (0.25x to 4.0x)
-- **Multiple Formats**: MP3, Opus, AAC, FLAC output options
-- **Streaming Support**: Real-time audio streaming for phone calls
+- Burki requests PCM audio from OpenAI and converts it for the current telephony path.
+- `gpt-4o-mini-tts*` models support the `instructions` field.
+- HD telephony providers use linear16 at 16 kHz where supported; Twilio-style paths use µ-law at 8 kHz.
+- Sentence buffering is used so the first audio chunk can start quickly without waiting for the entire LLM response.
 
----
+## When to Use OpenAI TTS
 
-## Comparison with Available Providers
+- You want a simple provider stack with OpenAI for both LLM and TTS.
+- You need model-level voice instructions.
+- You prefer built-in voices over custom voice cloning.
 
-| Feature | OpenAI TTS | ElevenLabs | Deepgram | Cartesia |
-|---------|------------|------------|----------|----------|
-| **Latency** | ~500ms | ~250ms | ~75ms | ~150ms |
-| **Quality** | High | Premium | Good | High |
-| **Voices** | 6 built-in | Custom | 10+ | 20+ |
-| **Languages** | English | 70+ | English | 42 |
-| **Custom Voices** | No | Yes | No | Yes |
-
----
-
-## Available Alternatives
-
-While waiting for OpenAI TTS, these providers offer excellent alternatives:
-
-<CardGroup cols={2}>
-  <Card title="ElevenLabs" icon="wand-magic-sparkles" href="/tts-providers/elevenlabs">
-    **Premium Quality**
-    
-    70+ languages, voice cloning, advanced controls
-  </Card>
-  
-  <Card title="Deepgram Aura" icon="bolt" href="/tts-providers/deepgram">
-    **Ultra-Fast**
-    
-    ~75ms latency, perfect for real-time conversations
-  </Card>
-  
-  <Card title="Cartesia Sonic 3" icon="bullseye" href="/tts-providers/cartesia">
-    **Multilingual**
-    
-    42 languages, voice cloning, low latency
-  </Card>
-  
-  <Card title="Azure Speech" icon="cloud" href="/tts-providers/azure">
-    **Enterprise Scale**
-    
-    500+ voices, 100+ languages, SSML support
-  </Card>
-</CardGroup>
-
----
-
-## Stay Updated
-
-<Callout type="info">
-Follow our [changelog](/changelog) for updates on OpenAI TTS integration and other new features.
-</Callout>
+For broader multilingual voice cloning, compare [ElevenLabs](/tts-providers/elevenlabs), [Cartesia](/tts-providers/cartesia), and [Inworld](/tts-providers/inworld).

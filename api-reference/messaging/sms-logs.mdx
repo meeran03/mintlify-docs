@@ -1,0 +1,153 @@
+---
+title: SMS Logs and Debug Timeline
+description: "Inspect SMS provider logs, delivery stats, and merged debug timelines."
+sidebarTitle: SMS logs
+---
+
+SMS logs provide provider-level delivery diagnostics. SMS debug timelines merge audit events and message-log delivery events for one SMS conversation.
+
+Authentication uses API key, JWT bearer token, or dashboard session.
+
+## List SMS Logs
+
+```http
+GET /api/v1/sms-logs/?skip=0&limit=100&provider=telnyx&status=failed
+Authorization: Bearer YOUR_TOKEN
+```
+
+| Query Parameter | Type | Description |
+|-----------------|------|-------------|
+| `skip` | integer | Records to skip |
+| `limit` | integer | Records to return (`1-500`) |
+| `provider` | string | Provider filter |
+| `direction` | string | `inbound` or `outbound` |
+| `status` | string | Delivery status filter |
+| `from_number` | string | Sender phone filter |
+| `to_number` | string | Recipient phone filter |
+| `assistant_id` | integer | Assistant filter |
+| `date_from` | string | ISO lower bound |
+| `date_to` | string | ISO upper bound |
+| `search` | string | Body/content search |
+
+```json Response
+{
+  "items": [
+    {
+      "id": 1,
+      "provider": "telnyx",
+      "provider_message_id": "msg_abc123",
+      "direction": "outbound",
+      "from_number": "+15551234567",
+      "to_number": "+15559876543",
+      "body": "Your appointment is confirmed.",
+      "media_urls": [],
+      "segment_count": 1,
+      "status": "sent",
+      "provider_status": "delivered",
+      "error_code": null,
+      "error_message": null,
+      "assistant_id": 123,
+      "assistant_name": "Support Bot",
+      "created_at": "2026-04-30T10:00:00Z",
+      "updated_at": "2026-04-30T10:00:05Z"
+    }
+  ],
+  "total": 1,
+  "skip": 0,
+  "limit": 100,
+  "has_more": false
+}
+```
+
+## Get SMS Log
+
+```http
+GET /api/v1/sms-logs/{log_id}
+Authorization: Bearer YOUR_TOKEN
+```
+
+Returns the same fields as list items plus organization and provider debug payload details.
+
+```json Response
+{
+  "id": 1,
+  "organization_id": 9,
+  "provider": "telnyx",
+  "provider_message_id": "msg_abc123",
+  "direction": "outbound",
+  "from_number": "+15551234567",
+  "to_number": "+15559876543",
+  "body": "Your appointment is confirmed.",
+  "media_urls": [],
+  "segment_count": 1,
+  "status": "sent",
+  "provider_status": "delivered",
+  "provider_payload": {
+    "raw_status": "delivered"
+  },
+  "created_at": "2026-04-30T10:00:00Z",
+  "updated_at": "2026-04-30T10:00:05Z"
+}
+```
+
+## SMS Log Stats
+
+```http
+GET /api/v1/sms-logs/stats?date_from=2026-04-01&date_to=2026-04-30
+Authorization: Bearer YOUR_TOKEN
+```
+
+```json Response
+{
+  "total": 240,
+  "by_direction": {
+    "inbound": 93,
+    "outbound": 147
+  },
+  "by_status": {
+    "sent": 130,
+    "delivered": 90,
+    "failed": 20
+  },
+  "by_provider": {
+    "twilio": 40,
+    "telnyx": 160,
+    "vonage": 40
+  },
+  "failed_count": 20,
+  "success_rate": 91.67
+}
+```
+
+## SMS Debug Timeline
+
+```http
+GET /api/v1/sms/{call_id}/logs
+Authorization: Bearer YOUR_TOKEN
+```
+
+The `call_id` is the SMS conversation call record ID.
+
+```json Response
+{
+  "call_id": 101,
+  "log_count": 3,
+  "logs": [
+    {
+      "id": 1,
+      "timestamp": "2026-04-30T10:00:00Z",
+      "event_type": "webhook_received",
+      "level": "info",
+      "message": "Inbound SMS webhook received",
+      "event_data": {
+        "provider": "telnyx"
+      }
+    }
+  ]
+}
+```
+
+Errors:
+
+- `404` if the call/conversation is missing.
+- `403` if the conversation does not belong to the authenticated user's organization.
