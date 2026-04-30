@@ -44,6 +44,36 @@ SIP trunk records include carrier credentials. Treat responses and request bodie
 | `register` | boolean | Whether FreeSWITCH should register to the gateway |
 | `provider` | string | Optional provider label |
 
+## PBX Allowlist and Registration
+
+For the current hosted SIP bridge, customer PBX/carrier firewalls should allow:
+
+```text
+Burki SIP bridge IP: 52.21.157.171
+SIP signaling: UDP/TCP 5060
+SIP TLS: TCP 5061, if enabled
+RTP media: UDP 10000-20000
+```
+
+Use `gateway` for the customer's PBX/carrier host and port. If Burki should register to the PBX, set `register: true` and provide the PBX username/password. If the PBX uses IP authentication instead, set `register: false` and allowlist `52.21.157.171` as the trusted SIP peer.
+
+```json Registration example
+{
+  "name": "FreePBX primary",
+  "gateway": "138.197.131.209:6061",
+  "username": "9228",
+  "password": "sip-password",
+  "priority": 1,
+  "enabled": true,
+  "register": true,
+  "provider": "freepbx"
+}
+```
+
+For inbound calls, configure the PBX/carrier to send INVITEs to `52.21.157.171:5060` and allow RTP from `52.21.157.171` on UDP `10000-20000`.
+
+For outbound calls, the PBX/carrier must accept INVITEs and RTP from `52.21.157.171`. If multiple DIDs share one PBX extension, the PBX must also include the original called DID in `Diversion`, `History-Info`, `X-Original-Called`, `P-Called-Party-ID`, the Request-URI, or the `To` user so Burki can route to the correct assistant.
+
 ## List Trunks
 
 ```http

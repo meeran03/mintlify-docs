@@ -12,6 +12,17 @@ https://api.burki.dev/sip-status
 https://api.burki.dev/sip-prewarm
 ```
 
+The SIP bridge that terminates customer PBX/carrier traffic currently advertises:
+
+```text
+SIP bridge IP: 52.21.157.171
+SIP signaling: UDP/TCP 5060
+SIP TLS: TCP 5061, if enabled
+RTP media: UDP 10000-20000
+```
+
+PBX/carrier firewalls should allow `52.21.157.171` for both inbound calls to Burki and outbound calls from Burki. The HTTP endpoints above are backend/provider coordination endpoints; customer PBXs should send SIP traffic to the SIP bridge IP, not to `/sip-webhook` directly.
+
 ## SIP Webhook
 
 ```http

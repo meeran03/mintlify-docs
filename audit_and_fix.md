@@ -588,6 +588,28 @@ Scope: API accuracy audit + immediate corrections in docs
   - `npx mintlify broken-links` passed.
   - `npx mintlify validate` passed.
 
+### 26) SIP trunking PBX network and multi-DID setup details
+
+- **Docs files updated:**
+  - `byo-sip-trunk.mdx`
+  - `api-reference/sip-trunks/overview.mdx`
+  - `api-reference/webhooks/sip-webhooks.mdx`
+- **Status:** Fixed
+- **Problems found:**
+  - SIP trunking docs described the feature and APIs, but did not clearly list the customer-facing SIP bridge IP, signaling ports, RTP range, or firewall/ACL requirements.
+  - Inbound vs outbound SIP responsibilities were not explicit enough for PBX admins.
+  - The docs did not explain the production multi-DID behavior from the SIP bridge fix: many DIDs can share one PBX extension only if the PBX preserves the original called DID in SIP signaling.
+- **Fix applied:**
+  - Documented current hosted SIP bridge IP `52.21.157.171`.
+  - Documented SIP signaling `5060`, SIP TLS `5061`, and RTP media `10000-20000/udp`.
+  - Added inbound and outbound PBX allowlist requirements.
+  - Added registration-based vs IP-auth trunk guidance.
+  - Added an example FreePBX/customer PBX gateway using `138.197.131.209:6061` and username `9228`.
+  - Documented multi-DID headers supported by the SIP bridge resolver: `Diversion`, `History-Info`, `X-Original-Called`, `X-Original-Number`, `X-Forwarded-To`, `X-Original-To`, `P-Called-Party-ID`, Request-URI, and `To` user.
+- **Validation:**
+  - `npx mintlify broken-links` passed.
+  - `npx mintlify validate` passed.
+
 ## Open audit items / residual risk
 
 ### API correctness
@@ -626,3 +648,4 @@ Scope: API accuracy audit + immediate corrections in docs
 - 2026-04-30: Trimmed Home vs Platform Overview and Live Transcript Guide vs API Reference overlap.
 - 2026-04-30: Aligned LLM/STT/TTS provider docs with backend provider factories and service options.
 - 2026-04-30: Completed final correctness/theme sweep; fixed phone-number paths, voice-cloning placeholders, stale branding/hosts, unqualified hard claims, docs theme colors, and hero visuals. Validation passed (`npx mintlify broken-links`, `npx mintlify validate`).
+- 2026-04-30: Added SIP trunking PBX network setup, bridge IP/ports, inbound/outbound allowlist guidance, and multi-DID SIP header requirements. Validation passed (`npx mintlify broken-links`, `npx mintlify validate`).
