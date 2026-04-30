@@ -23,7 +23,7 @@ openapi: 'POST /api/v1/assistants'
 <section aria-labelledby="create-assistant-api-behavior">
   <h2 id="create-assistant-api-behavior">How this endpoint maps to the product</h2>
   <p>
-    The JSON body mirrors the assistant creation form in the Burki dashboard. The same groups appear in the API: basic info, LLM, TTS, STT, interruptions, tools, and telephony.
+    The JSON body mirrors the assistant creation form in the Burki dashboard. The same groups appear in the API: basic info, LLM, TTS, STT, calling behavior, tools, knowledge, post-call actions, safety, and telephony.
   </p>
   <p>
     A successful request creates the assistant in your organization and returns the full record, including the assistant ID for updates, phone-number assignment, and routing.
@@ -48,14 +48,18 @@ This section covers the core AI models for language, speech-to-text, and text-to
 
 **LLM (Language Model)**
 - `llm_provider` (string): The language model provider.
-  - **Enum**: `"openai"`, `"anthropic"`, `"gemini"`, `"groq"`, `"xai"`, `"custom"`. Defaults to `openai`.
+  - **Enum**: `"openai"`, `"azure"`, `"azure_ai_foundry"`, `"anthropic"`, `"gemini"`, `"groq"`, `"xai"`, `"custom"`, `"custom_websocket"`. Defaults to `openai`.
 - `llm_provider_config` (object): Provider-specific configuration.
   - `api_key` (string, **required**): The API key for the selected provider.
   - `model` (string, optional): The specific model to use (e.g., `gpt-4o-mini`).
-  - `base_url` (string, optional): A custom API base URL. Required if `llm_provider` is `custom`.
+  - `base_url` (string, optional): A custom or Azure-compatible API base URL.
+  - `custom_config.ws_url` (string, optional): WebSocket URL for `custom_websocket`.
+  - `custom_config.fallback_base_url` (string, optional): HTTP fallback URL for `custom_websocket`.
+  - `custom_config.api_version` (string, optional): Azure OpenAI API version when using Azure deployments.
 - `llm_settings` (object): General parameters for the language model.
   - `temperature` (number): Controls creativity. Defaults to `0.7`.
   - `max_tokens` (integer): Max length of the AI's response in tokens. Defaults to `1000`.
+  - `top_p` (number): Nucleus sampling control. Defaults to `1.0`.
   - `system_prompt` (string): The AI's personality and instructions.
   - `welcome_message` (string): The first thing the assistant says to the caller.
 - `llm_fallback_providers` (object, optional): Configure backup LLM providers.
@@ -64,7 +68,7 @@ This section covers the core AI models for language, speech-to-text, and text-to
 
 **TTS (Text-to-Speech)**
 - `tts_settings` (object):
-  - `provider` (string): The TTS provider. **Enum**: `"elevenlabs"`, `"deepgram"`, `"inworld"`, `"resemble"`.
+  - `provider` (string): The TTS provider. **Enum**: `"elevenlabs"`, `"deepgram"`, `"azure"`, `"cartesia"`, `"inworld"`, `"openai"`, `"murf"`, `"soniox"`, `"uplift"`.
   - `voice_id` (string): The specific voice character to use (e.g., `rachel`).
   - `model_id` (string, optional): The voice model (e.g., `eleven_flash_v2_5`).
   - **Conditional Fields**:
@@ -77,23 +81,40 @@ This section covers the core AI models for language, speech-to-text, and text-to
       - `provider_config.project_uuid` (string): Your Resemble AI project UUID.
     - If `provider` is `inworld`:
       - `provider_config.language` (string): Language code (e.g., `en`).
+  - `background_audio` / provider-specific background sound settings may be supplied for assistants that use ambient audio.
   
 **STT (Speech-to-Text)**
 - `stt_settings` (object):
+  - `provider` (string, optional): STT provider. Supported dashboard providers include `deepgram`, `azure`, `uplift`, `elevenlabs`, `speechmatics`, `soniox`, and `telnyx`.
   - `model` (string): The STT model (e.g., `nova-2`, `nova-3`).
   - `language` (string): Language code (e.g., `en-US`).
+  - `punctuate`, `smart_format`, `interim_results`, `audio_denoising` (boolean, optional): Transcript formatting and audio cleanup controls.
+  - `endpointing.silence_threshold`, `utterance_end_ms`, `utterance_timeout_seconds` (optional): Turn-detection controls for providers that consume them.
   - `keywords` (array of objects, optional): An array of keywords to boost. Each object should have a `keyword` (string) and an optional `intensifier` (float). For `nova-2` and older models.
   - `keyterms` (array of strings, optional): An array of key terms to boost. For `nova-3` model only.
+  - `speculative_config` (object, optional): Speculative LLM settings for lower latency on partial transcripts.
+    - `enable_speculative_llm` (boolean): Start the LLM before final STT arrives.
+    - `speculative_stream_to_tts` (boolean): Stream speculative output immediately to TTS.
+    - `speculative_debounce_ms` (integer): Delay after the latest partial before speculation.
+    - `speculative_min_words` (integer): Minimum words before triggering speculation.
+    - `speculative_similarity_threshold` (number): Confirmation threshold between partial and final transcript.
 </Accordion>
 
 <Accordion title="Call & Interruption Management">
 - `interruption_settings` (object):
+  - `interruption_mode` (string, optional): `"aggressive"`, `"balanced"`, or `"conservative"`.
   - `interruption_threshold` (integer): Number of words a user must speak to interrupt.
   - `min_speaking_time` (number): How long the assistant must speak before being interruptible (in seconds).
   - `interruption_cooldown` (number): Cooldown period after an interruption (in seconds).
+  - `min_confidence`, `tentative_window_ms`, `backchannel_filter`, `tail_protection_ms` (optional): Advanced interruption controls.
+- `backchannel_settings` (object, optional): Active listening cues such as "uh-huh".
+  - `enabled` (boolean): Enable backchannels.
+  - `frequency` (integer): Backchannel frequency from rare to aggressive.
+- `conversation_continuity_enabled` (boolean, optional): Continue context for repeat calls from the same number within the continuity window.
 - `idle_message` (string, optional): Message sent when the caller is silent.
 - `max_idle_messages` (integer, optional): How many idle messages to send before ending the call.
 - `idle_timeout` (integer, optional): Seconds of silence before sending an idle message.
+- `max_call_length` (integer or null, optional): Maximum call duration in seconds. Omit or set null for no assistant-level cap.
 </Accordion>
 
 <Accordion title="Tools">
@@ -105,6 +126,25 @@ This section covers the core AI models for language, speech-to-text, and text-to
     - `enabled` (boolean): Enable/disable the tool.
     - `scenarios` (array of strings): Phrases that will trigger a transfer.
     - `transfer_numbers` (array of strings): Phone numbers where calls can be transferred.
+    - `transfer_type` (string): `"cold"` for blind transfer or `"warm"` for an agent-briefed handoff.
+    - `agent_confirmation` (boolean): For warm transfer, require the agent to confirm before connection.
+    - `unavailable_message` (string, optional): Message for failed/unavailable warm transfer.
+  - `dtmf_solver` (object, optional): Enable IVR/touch-tone navigation and provide scenarios.
+  - `send_sms` (object, optional): Enable SMS sending, provide scenarios, and optionally set `default_message`.
+  - `custom_tools` (array, optional): Assigned organization tools with `tool_id`, `enabled`, `timeout_seconds`, and optional custom configuration.
+</Accordion>
+
+<Accordion title="Knowledge, Post-Call, and Safety">
+- `rag_settings` (object, optional): Enable the assistant knowledge base and tune retrieval.
+  - `enabled` (boolean): Enable retrieval-augmented answers from uploaded documents.
+  - `search_limit` (integer): Max documents/chunks to retrieve.
+  - `similarity_threshold` (number): Minimum relevance score.
+- `recording_settings` (object, optional): Recording and disclosure controls.
+  - `enabled` (boolean): Store call audio.
+  - `record_user_only_track` (boolean or null, optional): Store a caller-only track. Omit/null to use organization default.
+  - `disclosure_enabled`, `disclosure_message`, `disclosure_mode`: Caller recording disclosure controls.
+- `bypass_numbers` (array of strings, optional): E.164 numbers that skip the AI and route directly to transfer.
+- Spam detection scenarios and thresholds are managed through the assistant spam detection endpoints and dashboard Safety section.
 </Accordion>
 
 <Accordion title="Advanced & Integration">

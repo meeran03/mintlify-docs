@@ -63,7 +63,9 @@ Use specific scenarios to help the AI understand when it's appropriate to end a 
 - **Enable/Disable:** Toggle the tool on or off
 - **Transfer Numbers:** List of phone numbers to transfer to
 - **Scenarios:** Define when transfers should happen
-- **Custom Message:** What to say before transferring
+- **Transfer Type:** Choose cold/blind transfer or warm/briefed transfer
+- **Agent Confirmation:** For warm transfer, require the agent to confirm before the caller is connected
+- **Unavailable Message:** For warm transfer, what the caller hears if no agent is available
 
 **Example Transfer Numbers:**
 - `+1234567890` (Sales team)
@@ -80,6 +82,48 @@ Use specific scenarios to help the AI understand when it's appropriate to end a 
 Make sure transfer numbers are valid and staffed. Failed transfers create poor customer experiences.
 </Callout>
 </Accordion>
+
+### Cold vs Warm Transfers
+
+| Mode | What happens | Best for |
+|------|--------------|----------|
+| Cold transfer | Caller is transferred immediately to the destination number. | Simple reception, queue handoffs, sales desks, and cases where agent context is not required. |
+| Warm transfer | Caller waits while the human agent receives an AI-generated summary before connection. | Escalations, support, healthcare/admin, or sales calls where context improves handoff quality. |
+
+Warm transfer settings:
+
+- `agent_confirmation`: the agent must accept before Burki connects the caller.
+- `unavailable_message`: message spoken or played to the caller when the warm transfer cannot complete.
+- `transfer_call_message`: configured in Calling, spoken before transfer starts.
+
+Example transfer configuration:
+
+```json
+{
+  "tools_settings": {
+    "transfer_call": {
+      "enabled": true,
+      "scenarios": [
+        "caller asks for a human agent",
+        "billing dispute requires account team"
+      ],
+      "transfer_numbers": ["+18005551212"],
+      "transfer_type": "warm",
+      "agent_confirmation": true,
+      "unavailable_message": "I could not reach an agent right now. I can take a message or schedule a callback."
+    }
+  }
+}
+```
+
+### DTMF Solver and SMS Tools
+
+The edit-assistant page also exposes:
+
+- **DTMF Solver:** define scenarios where the assistant should press touch-tone digits to navigate an IVR or enter a code.
+- **Send SMS:** define scenarios and an optional default message. If no default message is set, the AI composes the SMS from context.
+
+SMS requires a valid messaging provider setup and carrier compliance where applicable.
 
 <Accordion title="Custom Tools">
 **What they are:** Powerful, reusable integrations that extend your assistant's capabilities.

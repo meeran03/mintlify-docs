@@ -42,6 +42,38 @@ The model is intentionally small: one JSON document, one base assistant for voic
 - Dynamic variables such as `{{from_number}}` are read-only and interpolated into prompts.
 - Existing assistant tools such as `endCall`, transfer, DTMF, SMS, and custom tools still come from the base assistant.
 
+## What the Base Assistant Controls
+
+The flow graph controls routing and node prompts. The base assistant still controls the rest of the live call stack:
+
+| Setting area | Comes from |
+|--------------|------------|
+| LLM provider, prompt defaults, fallbacks | Base assistant |
+| TTS voice, cloned voices, background sound | Base assistant |
+| STT provider, turn detection, speculative LLM | Base assistant |
+| Cold/warm transfer, DTMF, SMS, custom tools | Base assistant |
+| RAG documents and retrieval settings | Base assistant |
+| Recording, spam detection, bypass numbers | Base assistant |
+| Nodes, transitions, global prompt, variables | Conversation Flow |
+
+The flow editor embeds the same assistant configuration form for the base assistant. If a flow behaves correctly but sounds wrong, uses the wrong tool, or has bad interruption timing, update the base assistant settings.
+
+## Node and Transition Design
+
+Use one node for each stable conversational mode: greeting, qualification, billing, support, escalation, booking, or wrap-up. Avoid creating a new node for every question; keep node prompts focused on behavior and use transitions for routing decisions.
+
+Transition examples:
+
+```json
+{
+  "kind": "prompt",
+  "to": "billing",
+  "when": "The caller asks about invoices, payments, refunds, or account balance."
+}
+```
+
+At runtime, Burki exposes only the current node's transition tools to the LLM. This keeps routing decisions local and reduces accidental jumps across the graph.
+
 ## Phone Number Assignment
 
 Phone numbers can be assigned to either a single assistant or a ConversationFlow. A flow assignment stores `flow_id` on the phone number and clears the direct assistant assignment.
@@ -54,3 +86,12 @@ curl -X POST https://api.burki.dev/api/v1/flows/42/phone-numbers/7/assign \
 ```
 
 See the [Conversation Flows API reference](/api-reference/flows/overview) for CRUD and assignment endpoints.
+
+## Common Flow Patterns
+
+| Pattern | Use when | Notes |
+|---------|----------|-------|
+| Intake → department routing | The first step is identifying caller intent. | Start node asks one broad question, then routes to department nodes. |
+| Qualification → transfer | AI should qualify before handoff. | Use a warm transfer tool on the base assistant for high-context handoffs. |
+| FAQ → escalation | AI can answer common questions but escalates complex cases. | Keep RAG enabled on the base assistant and transfer scenarios specific. |
+| Appointment booking | Caller needs multi-step scheduling. | Use node prompts for required fields and post-call extraction for structured data. |

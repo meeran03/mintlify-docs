@@ -25,6 +25,18 @@ Call Management controls the **conversation flow** during phone calls. It's sepa
 **Most Important Section**: These settings directly affect how natural your conversations feel!
 </Callout>
 
+### Interruption Style
+
+The dashboard exposes three presets:
+
+| Style | Best for | Behavior |
+|-------|----------|----------|
+| Fast barge-in | Sales, demos, fast support | Stops playback quickly when the caller starts speaking. With Deepgram Flux, playback stops from the provider's speech-start signal. |
+| Balanced | Most assistants | Filters filler sounds and short noise before yielding. |
+| Patient listener | Healthcare, senior callers, noisy rooms, IVR replacement | Waits longer before treating caller speech as a real interruption. |
+
+The advanced fields below override the selected preset for providers that do not have native turn detection.
+
 ### Interruption Threshold
 <Accordion title="What does 'Interruption Threshold' mean?">
 **Simple Explanation**: How many words a caller needs to say before the AI stops talking and listens.
@@ -92,6 +104,14 @@ Call Management controls the **conversation flow** during phone calls. It's sepa
 - **Much higher (5s+)**: For elderly callers or those needing processing time
 
 </Accordion>
+
+### Active Listening and Incomplete Utterances
+
+**Active listening** enables short backchannel acknowledgments such as "uh-huh" or "mm-hmm" while the caller is speaking. Use the frequency control to keep these cues rare, occasional, moderate, frequent, or aggressive.
+
+**Incomplete utterance detection** helps prevent the assistant from answering too early when a caller says a partial phrase like "I want to..." or "Can you help me with...".
+
+**Conversation continuity** lets calls from the same number within a short window continue with recent context instead of starting completely fresh.
 
 <Card title="💡 Interruption Settings Quick Guide" icon="lightbulb">
   **Natural Conversations**: Threshold=2, Speaking=0.3s, Cooldown=1.5s
@@ -219,10 +239,16 @@ Call Management controls the **conversation flow** during phone calls. It's sepa
 ## Recording Settings
 
 <Card title="🎙️ Automatic Call Recording" icon="microphone">
-  **Always Enabled**: All calls are automatically recorded by Twilio and stored securely in S3 as high-quality MP3 files.
+  **Configurable per assistant**: Recording can be enabled or disabled from the Safety section.
   
-  This is built-in and cannot be disabled - it ensures you have records for quality, compliance, and training purposes.
+  When enabled, Burki can store mixed call audio, optionally store a caller-only track, and play a disclosure message before recording.
 </Card>
+
+Recording-related settings now live in **Safety**:
+
+- **Enable recording:** store call audio for review and compliance.
+- **User-only track:** use organization default, force on, or force off for a caller-only recording.
+- **Recording disclosure:** play a disclosure message every call or only the first call per caller.
 
 ---
 

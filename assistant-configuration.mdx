@@ -1,0 +1,123 @@
+---
+title: "Assistant configuration guide — edit page settings, flows, transfers & latency controls"
+description: "Map every major setting in the Burki assistant edit page to runtime behavior, API fields, and related docs."
+sidebarTitle: Assistant configuration
+---
+
+# Assistant Configuration Guide
+
+The assistant edit page is the control surface for a single Burki voice agent. Use this page as the map between what operators see in the dashboard and what happens at runtime.
+
+For exact request/response schemas, see [Create Assistant](/api-reference/assistants/create) and [Update Assistant](/api-reference/assistants/update).
+
+## Edit Assistant Sections
+
+| Dashboard section | What it controls | Related docs |
+|-------------------|------------------|--------------|
+| Model & Prompt | System prompt, prompt enhancement, welcome message, LLM provider/model/API key, Azure and org presets, generation settings, LLM fallbacks, custom HTTP/WebSocket LLM endpoints | [LLM Providers](/llm-providers), [AI Configuration](/ai-configuration) |
+| Voice | TTS provider, model, voice, cloned/custom voice IDs, provider-specific voice tuning, pronunciation dictionaries, background sounds | [TTS Providers](/tts-providers), [Voice Cloning](/voice-cloning) |
+| Transcription | STT provider/model/language, punctuation, smart formatting, interim results, denoising, turn detection, keyterms, provider-specific options, speculative LLM | [STT Providers](/stt-providers), [Call Management](/call-management) |
+| Calling | Barge-in style, active listening/backchannels, incomplete utterance detection, conversation continuity, idle/end/transfer messages, timeouts, max call length | [Call Management](/call-management) |
+| Tools | End call, transfer call, DTMF solver, send SMS, custom tools from the organization library | [Tools](/tools), [Custom tools](/tools/custom-tools-deep-dive) |
+| Knowledge | RAG enablement, document upload/list/delete, retrieval tuning | [RAG](/rag) |
+| Post Call | Webhook URL, SMS webhook URL, Messaging Service SID, structured extraction fields and instructions | [Webhooks](/api-reference/introduction#webhooks), [Advanced Features](/advanced-features) |
+| Safety | Recording, caller-only track, recording disclosure, spam detection, bypass numbers | [Spam Detection](/spam-detection), [Call Management](/call-management) |
+
+## Conversation Flows vs Assistant Settings
+
+Conversation Flows and assistants are related but separate:
+
+- A **base assistant** owns the model, voice, STT, tools, RAG, recording, safety, and post-call settings.
+- A **Conversation Flow** owns graph routing: nodes, prompts, global prompt, variables, and transitions.
+- A phone number can be assigned directly to an assistant or to a flow. When assigned to a flow, `flow_id` is set on the phone number and the direct `assistant_id` assignment is cleared.
+- The flow editor embeds the same assistant form for the base assistant, so changes to voice/tools/RAG/safety still come from the assistant settings.
+
+Use flows when the call needs multiple states or departments, such as intake → billing → support → escalation. Use a single assistant when one prompt can handle the whole call.
+
+## Cold and Warm Transfers
+
+The Transfer Call tool supports both transfer modes:
+
+| Mode | Behavior | When to use |
+|------|----------|-------------|
+| Cold transfer | The caller is transferred immediately to the configured number. The agent receives the call without a prior AI briefing. | Simple handoffs, sales queues, reception desks, or when speed matters more than context. |
+| Warm transfer | The caller hears hold behavior while the agent is briefed with an AI-generated summary before connection. | Support escalations, high-value sales, healthcare/admin handoffs, or any call where context matters. |
+
+Warm transfer options:
+
+- `agent_confirmation`: when enabled, the agent must confirm before the caller is connected.
+- `unavailable_message`: what the caller hears if no agent is available or the warm transfer cannot complete.
+- `transfer_numbers`: one or more destinations. Keep them in E.164 format where possible.
+- `scenarios`: plain-language conditions that tell the model when transfer is appropriate.
+
+The transfer message shown in **Calling** is what the caller hears before transfer. The transfer tool settings shown in **Tools** determine when and where the transfer happens.
+
+## Speculative LLM / Speculative Execution
+
+Speculative LLM is the dashboard label for speculative execution on partial transcripts. When enabled, Burki can start the LLM before the final STT result arrives, reducing dead air after the caller stops speaking.
+
+It appears under **Voice → Transcription → Speculative LLM** for non-Flux STT models. Deepgram Flux already has native eager end-of-turn behavior, so the generic speculative LLM controls are hidden for Flux.
+
+| Setting | API field | Notes |
+|---------|-----------|-------|
+| Enable speculative LLM | `stt_settings.speculative_config.enable_speculative_llm` | Master toggle. |
+| Stream to TTS | `speculative_stream_to_tts` | Aggressive mode. Caller can hear speculative output immediately. Disable for safer buffering until final text confirms. |
+| Debounce | `speculative_debounce_ms` | Delay after the latest partial transcript before triggering LLM. |
+| Min words | `speculative_min_words` | Minimum partial transcript length before speculation starts. |
+| Similarity | `speculative_similarity_threshold` | How close the final transcript must be to confirm the speculative response. |
+
+Use speculative LLM on latency-sensitive calls after you have tested interruption handling and STT stability. Avoid aggressive streaming in regulated or high-stakes conversations unless you have verified that partial transcripts are accurate enough.
+
+## Calling Behavior
+
+The **Calling** section controls timing and turn-taking:
+
+- **Interruption style**: fast barge-in, balanced, or patient listener. These presets set interruption threshold, minimum AI speaking time, cooldown, confidence, filler filtering, and tail protection.
+- **Active listening**: generates short acknowledgments such as "uh-huh" while the caller speaks. Frequency controls how often the assistant backchannels.
+- **Incomplete utterance detection**: waits when a caller says partial thoughts like "I want to..." instead of responding too early.
+- **Conversation continuity**: calls from the same number within the configured continuity window can continue recent context.
+- **Messages and timeouts**: end-call message, transfer message, idle message, idle timeout, max idle messages, and max call length.
+- **Advanced interruption overrides**: minimum AI speaking time, cooldown between interruptions, and filler/backchannel filtering.
+
+## Tools and Actions
+
+Built-in tools in the edit page:
+
+- **End Call**: ends the call when scenario text matches the conversation state.
+- **Transfer Call**: cold or warm transfer to one or more phone numbers.
+- **DTMF Solver**: lets the AI send touch-tone digits for IVR navigation.
+- **Send SMS**: sends confirmations, links, or follow-up text messages. SMS requires a valid messaging setup and carrier compliance where applicable.
+- **Custom Tools**: assign existing endpoint, Python function, or Lambda tools from the organization tool library and set per-tool timeout seconds.
+
+Write scenarios as business conditions, not keywords. For example, use "caller has a billing dispute that requires a human" instead of only "billing".
+
+## Knowledge, Post-Call, and Safety
+
+Knowledge base settings:
+
+- Enable RAG.
+- Upload PDFs, DOCX, TXT, Markdown, and image files after saving the assistant.
+- Tune retrieval with max documents per query, relevance threshold, chunk size, and context window settings.
+
+Post-call settings:
+
+- `webhook_url`: call events, transcripts, extracted data, and integration payloads.
+- `sms_webhook_url`: inbound SMS workflow events.
+- `messaging_service_sid`: Twilio Messaging Service SID when required for SMS.
+- Structured data extraction fields: name, type, description, required flag, and enum options.
+
+Safety settings:
+
+- Recording enablement.
+- Caller-only track: org default, on, or off.
+- Recording disclosure message and frequency.
+- Spam detection scenarios: denied patterns and allowed overrides.
+- Spam evaluation thresholds: max evaluations, minimum confidence, grace duration, transcript length, and caller turns.
+- Bypass numbers: callers that skip the AI and route directly to transfer.
+
+## Related Surfaces Not Inside Edit Assistant
+
+- **Conversation Flow canvas**: node graph, transitions, global prompt, runtime variables, and phone-number assignment to flows.
+- **Phone numbers page**: assign numbers to assistants or flows, manage providers, and route SIP/Twilio/Telnyx/Vonage numbers.
+- **History panel**: edit-assistant history, change notes, and rollback for assistant settings.
+- **Browser test panel**: test an assistant after it has a name, prompt, and voice.

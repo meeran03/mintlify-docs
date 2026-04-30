@@ -37,6 +37,7 @@
             "group": "Core Concepts",
             "pages": [
               "architecture",
+              "assistant-configuration",
               "ai-configuration"
             ]
           },

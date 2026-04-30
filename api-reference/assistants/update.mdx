@@ -11,7 +11,7 @@ This endpoint allows you to modify the configuration of an existing assistant by
 
 ### Request Body
 
-The request body is a JSON object containing the fields to update. The structure and available parameters are identical to those used when creating an assistant. Refer to the [Create Assistant](/api-reference/assistants/create) documentation for a detailed breakdown of all possible fields within the `llm_settings`, `tts_settings`, `stt_settings`, `interruption_settings`, `tools_settings`, `twilio_config`, and `telnyx_config` objects.
+The request body is a JSON object containing the fields to update. The structure and available parameters are identical to those used when creating an assistant. Refer to [Create Assistant](/api-reference/assistants/create) for the full schema and [Assistant configuration](/assistant-configuration) for how dashboard settings map to runtime behavior.
 
 ### Examples
 
@@ -20,7 +20,47 @@ The request body is a JSON object containing the fields to update. The structure
 {
   "name": "Senior Customer Support Specialist",
   "llm_settings": {
-    "temperature": 0.5
+    "temperature": 0.5,
+    "top_p": 0.9
+  }
+}
+```
+
+**Enable warm transfer:**
+```json Request
+{
+  "transfer_call_message": "Let me brief a specialist and connect you.",
+  "tools_settings": {
+    "transfer_call": {
+      "enabled": true,
+      "scenarios": [
+        "caller asks for a human",
+        "billing dispute requires account team"
+      ],
+      "transfer_numbers": ["+18005551212"],
+      "transfer_type": "warm",
+      "agent_confirmation": true,
+      "unavailable_message": "I could not reach an agent right now. I can take a message or schedule a callback."
+    }
+  }
+}
+```
+
+**Enable speculative LLM for lower latency:**
+```json Request
+{
+  "stt_settings": {
+    "provider": "deepgram",
+    "model": "nova-3",
+    "language": "en-US",
+    "interim_results": true,
+    "speculative_config": {
+      "enable_speculative_llm": true,
+      "speculative_stream_to_tts": false,
+      "speculative_debounce_ms": 300,
+      "speculative_min_words": 3,
+      "speculative_similarity_threshold": 0.85
+    }
   }
 }
 ```
@@ -62,26 +102,33 @@ A successful update will return the complete, updated assistant object.
   "description": "Handles inbound customer queries and provides support.",
   "is_active": true,
   "llm_settings": {
-    "provider": "openai",
-    "model": "gpt-4-turbo",
     "temperature": 0.5,
-    "max_tokens": 250
+    "max_tokens": 1000,
+    "top_p": 0.9,
+    "system_prompt": "You are a senior customer support specialist.",
+    "welcome_message": "Hello, how can I help today?"
+  },
+  "llm_provider": "openai",
+  "llm_provider_config": {
+    "model": "gpt-5",
+    "api_key": "********"
   },
   "tts_settings": {
-    "provider": "elevenlabs",
-    "voice_id": "EXAVITQu4vr4xnSDxMaL",
-    "stability": 0.5,
-    "similarity_boost": 0.75
+    "provider": "openai",
+    "model_id": "tts-1",
+    "voice_id": "alloy"
   },
   "stt_settings": {
     "provider": "deepgram",
     "language": "en-US",
-    "model": "nova-2"
+    "model": "nova-3",
+    "interim_results": true
   },
   "interruption_settings": {
-    "enabled": true,
-    "threshold": 0.5,
-    "evaluation_period": 0.8
+    "interruption_mode": "balanced",
+    "interruption_threshold": 3,
+    "min_speaking_time": 0.8,
+    "interruption_cooldown": 2.0
   },
   "tools_settings": {
     "end_call": {
@@ -89,7 +136,9 @@ A successful update will return the complete, updated assistant object.
       "scenarios": ["The user says goodbye.", "The issue is fully resolved."]
     },
     "transfer_call": {
-      "enabled": false
+      "enabled": true,
+      "transfer_type": "warm",
+      "transfer_numbers": ["+18005551212"]
     }
   },
   "created_at": "2023-10-26T10:00:00Z",
