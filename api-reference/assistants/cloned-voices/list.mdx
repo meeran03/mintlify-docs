@@ -14,7 +14,7 @@ This endpoint retrieves a list of all cloned voices available to a specific assi
 - `status` (string, optional): Filter cloned voices by status.
   - Allowed values: `processing`, `ready`, `failed`, `archived`
 - `provider` (string, optional): Filter cloned voices by TTS provider.
-  - Allowed values: `elevenlabs`, `resemble`, `inworld`
+  - Common values: `elevenlabs`, `resemble`, `cartesia`. The providers endpoint returns the current supported set.
 
 ### Response
 
@@ -100,22 +100,22 @@ Quality scores are provider-dependent and may not be available for all voices:
 ### Example Requests
 
 ```bash List All Cloned Voices
-curl -X GET "https://api.burki.dev/assistants/123/cloned-voices" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/123/cloned-voices" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ```bash Filter by Status
-curl -X GET "https://api.burki.dev/assistants/123/cloned-voices?status=ready" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/123/cloned-voices?status=ready" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ```bash Filter by Provider
-curl -X GET "https://api.burki.dev/assistants/123/cloned-voices?provider=elevenlabs" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/123/cloned-voices?provider=elevenlabs" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ```bash Multiple Filters
-curl -X GET "https://api.burki.dev/assistants/123/cloned-voices?status=ready&provider=resemble" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/123/cloned-voices?status=ready&provider=resemble" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -133,7 +133,7 @@ The response includes usage analytics for each voice:
 import requests
 
 def analyze_voice_usage(assistant_id):
-    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices"
+    url = f"https://api.burki.dev/api/v1/assistants/{assistant_id}/cloned-voices"
     headers = {"Authorization": "Bearer YOUR_API_KEY"}
     
     response = requests.get(url, headers=headers)
@@ -155,7 +155,7 @@ def analyze_voice_usage(assistant_id):
 ```javascript Node.js - Filter High-Quality Voices
 async function getHighQualityVoices(assistantId, minQuality = 0.8) {
   const response = await axios.get(
-    `https://api.burki.dev/assistants/${assistantId}/cloned-voices?status=ready`,
+    `https://api.burki.dev/api/v1/assistants/${assistantId}/cloned-voices?status=ready`,
     {
       headers: { 'Authorization': 'Bearer YOUR_API_KEY' }
     }

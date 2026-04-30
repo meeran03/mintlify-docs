@@ -46,6 +46,22 @@ Returns an array of providers with their capabilities and requirements.
           "channels": 1
         }
       }
+    },
+    {
+      "provider": "cartesia",
+      "name": "Cartesia",
+      "requirements": {
+        "formats": ["mp3", "wav", "flac", "m4a", "ogg"],
+        "min_duration": 5,
+        "max_duration": 30,
+        "max_size": 10485760,
+        "quality_requirements": {
+          "sample_rate": 16000,
+          "bit_rate": 128,
+          "channels": 1,
+          "note": "Clean mono audio without background noise is recommended"
+        }
+      }
     }
   ]
 }
@@ -85,12 +101,12 @@ Each provider object contains:
 |----------|---------|-------|------|------------------|
 | **ElevenLabs** | High | Fast | Premium | Instant cloning, emotion control |
 | **Resemble** | High | Medium | Moderate | Real-time streaming, voice mixing |
-| **Inworld** | Good | Fast | Gaming-focused | Character voices, emotional range |
+| **Cartesia** | High | Fast | Usage-based | Low-latency multilingual cloned voices |
 
 ### Example Request
 
 ```bash cURL
-curl -X GET "https://api.burki.dev/assistants/123/voice-cloning/providers" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/123/voice-cloning/providers" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -105,7 +121,7 @@ def select_best_provider(audio_file_info):
     """
     # Get available providers
     response = requests.get(
-        "https://api.burki.dev/assistants/123/voice-cloning/providers",
+        "https://api.burki.dev/api/v1/assistants/123/voice-cloning/providers",
         headers={"Authorization": "Bearer YOUR_API_KEY"}
     )
     providers = response.json()["providers"]
@@ -172,7 +188,7 @@ async function validateAudioFile(assistantId, audioFile) {
   try {
     // Get provider requirements
     const response = await axios.get(
-      `https://api.burki.dev/assistants/${assistantId}/voice-cloning/providers`,
+      `https://api.burki.dev/api/v1/assistants/${assistantId}/voice-cloning/providers`,
       { headers: { 'Authorization': 'Bearer YOUR_API_KEY' } }
     );
     

@@ -14,7 +14,7 @@ Voice cloning allows you to create custom voices from audio samples, giving your
 Burki Voice AI's voice cloning feature enables you to:
 
 - **Upload Voice Samples**: Upload high-quality audio recordings to create voice models
-- **Multi-Provider Support**: Use ElevenLabs, Resemble AI, and other providers that support voice cloning
+- **Multi-Provider Support**: Use ElevenLabs, Resemble AI, and Cartesia providers that support voice cloning
 - **Instant Voice Creation**: Generate cloned voices ready for immediate use
 - **Voice Management**: Organize, test, and manage your custom voices
 - **Usage Analytics**: Track voice usage for billing and optimization
@@ -53,9 +53,10 @@ Burki Voice AI's voice cloning feature enables you to:
 - **Unlimited Voices**: Create as many voices as needed
 - **Enterprise Features**: Advanced customization options
 
-### Future Providers
-- **Inworld AI**: Coming soon with emotional voice cloning
-- **OpenAI**: Voice cloning capabilities when available
+### Cartesia
+- **Voice Cloning Support**: Create voices from short samples through Cartesia's cloning workflow
+- **Multilingual TTS**: Use cloned voices with Cartesia's multilingual Sonic models
+- **Low-Latency Streaming**: Optimized for realtime voice agents
 
 ---
 
@@ -80,9 +81,9 @@ Burki Voice AI's voice cloning feature enables you to:
 
 <Accordion title="Recording Guidelines">
 **Duration Requirements:**
-- **Minimum**: 10 seconds of clear speech
-- **Recommended**: 30-60 seconds for better quality
-- **Maximum**: 10 minutes (longer samples may not improve quality)
+- **Minimum**: 5-10 seconds of clear speech, depending on provider
+- **Recommended**: 30-60 seconds for better quality when the provider accepts longer samples
+- **Maximum**: Provider-specific. Use the [Voice Cloning Providers API](/api-reference/assistants/voice-cloning/providers) for exact limits before upload.
 
 **Content Guidelines:**
 - **Clear Speech**: No background noise or music
@@ -120,7 +121,7 @@ formData.append('name', 'Professional Voice');
 formData.append('description', 'Clear, professional speaking voice');
 formData.append('tags', 'professional, clear, business');
 
-const response = await fetch('/assistants/123/voice-samples/upload', {
+const response = await fetch('/api/v1/assistants/123/voice-samples/upload', {
   method: 'POST',
   body: formData,
   headers: {
@@ -133,13 +134,13 @@ const response = await fetch('/assistants/123/voice-samples/upload', {
 
 Once your sample is uploaded, create a cloned voice:
 
-1. **Select Provider**: Choose ElevenLabs or Resemble AI
+1. **Select Provider**: Choose ElevenLabs, Resemble AI, or Cartesia
 2. **Configure Options**: Set voice name, language, and quality settings
 3. **Initiate Cloning**: Start the voice training process
 4. **Monitor Progress**: Track cloning status in real-time
 
 ```javascript Example Voice Creation
-const response = await fetch('/assistants/123/cloned-voices/create', {
+const response = await fetch('/api/v1/assistants/123/cloned-voices/create', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -214,7 +215,7 @@ Test your cloned voices before deployment:
 
 <CodeGroup>
 ```bash cURL
-curl -X POST "https://api.burki.dev/assistants/123/voice-samples/upload" \
+curl -X POST "https://api.burki.dev/api/v1/assistants/123/voice-samples/upload" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "file=@voice_sample.wav" \
   -F "name=Professional Voice" \
@@ -225,7 +226,7 @@ curl -X POST "https://api.burki.dev/assistants/123/voice-samples/upload" \
 import requests
 
 def upload_voice_sample(assistant_id, audio_file_path, name, description=""):
-    url = f"https://api.burki.dev/assistants/{assistant_id}/voice-samples/upload"
+    url = f"https://api.burki.dev/api/v1/assistants/{assistant_id}/voice-samples/upload"
     
     files = {'file': open(audio_file_path, 'rb')}
     data = {
@@ -253,7 +254,7 @@ async function uploadVoiceSample(assistantId, filePath, name, description = '') 
   form.append('description', description);
 
   const response = await axios.post(
-    `https://api.burki.dev/assistants/${assistantId}/voice-samples/upload`,
+    `https://api.burki.dev/api/v1/assistants/${assistantId}/voice-samples/upload`,
     form,
     {
       headers: {
@@ -272,7 +273,7 @@ async function uploadVoiceSample(assistantId, filePath, name, description = '') 
 
 <CodeGroup>
 ```bash cURL
-curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
+curl -X POST "https://api.burki.dev/api/v1/assistants/123/cloned-voices/create" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -286,7 +287,7 @@ curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
 
 ```python Python
 def create_cloned_voice(assistant_id, voice_sample_id, provider, name, language="en"):
-    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices/create"
+    url = f"https://api.burki.dev/api/v1/assistants/{assistant_id}/cloned-voices/create"
     
     payload = {
         "voice_sample_id": voice_sample_id,
@@ -311,7 +312,7 @@ result = create_cloned_voice(123, 456, 'elevenlabs', 'Custom Professional Voice'
 ```javascript Node.js
 async function createClonedVoice(assistantId, voiceSampleId, provider, name, language = 'en') {
   const response = await axios.post(
-    `https://api.burki.dev/assistants/${assistantId}/cloned-voices/create`,
+    `https://api.burki.dev/api/v1/assistants/${assistantId}/cloned-voices/create`,
     {
       voice_sample_id: voiceSampleId,
       provider: provider,
@@ -336,13 +337,13 @@ async function createClonedVoice(assistantId, voiceSampleId, provider, name, lan
 
 <CodeGroup>
 ```bash cURL
-curl -X GET "https://api.burki.dev/assistants/123/cloned-voices" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/123/cloned-voices" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 ```python Python
 def list_cloned_voices(assistant_id, status=None, provider=None):
-    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices"
+    url = f"https://api.burki.dev/api/v1/assistants/{assistant_id}/cloned-voices"
     
     params = {}
     if status:
@@ -366,7 +367,7 @@ async function listClonedVoices(assistantId, status = null, provider = null) {
   if (provider) params.append('provider', provider);
   
   const response = await axios.get(
-    `https://api.burki.dev/assistants/${assistantId}/cloned-voices?${params}`,
+    `https://api.burki.dev/api/v1/assistants/${assistantId}/cloned-voices?${params}`,
     {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY'
@@ -486,16 +487,15 @@ async function listClonedVoices(assistantId, status = null, provider = null) {
 
 ## Provider Comparison
 
-| Feature | ElevenLabs | Resemble AI | Coming Soon |
-|---------|------------|-------------|-------------|
-| **Processing Time** | Seconds | Minutes | Varies |
-| **Quality** | Excellent | Excellent | TBD |
-| **Languages** | 29+ | English+ | TBD |
-| **Cost Model** | Per character | Per synthesis | TBD |
-| **Sample Requirements** | 30s+ | 60s+ | TBD |
-| **Instant Preview** | ✅ | ❌ | TBD |
-| **Emotional Control** | Basic | Advanced | TBD |
-| **Enterprise Features** | Limited | Full | TBD |
+| Feature | ElevenLabs | Resemble AI | Cartesia |
+|---------|------------|-------------|----------|
+| **Processing Time** | Seconds | Minutes | Provider-dependent |
+| **Quality** | Excellent | Excellent | Excellent |
+| **Languages** | Provider-dependent | Provider-dependent | Multilingual Sonic models |
+| **Cost Model** | Per character | Per synthesis | Provider usage-based |
+| **Sample Requirements** | 10s+ | 10s+ | Provider requirements endpoint |
+| **Instant Preview** | Often available quickly | Training-oriented | Provider-dependent |
+| **Best For** | Fast prototyping | Brand voice programs | Low-latency multilingual agents |
 
 ---
 

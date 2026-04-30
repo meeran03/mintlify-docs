@@ -15,7 +15,7 @@ The request body is a JSON object containing cloning configuration.
 
 - `voice_sample_id` (integer, **required**): ID of the uploaded voice sample to clone from
 - `provider` (string, **required**): TTS provider to use for voice cloning
-  - Allowed values: `elevenlabs`, `resemble`, `inworld`
+  - Common values: `elevenlabs`, `resemble`, `cartesia`. The providers endpoint returns the current supported set.
 - `name` (string, **required**): Display name for the cloned voice
 - `description` (string, optional): Description of the cloned voice
 - `language` (string, optional): Language code (e.g., `en`, `es`, `fr`)
@@ -90,7 +90,7 @@ A successful request returns the cloned voice object with initial status.
 ### Example Requests
 
 ```bash ElevenLabs Voice Cloning
-curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
+curl -X POST "https://api.burki.dev/api/v1/assistants/123/cloned-voices/create" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -103,7 +103,7 @@ curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
 ```
 
 ```bash Resemble AI Voice Cloning
-curl -X POST "https://api.burki.dev/assistants/123/cloned-voices/create" \
+curl -X POST "https://api.burki.dev/api/v1/assistants/123/cloned-voices/create" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

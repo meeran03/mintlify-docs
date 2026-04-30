@@ -37,7 +37,7 @@ When you delete a cloned voice, the following actions occur:
 ### Example Request
 
 ```bash cURL
-curl -X DELETE "https://api.burki.dev/assistants/123/cloned-voices/456" \
+curl -X DELETE "https://api.burki.dev/api/v1/assistants/123/cloned-voices/456" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -73,7 +73,7 @@ def delete_cloned_voice(assistant_id, voice_id, confirm=False):
     if not confirm:
         raise ValueError("Deletion requires explicit confirmation")
     
-    url = f"https://api.burki.dev/assistants/{assistant_id}/cloned-voices/{voice_id}"
+    url = f"https://api.burki.dev/api/v1/assistants/{assistant_id}/cloned-voices/{voice_id}"
     headers = {"Authorization": "Bearer YOUR_API_KEY"}
     
     response = requests.delete(url, headers=headers)
@@ -91,7 +91,7 @@ result = delete_cloned_voice(123, 456, confirm=True)
 async function deleteUnusedVoices(assistantId, daysUnused = 30) {
   // First, get all voices
   const voicesResponse = await axios.get(
-    `https://api.burki.dev/assistants/${assistantId}/cloned-voices`,
+    `https://api.burki.dev/api/v1/assistants/${assistantId}/cloned-voices`,
     { headers: { 'Authorization': 'Bearer YOUR_API_KEY' } }
   );
   
@@ -111,7 +111,7 @@ async function deleteUnusedVoices(assistantId, daysUnused = 30) {
   for (const voice of unusedVoices) {
     try {
       await axios.delete(
-        `https://api.burki.dev/assistants/${assistantId}/cloned-voices/${voice.id}`,
+        `https://api.burki.dev/api/v1/assistants/${assistantId}/cloned-voices/${voice.id}`,
         { headers: { 'Authorization': 'Bearer YOUR_API_KEY' } }
       );
       deletionResults.push({ id: voice.id, name: voice.name, success: true });

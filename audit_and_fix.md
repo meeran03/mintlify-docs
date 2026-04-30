@@ -238,6 +238,11 @@ Scope: API accuracy audit + immediate corrections in docs
   - `app/services/tts/tts_factory.py` (`TTSFactory._providers`, provider setting branches)
   - `app/services/tts/tts_openai.py` (OpenAI models/voices/options)
   - `app/services/tts/tts_inworld.py` (Inworld model IDs/language support)
+- **Validation result:**
+  - `docs.json`: valid JSON
+  - `api-reference/openapi.json`: valid JSON
+  - `npx mintlify broken-links`: passed with no broken links found
+  - Cursor lints on edited docs: no errors
 
 ### 5 Calls API list/filter/detail correction
 
