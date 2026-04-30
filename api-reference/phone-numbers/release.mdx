@@ -1,6 +1,6 @@
 ---
 title: 'Release Phone Number'
-openapi: 'POST /phone-numbers/release'
+openapi: 'POST /api/v1/phone-numbers/release'
 ---
 
 This endpoint allows you to release (delete) a phone number from your Twilio or Telnyx account, making it available for others to purchase. The number is immediately removed from your account and all associated configurations are cleaned up.
@@ -116,11 +116,11 @@ Common causes:
 
 ```bash
 # 1. List your current numbers (optional)
-curl -X GET "https://api.burki.dev/organization/phonenumbers" \
+curl -X GET "https://api.burki.dev/api/v1/assistants/organization/phone-numbers" \
   -H "Authorization: Bearer YOUR_API_KEY"
 
 # 2. Release a specific number
-curl -X POST "https://api.burki.dev/phone-numbers/release" \
+curl -X POST "https://api.burki.dev/api/v1/phone-numbers/release" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -135,7 +135,7 @@ curl -X POST "https://api.burki.dev/phone-numbers/release" \
 ```bash
 # Release multiple numbers
 for number in "+14155551234" "+14155551235" "+14155551236"; do
-  curl -X POST "https://api.burki.dev/phone-numbers/release" \
+  curl -X POST "https://api.burki.dev/api/v1/phone-numbers/release" \
     -H "Authorization: Bearer YOUR_API_KEY" \
     -H "Content-Type: application/json" \
     -d "{\"phone_number\": \"$number\"}"
@@ -237,7 +237,7 @@ async function releasePhoneNumber(phoneNumber, provider = null) {
       requestData.provider = provider;
     }
 
-    const response = await axios.post('https://api.burki.dev/phone-numbers/release', requestData, {
+    const response = await axios.post('https://api.burki.dev/api/v1/phone-numbers/release', requestData, {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY',
         'Content-Type': 'application/json'
@@ -265,7 +265,7 @@ await releasePhoneNumber('+14155551234', 'telnyx');
 import requests
 
 def release_phone_number(phone_number, provider=None):
-    url = "https://api.burki.dev/phone-numbers/release"
+    url = "https://api.burki.dev/api/v1/phone-numbers/release"
     headers = {
         "Authorization": "Bearer YOUR_API_KEY",
         "Content-Type": "application/json"
@@ -292,7 +292,7 @@ result = release_phone_number("+14155551234", "telnyx")  # Explicit provider
 ```php
 <?php
 function releasePhoneNumber($phoneNumber, $provider = null) {
-    $url = 'https://api.burki.dev/phone-numbers/release';
+    $url = 'https://api.burki.dev/api/v1/phone-numbers/release';
     $headers = [
         'Authorization: Bearer YOUR_API_KEY',
         'Content-Type: application/json'

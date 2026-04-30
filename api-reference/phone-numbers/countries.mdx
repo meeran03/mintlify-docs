@@ -1,6 +1,6 @@
 ---
 title: 'List Country Codes'
-openapi: 'GET /phone-numbers/countries'
+openapi: 'GET /api/v1/phone-numbers/countries'
 ---
 
 This endpoint returns a list of country codes where phone numbers are available for purchase from the specified telephony provider. Use this to populate country selection dropdowns or validate country availability before searching for numbers.
@@ -20,7 +20,7 @@ This endpoint returns a list of country codes where phone numbers are available 
 - `provider` (string, optional): Provider to get country codes from (`"twilio"` or `"telnyx"`). Defaults to `"telnyx"`
 
 ```bash
-GET /phone-numbers/countries?provider=telnyx
+GET /api/v1/phone-numbers/countries?provider=telnyx
 ```
 
 ## Response
@@ -106,7 +106,7 @@ Returned when the provider API is unavailable.
 ### Basic Request
 
 ```bash
-curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=telnyx" \
+curl -X GET "https://api.burki.dev/api/v1/phone-numbers/countries?provider=telnyx" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -114,11 +114,11 @@ curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=telnyx" \
 
 ```bash
 # Get Telnyx coverage
-curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=telnyx" \
+curl -X GET "https://api.burki.dev/api/v1/phone-numbers/countries?provider=telnyx" \
   -H "Authorization: Bearer YOUR_API_KEY"
 
 # Get Twilio coverage  
-curl -X GET "https://api.burki.dev/phone-numbers/countries?provider=twilio" \
+curl -X GET "https://api.burki.dev/api/v1/phone-numbers/countries?provider=twilio" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -131,7 +131,7 @@ const axios = require('axios');
 
 async function getCountryCodes(provider = 'telnyx') {
   try {
-    const response = await axios.get(`https://api.burki.dev/phone-numbers/countries?provider=${provider}`, {
+    const response = await axios.get(`https://api.burki.dev/api/v1/phone-numbers/countries?provider=${provider}`, {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY'
       }
@@ -160,7 +160,7 @@ const commonCountries = telnyxCountries.filter(code =>
 import requests
 
 def get_country_codes(provider='telnyx'):
-    url = f"https://api.burki.dev/phone-numbers/countries?provider={provider}"
+    url = f"https://api.burki.dev/api/v1/phone-numbers/countries?provider={provider}"
     headers = {"Authorization": "Bearer YOUR_API_KEY"}
     
     response = requests.get(url, headers=headers)
@@ -184,7 +184,7 @@ print(f"Twilio supports {len(twilio_countries)} countries")
 ```php
 <?php
 function getCountryCodes($provider = 'telnyx') {
-    $url = "https://api.burki.dev/phone-numbers/countries?provider=" . urlencode($provider);
+    $url = "https://api.burki.dev/api/v1/phone-numbers/countries?provider=" . urlencode($provider);
     $headers = ['Authorization: Bearer YOUR_API_KEY'];
     
     $ch = curl_init();
@@ -295,15 +295,15 @@ try {
 ### Twilio Coverage
 
 **Extensive Coverage**:
-- 100+ countries worldwide
-- Comprehensive global reach
-- Emerging markets support
+- Country availability is provider-dependent and changes by product
+- Broad international inventory in supported regions
+- Coverage should be checked through this endpoint before promising availability
 
 **Features**:
 - Mature platform
 - Extensive documentation
 - Wide feature set
-- Enterprise-grade reliability
+- Provider-backed reliability
 
 ## Caching Strategy
 

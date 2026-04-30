@@ -1,10 +1,10 @@
 ---
 title: ElevenLabs Scribe v2
-description: Configure ElevenLabs Scribe v2 Realtime for ultra-low latency speech-to-text with 90+ language support
+description: Configure ElevenLabs Scribe v2 Realtime for low-latency speech-to-text with broad language support
 ---
 
 <Callout type="info">
-ElevenLabs Scribe v2 Realtime is an ultra-low latency STT provider with ~150ms response time, 93.5% accuracy, and support for 90+ languages. It uses advanced Voice Activity Detection (VAD) for intelligent speech boundary detection.
+ElevenLabs Scribe v2 Realtime is a low-latency STT provider with broad language support. It uses advanced Voice Activity Detection (VAD) for intelligent speech boundary detection; exact latency and accuracy depend on language, audio quality, and provider conditions.
 </Callout>
 
 ---
@@ -14,8 +14,8 @@ ElevenLabs Scribe v2 Realtime is an ultra-low latency STT provider with ~150ms r
 | Feature | Details |
 |---------|---------|
 | **Model** | `scribe_v2_realtime` |
-| **Latency** | ~150ms |
-| **Accuracy** | 93.5% |
+| **Latency** | Vendor-reported low latency; measure in your call path |
+| **Accuracy** | Provider/model-dependent |
 | **Languages** | 90+ |
 | **VAD Support** | ✅ Advanced |
 | **Word Timestamps** | ✅ Optional |
@@ -265,12 +265,12 @@ Word timestamps are useful for analytics, keyword spotting, and advanced convers
 
 | Feature | ElevenLabs Scribe v2 | Deepgram | Azure Speech |
 |---------|---------------------|----------|--------------|
-| Latency | ~150ms | ~100ms | ~200ms |
+| Latency | Vendor-reported low latency | Vendor-reported low latency | Provider/config dependent |
 | Languages | 90+ | 30+ | 100+ |
 | VAD | Advanced | Basic | Standard |
 | Word Timestamps | ✅ | ✅ | ✅ |
 | Term Boosting | ❌ | ✅ Keywords | ✅ Phrase Lists |
-| Best For | Multi-language, VAD | Speed, English | Enterprise |
+| Best For | Multi-language, VAD | Speed, English | Microsoft ecosystem |
 
 <Callout type="info">
 Choose ElevenLabs Scribe v2 when you need excellent multi-language support with advanced VAD capabilities. Choose Deepgram for the absolute lowest latency, or Azure for enterprise features and custom models.

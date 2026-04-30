@@ -101,10 +101,10 @@ Optimize your phone number costs:
 
 | Endpoint | Method | Description |
 |----------|---------|-------------|
-| `/phone-numbers/search` | POST | Search available numbers |
-| `/phone-numbers/purchase` | POST | Purchase a phone number |
-| `/phone-numbers/release` | POST | Release a phone number |
-| `/phone-numbers/countries` | GET | List supported countries |
+| `/api/v1/phone-numbers/search` | POST | Search available numbers |
+| `/api/v1/phone-numbers/purchase` | POST | Purchase a phone number |
+| `/api/v1/phone-numbers/release` | POST | Release a phone number |
+| `/api/v1/phone-numbers/countries` | GET | List supported countries |
 
 ## Getting Started
 
@@ -113,7 +113,7 @@ Optimize your phone number costs:
 Find available numbers in your target area:
 
 ```bash
-curl -X POST "https://api.burki.dev/phone-numbers/search" \
+curl -X POST "https://api.burki.dev/api/v1/phone-numbers/search" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -128,7 +128,7 @@ curl -X POST "https://api.burki.dev/phone-numbers/search" \
 Buy a number from the search results:
 
 ```bash
-curl -X POST "https://api.burki.dev/phone-numbers/purchase" \
+curl -X POST "https://api.burki.dev/api/v1/phone-numbers/purchase" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -152,11 +152,11 @@ The number is immediately ready to:
 
 | Feature | Twilio | Telnyx |
 |---------|--------|--------|
-| **Global Coverage** | 100+ countries | 60+ countries |
+| **Global Coverage** | Provider-dependent and changes by product | Provider-dependent and changes by product |
 | **Pricing** | Higher cost, premium service | Competitive pricing |
 | **API Maturity** | Very mature, extensive docs | Modern, developer-friendly |
 | **Features** | Full feature set | Core features, growing |
-| **Reliability** | Enterprise-grade | High reliability |
+| **Reliability** | Provider-backed infrastructure | Provider-backed infrastructure |
 | **Support** | Comprehensive | Developer-focused |
 
 ### When to Choose Which Provider

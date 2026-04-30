@@ -1,6 +1,6 @@
 ---
 title: 'Get Phone Number Webhooks'
-openapi: 'GET /phone-numbers/{phone_number}/webhooks'
+openapi: 'GET /api/v1/phone-numbers/{phone_number}/webhooks'
 ---
 
 This endpoint retrieves the current webhook configuration for a phone number, showing the URLs configured to receive voice call and SMS events.
@@ -24,7 +24,7 @@ This endpoint retrieves the current webhook configuration for a phone number, sh
 - `provider` (string, optional): Provider (`"twilio"` or `"telnyx"`). Auto-detected if not provided
 
 ```bash
-GET /phone-numbers/+14155551234/webhooks?provider=twilio
+GET /api/v1/phone-numbers/+14155551234/webhooks?provider=twilio
 ```
 
 ## Response
@@ -159,7 +159,7 @@ Verify webhook configurations across all numbers:
 # Check multiple numbers
 for number in "+14155551234" "+12125555678" "+13105559999"; do
   curl -H "Authorization: Bearer YOUR_API_KEY" \
-    "https://api.burki.dev/phone-numbers/${number}/webhooks"
+    "https://api.burki.dev/api/v1/phone-numbers/${number}/webhooks"
 done
 ```
 
@@ -212,7 +212,7 @@ const axios = require('axios');
 async function getPhoneWebhooks(phoneNumber, provider = null) {
   try {
     const params = provider ? `?provider=${provider}` : '';
-    const response = await axios.get(`https://api.burki.dev/phone-numbers/${phoneNumber}/webhooks${params}`, {
+    const response = await axios.get(`https://api.burki.dev/api/v1/phone-numbers/${phoneNumber}/webhooks${params}`, {
       headers: {
         'Authorization': 'Bearer YOUR_API_KEY'
       }
@@ -237,7 +237,7 @@ console.log('SMS webhook:', config.sms_webhook_url);
 import requests
 
 def get_phone_webhooks(phone_number, provider=None):
-    url = f"https://api.burki.dev/phone-numbers/{phone_number}/webhooks"
+    url = f"https://api.burki.dev/api/v1/phone-numbers/{phone_number}/webhooks"
     headers = {"Authorization": "Bearer YOUR_API_KEY"}
     
     params = {}
@@ -262,7 +262,7 @@ print(f"SMS: {config['sms_webhook_url']}")
 ```php
 <?php
 function getPhoneWebhooks($phoneNumber, $provider = null) {
-    $url = "https://api.burki.dev/phone-numbers/" . urlencode($phoneNumber) . "/webhooks";
+    $url = "https://api.burki.dev/api/v1/phone-numbers/" . urlencode($phoneNumber) . "/webhooks";
     
     if ($provider) {
         $url .= "?provider=" . urlencode($provider);

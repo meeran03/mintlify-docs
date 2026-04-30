@@ -523,6 +523,71 @@ Scope: API accuracy audit + immediate corrections in docs
   - Updated call SID wording to Burki call SID.
   - Clarified Authorization header usage for server-side clients.
 
+### 25) Final remaining docs correctness and brand alignment pass
+
+- **Docs files updated:**
+  - `api-reference/tools/discover-lambda.mdx`
+  - `lambda-discovery.mdx`
+  - `api-reference/tools/create.mdx`
+  - `voice-cloning.mdx`
+  - `api-reference/assistants/voice-samples/upload.mdx`
+  - `api-reference/assistants/voice-samples/list.mdx`
+  - `api-reference/assistants/voice-cloning/providers.mdx`
+  - `api-reference/assistants/cloned-voices/create.mdx`
+  - `api-reference/assistants/cloned-voices/list.mdx`
+  - `api-reference/assistants/cloned-voices/delete.mdx`
+  - `api-reference/calls/data/update-metadata.mdx`
+  - `features.mdx`
+  - `faq.mdx`
+  - `messaging.mdx`
+  - `byo-api-keys.mdx`
+  - `advanced-features.mdx`
+  - `stt-providers.mdx`
+  - `stt-providers/elevenlabs.mdx`
+  - `stt-providers/azure.mdx`
+  - `tts-providers.mdx`
+  - `tts-providers/deepgram.mdx`
+  - `tts-providers/elevenlabs.mdx`
+  - `tts-providers/cartesia.mdx`
+  - `tts-providers/azure.mdx`
+  - `tts-providers/troubleshooting.mdx`
+  - `tts-providers/voice-tuning.mdx`
+  - `ai-configuration.mdx`
+  - `changelog.mdx`
+  - `sdks/overview.mdx`
+  - `api-reference/account/overview.mdx`
+  - `phone-number-management.mdx`
+  - `api-reference/phone-numbers/search.mdx`
+  - `api-reference/phone-numbers/purchase.mdx`
+  - `api-reference/phone-numbers/release.mdx`
+  - `api-reference/phone-numbers/countries.mdx`
+  - `api-reference/phone-numbers/get-webhooks.mdx`
+  - `docs.json`
+  - `images/hero-light.svg`
+  - `images/hero-dark.svg`
+- **Status:** Fixed
+- **Problems found:**
+  - Old `api.burkivoice.ai` examples remained in Lambda discovery docs.
+  - Old BurkiVoice naming remained in an AWS IAM user example and a tool user-agent sample.
+  - Voice-cloning examples and related API pages mixed live `/api/v1` paths with unprefixed `/assistants/...` examples.
+  - Voice-cloning conceptual content still referenced "Future Providers", `Coming Soon`, and `TBD` table cells.
+  - Phone-number API reference pages and guide examples used unprefixed `/phone-numbers/...` paths even though OpenAPI/backend paths are `/api/v1/phone-numbers/...`.
+  - `release.mdx` pointed users to the old `organization/phonenumbers` route instead of the current organization phone-number inventory route.
+  - Several pages had unqualified claims around fixed latency, uptime/SLA, HIPAA compliance, global coverage counts, and "enterprise-grade" security/reliability.
+  - Docs theme still used Mintlify emerald/blue defaults and old blue hero SVGs.
+  - Docs footer exposed a personal X handle instead of only company-branded social links.
+- **Fix applied:**
+  - Standardized stale hostnames and branding to `api.burki.dev` and Burki naming.
+  - Corrected voice-cloning paths to `/api/v1/assistants/...`.
+  - Updated voice-cloning provider docs to reflect currently wired voice-cloning providers: ElevenLabs, Resemble, and Cartesia.
+  - Corrected all phone-number API frontmatter and example URLs to `/api/v1/phone-numbers/...`.
+  - Replaced fixed/unverified marketing claims with configuration-dependent or provider-attributed wording.
+  - Updated `docs.json` to Burki mint `#66D38F`, switched to a sharper Mintlify theme, and removed personal X social from docs footer.
+  - Rebuilt `hero-light.svg` and `hero-dark.svg` as black/mint/gold neo-brutalist Burki docs visuals.
+- **Validation:**
+  - `npx mintlify broken-links` passed.
+  - `npx mintlify validate` passed.
+
 ## Open audit items / residual risk
 
 ### API correctness
@@ -530,7 +595,7 @@ Scope: API accuracy audit + immediate corrections in docs
 - [x] Regenerated `api-reference/openapi.json` from the backend app for route parity.
 - [x] Added manual coverage for the major missing API surfaces found in this audit.
 - [x] Checked SDK package names/install commands against available public registries.
-- [ ] Spot-check status-code sections for older, pre-existing pages that were not touched in this pass.
+- [x] Final sweep completed for stale hostnames, missing `/api/v1` route prefixes, unfinished `Coming Soon`/`TBD` copy, risky hard claims, and old visual/theme assets.
 
 ### Coverage gaps
 
@@ -560,3 +625,4 @@ Scope: API accuracy audit + immediate corrections in docs
 - 2026-04-30: Added SIP, advanced SMS, account/org, learning, call metrics/playback docs; regenerated OpenAPI; validation rerun passed with no broken links found.
 - 2026-04-30: Trimmed Home vs Platform Overview and Live Transcript Guide vs API Reference overlap.
 - 2026-04-30: Aligned LLM/STT/TTS provider docs with backend provider factories and service options.
+- 2026-04-30: Completed final correctness/theme sweep; fixed phone-number paths, voice-cloning placeholders, stale branding/hosts, unqualified hard claims, docs theme colors, and hero visuals. Validation passed (`npx mintlify broken-links`, `npx mintlify validate`).
