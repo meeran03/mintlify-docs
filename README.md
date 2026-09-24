@@ -1,37 +1,36 @@
-# Burki Voice AI Documentation
+# Burki Voice AI — public documentation
 
-This is the documentation site for Burki Voice AI, built with [Mintlify](https://mintlify.com).
+The integration guides, architecture overview, and API reference for **[Burki](https://burki.dev)**, the voice AI platform built by [Muhammad Meeran](https://meeran.dev).
 
-## Local Development
+**[Read the live documentation →](https://docs.burki.dev)**
 
-Install the Mintlify CLI to preview documentation changes locally:
+Burki grew from a replacement for a voice provider into a platform for configuring and operating phone agents. This repository is the public documentation surface. The production backend and customer configurations are private.
+
+## Start with the engineering
+
+| Area | Read |
+| --- | --- |
+| System structure and conversation pipeline | [Architecture](architecture.mdx) |
+| First assistant and call | [Quickstart](quickstart.mdx) |
+| Carrier and SIP integration | [Telephony providers](telephony-providers.mdx) · [Bring your own SIP trunk](byo-sip-trunk.mdx) |
+| Agent actions and integrations | [Tools](tools.mdx) · [Custom tools](tools/custom-tools-deep-dive.mdx) |
+| Streaming operational visibility | [Live transcripts](live-transcript.mdx) |
+| HTTP API contracts | [API introduction](api-reference/introduction.mdx) · [OpenAPI](api-reference/openapi.json) |
+| Provider configuration | [LLMs](llm-providers.mdx) · [Speech recognition](stt-providers.mdx) · [Speech synthesis](tts-providers.mdx) |
+
+## Preview locally
 
 ```bash
-npm i -g mint
-```
-
-Run the development server:
-
-```bash
-cd /Users/meeran/Startup/burki-docs
+git clone https://github.com/meeran03/mintlify-docs.git
+cd mintlify-docs
+npm install -g mint
 mint dev
 ```
 
-The docs will be available at `http://localhost:3000`.
+The CLI prints the local preview URL. Navigation and site settings live in `docs.json`; documentation is written in MDX. Keep credentials, customer data, and private infrastructure details out of examples.
 
-## Structure
+## Contributing
 
-- `docs.json` - Navigation and configuration
-- `*.mdx` - Documentation pages
-- `api-reference/` - API documentation
-- `tts-providers/` - TTS provider guides
-- `images/` - Images and assets
-- `logo/` - Logo files
+For a documentation correction, open an issue or pull request with the affected page and the expected behavior. For account or product support, use [info@burki.dev](mailto:info@burki.dev).
 
-## Deployment
-
-Changes to the `main` branch are automatically deployed via Mintlify's integration.
-
-## Support
-
-For documentation issues or suggestions, contact support@burki.dev.
+This repository intentionally retains its existing name so incoming links and documentation integrations keep working.
