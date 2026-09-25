@@ -1,228 +1,98 @@
 ---
 title: Quickstart
-description: "Get your first AI-powered voice assistant up and running in minutes"
+description: "Create a business assistant draft, practice in your browser, and review it before connecting callers."
 ---
 
-<img src="/logo/light.svg" alt="Burki Voice AI" style={{ height: '40px', marginBottom: '1rem' }} />
+Start with one real conversation: what will a caller need, what facts can your assistant use, and what should happen next?
+You can prepare and practice a draft before purchasing a telephone number or configuring provider keys.
 
-Get your first AI-powered voice assistant up and running in minutes!
+## 1. Create your account
 
-This quickstart is the shortest path from an empty account to a working inbound or outbound call. You will create a Burki
-organization, pick how AI providers are billed (managed Burki Cloud or bring-your-own keys), define an assistant with voice
-and language settings, attach a phone number, and place a test call from the dashboard. After the steps below, continue with
-[Getting Started](/getting-started) for team setup, security, and advanced configuration.
+[Sign up for Burki](https://burki.dev/auth/register), verify your email when requested, and open **Assistants**.
 
----
-
-## Step 1: Create Your Account
-
-<Steps>
-  <Step title="Sign Up">
-    Go to [burki.dev/signup](https://burki.dev/signup) and create your free account.
-    
-    You'll receive:
-    - **200 connected trial minutes**
-    - **Trial phone number** (free for 30 days)
-    - **Full access** to all features
-  </Step>
-  
-  <Step title="Verify Your Email">
-    Check your inbox and click the verification link to activate your account.
-  </Step>
-  
-  <Step title="Access Your Dashboard">
-    Log in at [burki.dev/dashboard](https://burki.dev/dashboard) to access the main control panel.
-  </Step>
-</Steps>
-
----
-
-## Step 2: Choose Your Setup Mode
-
-Before creating an assistant, decide how you want to handle AI providers:
-
-<CardGroup cols={2}>
-  <Card title="Burki Cloud (Recommended)" icon="cloud">
-    **Easiest to get started**
-    
-    - No API keys needed
-    - We manage all providers
-    - Pay as you go
-    - Best for: Getting started quickly
-  </Card>
-  <Card title="BYO (Bring Your Own)" icon="key">
-    **Use your existing accounts**
-    
-    - Connect your own API keys
-    - You pay providers directly
-    - Platform fees only
-    - Best for: Cost optimization
-  </Card>
-</CardGroup>
+Eligible new workspaces receive **up to three minutes of personalized browser testing**, pooled across sessions, with a
+**two-minute maximum per call** and one trial call at a time. The available allowance is shown before testing. Daily trial
+capacity and provider-cost limits can reduce availability; a trial is not a cash wallet credit or a free telephone number.
 
 <Info>
-You can start with Burki Cloud and switch to BYO later, or use a hybrid approach with some services managed and others BYO.
+Existing grants and funded balances keep their own terms. Check your workspace's allowance and billing details for what is available to your account.
 </Info>
 
----
-
-## Step 3: Create Your First Assistant
+## 2. Prepare an unpublished draft
 
 <Steps>
-  <Step title="Click Create New Assistant">
-    From your dashboard, click the **"Create New Assistant"** button.
+  <Step title="Describe your business and the call">
+    Choose a starter such as receptionist or appointment booking, then enter the business facts and desired outcome.
+    For example: “Northside Plumbing handles residential repairs in Boston. Capture the caller's issue, service address,
+    urgency and callback number. Do not quote a price or promise an appointment.”
   </Step>
-  
-  <Step title="Configure Basic Info">
-    - **Name:** Give your assistant a descriptive name (e.g., "Customer Support Bot")
-    - **Description:** Brief description of what this assistant does
+  <Step title="Choose how to prepare it">
+    The free starter creates editable instructions from your description. Optional AI workflow generation is a separately
+    priced operation that requires funded usage; browser trial time does not cover it. Review its displayed price before starting.
   </Step>
-  
-  <Step title="Set Up AI Configuration">
-    Configure the three AI components:
-    
-    **LLM (Language Model)** - The brain
-    - Choose a provider (OpenAI, Azure OpenAI, Anthropic, Gemini, xAI, Groq, or custom)
-    - Select a model (GPT-4o recommended)
-    - Write a system prompt describing your assistant's personality and purpose
-    
-    **TTS (Text-to-Speech)** - The voice
-    - Choose a provider (ElevenLabs, Deepgram, Cartesia, Azure, Inworld, Resemble, OpenAI, Kokoro, Uplift, Murf, or Soniox)
-    - Select a voice that matches your brand
-    
-    **STT (Speech-to-Text)** - The ears
-    - Deepgram Nova-3 is recommended for most calls; ElevenLabs, Azure, Uplift, Speechmatics, Telnyx, and Soniox are also supported
-    - Choose your primary language
-  </Step>
-  
-  <Step title="Assign a Phone Number">
-    Your trial phone number is automatically available. Assign it to your assistant to start receiving calls.
-  </Step>
-  
-  <Step title="Save and Test">
-    Click **"Create Assistant"** and call your phone number to test!
+  <Step title="Review the instructions and voice">
+    New assistants start with the managed GPT Live preset. Read the greeting, business facts, requested information and
+    limits on promises. GPT Live handles speech directly, so a separate STT and TTS configuration is not required for this preset.
+    Advanced provider choices remain available where supported.
   </Step>
 </Steps>
 
----
+## 3. Practice in your browser
 
-## Step 4: Test Your Assistant
+Select **Test this version**, review the available allowance, and allow microphone access when requested.
+Ask a realistic question, interrupt with a correction, and check how the assistant handles information it does not know.
 
-Once your assistant is created:
+Trial external actions are simulated and should be labeled that way. Live bookings, telephone calls, IVR exploration and
+stored recordings require funded usage and the relevant connections. A trial booking response is not a calendar reservation.
 
-1. **Call the phone number** assigned to your assistant
-2. **Speak naturally** - the assistant will respond based on your configuration
-3. **Check the dashboard** for call logs, transcripts, and analytics
+After the call, inspect the transcript and available activity. Edit the draft and practice again with the remaining allowance.
+Testing an unpublished draft does not publish it.
 
 <Tip>
-Use the **Live Transcript** feature in your dashboard to monitor calls in real-time and see exactly what's being said.
+If testing is temporarily unavailable or the allowance is exhausted, keep editing your draft. Review the reason shown in
+Burki before retrying or choosing prepaid usage; trial testing does not automatically turn into paid usage.
 </Tip>
 
----
+## 4. Connect real callers when ready
 
-## Step 5: Making API Calls
+1. Review [usage pricing](https://burki.dev/pricing) and add prepaid funds through **Usage & billing**.
+2. Connect the actions your assistant needs. For booking, configure Cal.com and select an appointment type. Review required
+   caller details, timezone handling and confirmation instructions.
+3. Open **Phone numbers**, review the available carrier route and number rental charges, and connect a number you control.
+4. Check the assistant's **Publish** readiness, resolve any connection or provider errors, and publish the reviewed version.
+5. Run an authorized telephone test before directing customer traffic to it.
 
-Once your assistant is created, you can interact with it programmatically using the API.
+An assigned number alone does not prove telephone readiness. Carrier setup, credentials, available funds and the selected
+assistant version must all pass the checks shown in your workspace. Number rental is separate from conversation usage and
+may continue while a number is idle.
 
-### Get Your API Key
+## 5. Use the API when needed
 
-1. Click on your profile in the top right corner
-2. Navigate to **API Keys**
-3. Click **"Generate New API Key"**
-4. Copy the key immediately (you won't see it again)
+You do not need an API key for browser practice. For an integration, open [API keys](https://burki.dev/api-keys) in your
+workspace and create a key with the required access. A read-only first request lists your assistants:
 
-### Make Your First API Request
-
-<CodeGroup>
-```bash cURL
-curl -X GET "https://api.burki.dev/api/v1/assistants/" \
-     -H "Authorization: Bearer YOUR_API_KEY" \
-     -H "Content-Type: application/json"
+```bash
+curl "https://api.burki.dev/api/v1/assistants/" \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
-
-```python Python
-import requests
-
-api_key = "YOUR_API_KEY"
-headers = {"Authorization": f"Bearer {api_key}"}
-
-response = requests.get(
-    "https://api.burki.dev/api/v1/assistants/",
-    headers=headers
-)
-
-print(response.json())
-```
-
-```javascript Node.js
-const response = await fetch('https://api.burki.dev/api/v1/assistants/', {
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
-});
-
-const data = await response.json();
-console.log(data);
-```
-</CodeGroup>
 
 <Warning>
-Treat your API keys like passwords! Never share them publicly or commit them to version control.
+Keep API keys on your server. Never place them in public browser code, share them in chat, or commit them to source control.
 </Warning>
 
----
-
-## Minimal Example Configuration
-
-Here's what a typical working setup looks like:
-
-| Component | Recommended Choice |
-|-----------|-------------------|
-| **LLM Provider** | OpenAI (GPT-4o) |
-| **TTS Provider** | ElevenLabs or Cartesia |
-| **STT Provider** | Deepgram (Nova-3) |
-| **Language** | English (US) |
-
-You can always customize and add more advanced features later!
-
----
-
-## Next Steps
+## Continue setting up
 
 <CardGroup cols={2}>
-  <Card
-    title="AI Configuration"
-    icon="brain"
-    href="/ai-configuration"
-  >
-    Deep dive into LLM, TTS, and STT settings
+  <Card title="Assistant configuration" icon="sliders" href="/assistant-configuration">
+    Review instructions, voice settings, supported actions and publishing controls.
   </Card>
-  <Card
-    title="STT Providers"
-    icon="waveform-lines"
-    href="/stt-providers"
-  >
-    Compare Deepgram, ElevenLabs, Azure, Uplift, Speechmatics, Telnyx, and Soniox STT settings
+  <Card title="Phone numbers" icon="phone" href="/phone-number-management">
+    Understand number configuration before connecting callers.
   </Card>
-  <Card
-    title="Phone Numbers"
-    icon="phone"
-    href="/phone-number-management"
-  >
-    Purchase additional numbers or use your own
+  <Card title="API reference" icon="code" href="/api-reference/introduction">
+    Connect your application using authenticated requests.
   </Card>
-  <Card
-    title="Knowledge Base"
-    icon="book"
-    href="/rag"
-  >
-    Upload documents to make your assistant smarter
-  </Card>
-  <Card
-    title="API Reference"
-    icon="code"
-    href="/api-reference/introduction"
-  >
-    Full API documentation for developers
+  <Card title="Common questions" icon="circle-question" href="/faq">
+    Find answers about trials, billing and troubleshooting.
   </Card>
 </CardGroup>

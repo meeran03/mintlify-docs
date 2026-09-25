@@ -1,172 +1,121 @@
 ---
 title: FAQ
-description: "Frequently asked questions about Burki Voice AI"
+description: "Answers about Burki's browser trial, GPT Live assistants, prepaid usage, telephone setup and call review."
 ---
 
-Find answers to common questions about Burki Voice AI.
-
----
-
-## General
+## Getting started
 
 <AccordionGroup>
-  <Accordion title="What is Burki Voice AI?">
-    Burki is a cloud-based voice AI platform for building intelligent phone assistants. It handles calls, transcribes speech, generates AI responses, and speaks naturally to callers - all with ultra-low latency.
+  <Accordion title="What is Burki?">
+    Burki helps you create a business voice assistant, practice a draft in your browser, connect callers and review results.
+    Start with one useful task, such as answering approved questions or collecting a service request.
   </Accordion>
-  
-  <Accordion title="Who can use Burki?">
-    Burki is built for businesses of all sizes - from startups automating their first phone line to enterprises handling millions of calls. Developers, agencies, and anyone needing advanced voice automation will find Burki useful.
-  </Accordion>
-  
-  <Accordion title="How is Burki different from other voice AI platforms?">
-    Burki offers:
-    - **Low-latency voice pipeline** for natural conversations, with exact timings depending on your providers and configuration
-    - **Flexible pricing** with BYO and managed options
-    - **Multi-provider support** so you're never locked in
-    - **Beautiful dashboard** that makes configuration intuitive
-  </Accordion>
-</AccordionGroup>
-
----
-
-## Pricing & Billing
-
-<AccordionGroup>
-  <Accordion title="How does pricing work?">
-    Burki charges a simple platform fee:
-    - **Voice:** $0.03 per connected minute
-    - **SMS:** $0.001 per segment
-    
-    With Burki Cloud, you also pay pass-through provider costs plus a 15% managed fee. With BYO mode, you only pay platform fees.
-    
-    See our [Pricing](/pricing) page for full details.
-  </Accordion>
-  
-  <Accordion title="What's included in the free trial?">
-    Every new account gets:
-    - 200 connected trial minutes in one unified trial bucket
-    - Platform fees waived while trial minutes remain
-    - Managed provider pass-through absorbed while trial minutes remain
-    - Trial phone number free for 30 days when eligible
-  </Accordion>
-  
-  <Accordion title="What's the difference between BYO and Burki Cloud?">
-    - **BYO (Bring Your Own):** You provide your own API keys for AI providers. You pay them directly. Burki only charges platform fees.
-    - **Burki Cloud:** We manage all providers for you. You pay pass-through costs plus 15% managed fee.
-    - **Hybrid:** Mix both - use your own keys for some services, let us manage others.
-  </Accordion>
-  
-  <Accordion title="How do I add funds to my account?">
-    Go to **Billing** → **Wallet** in your dashboard and click **Add Funds**. You can also set up auto top-up to automatically add funds when your balance gets low.
-  </Accordion>
-</AccordionGroup>
-
----
-
-## Setup & Configuration
-
-<AccordionGroup>
   <Accordion title="How do I create my first assistant?">
-    1. Sign up at [burki.dev/signup](https://burki.dev/signup)
-    2. Go to your dashboard and click **Create New Assistant**
-    3. Configure your AI providers (LLM, TTS, STT)
-    4. Assign a phone number
-    5. Call the number to test!
-    
-    See our [Quickstart](/quickstart) guide for detailed steps.
+    [Create your account](https://burki.dev/auth/register), verify your email when requested, and open **Assistants**.
+    Describe the business and desired call outcome, review the editable starter, then select **Test this version**.
+    You do not need a telephone number or provider keys for eligible managed browser testing.
+    Follow the [Quickstart](/quickstart) for the complete journey.
   </Accordion>
-  
-  <Accordion title="How do I add my own API keys (BYO mode)?">
-    Go to **Settings** → **Provider Keys** in your dashboard. Enter your API keys for OpenAI, Anthropic, ElevenLabs, Deepgram, or any other supported provider. Then select **BYO** when configuring your assistant.
+  <Accordion title="What is the default voice setup?">
+    New assistants start with managed GPT Live, which handles speech directly. You do not need to choose separate
+    transcription and speech-synthesis providers for this preset. Other provider configurations are available where
+    supported; check their readiness before testing or publishing.
   </Accordion>
-  
-  <Accordion title="Can I use my existing phone numbers?">
-    Yes! If you have phone numbers with Twilio, Vonage, or Telnyx:
-    1. Add your provider credentials in **Settings** → **Provider Keys**
-    2. Go to **Phone Numbers** → **Sync**
-    3. Your numbers will appear and can be assigned to assistants
-  </Accordion>
-  
-  <Accordion title="How do I configure fallback providers?">
-    When editing your assistant, expand the **Fallback Configuration** section. You can add backup LLM, TTS, or STT providers that will be used automatically if your primary provider fails.
+  <Accordion title="Does testing publish my draft?">
+    No. Review and test the selected draft version, then use the publishing controls when you are ready.
+    A successful browser test does not by itself establish telephone, booking or transfer readiness.
   </Accordion>
 </AccordionGroup>
 
----
-
-## Usage
+## Trial and billing
 
 <AccordionGroup>
-  <Accordion title="Where can I find call recordings and transcripts?">
-    In your dashboard, go to **Calls** to see call history. Click on any call to view its transcript and download the recording.
+  <Accordion title="What's included in the free trial?">
+    Eligible new workspaces can use up to **three minutes of personalized browser testing**, shared across sessions,
+    with a **two-minute maximum per call** and one concurrent trial call. Provider-cost limits and shared daily capacity
+    also apply. Burki shows your effective remaining allowance before a test.
+
+    This is browser practice time, not cash wallet credit, 200 telephone minutes or a free phone number. Existing grants
+    and paid balances retain their own terms. Trial actions are simulated; live external actions and stored recordings
+    require funded usage and supported connections.
   </Accordion>
-  
-  <Accordion title="How do I monitor calls in real-time?">
-    Use the **Live Transcript** feature in your dashboard. You can watch transcripts appear in real-time as calls happen.
+  <Accordion title="I don't see free credits. What should I check?">
+    Check the browser test allowance as well as **Usage & billing**: trial time and wallet funds are different.
+    Verify your email if requested and read the reason shown before testing. The allowance may be used, unavailable for
+    the workspace, or temporarily limited by daily capacity. Your draft remains editable. If it seems wrong, use Burki's
+    Help or support-ticket option and include the visible message; never send provider keys.
   </Accordion>
-  
-  <Accordion title="Can I make outbound calls?">
-    Yes! Use the API to initiate outbound calls. The assistant will call the specified number and follow your configured conversation flow.
+  <Accordion title="How does pricing work?">
+    Burki uses prepaid usage. Review the configured platform, managed-provider and telephone charges before a call.
+    Number rental is a separate recurring charge and may continue even when the number is not used.
+    See [current pricing](https://burki.dev/pricing) and your workspace's quote for the selected configuration.
+    An estimate or temporary reservation is not the same as the final settled charge.
   </Accordion>
-  
-  <Accordion title="How do I upload documents for my assistant?">
-    Go to your assistant's **Knowledge Base** section and upload PDFs, Word docs, or paste URLs. The assistant will use this information to answer questions.
+  <Accordion title="Does the trial include AI workflow generation?">
+    The editable starter is free. Optional AI workflow generation is separately priced and requires funded usage.
+    Review the displayed generation price before confirming; browser trial time does not pay for it.
+  </Accordion>
+  <Accordion title="What changes when I use my own provider keys?">
+    With BYO credentials, you pay the connected provider directly for its usage. Burki platform charges and any other
+    applicable managed or telephone charges remain separate. Use supported provider settings and check the effective
+    quote; a provider cost that Burki cannot calculate is unknown, not free.
+  </Accordion>
+  <Accordion title="How do I add funds?">
+    Open **Usage & billing** and choose a supported top-up amount. Review any auto-top-up setting separately; it is optional.
+    Exhausting trial time does not automatically authorize paid calling.
   </Accordion>
 </AccordionGroup>
 
----
-
-## Troubleshooting
+## Real calls and actions
 
 <AccordionGroup>
-  <Accordion title="My assistant isn't responding on calls">
-    Check:
-    1. Your wallet has sufficient balance
-    2. The phone number is assigned to an assistant
-    3. AI provider credentials are valid
-    4. Check the call logs for error messages
+  <Accordion title="Can I use my existing phone number?">
+    Check the carrier-specific setup in **Phone numbers**. Telnyx, Twilio and Vonage configuration paths have different
+    requirements; a connected credential or imported number does not prove end-to-end readiness. Use a number you
+    control, resolve the displayed setup checks, and complete an authorized test before sending customer calls to it.
   </Accordion>
-  
-  <Accordion title="The response latency is high">
-    Try:
-    1. Use a faster LLM model (GPT-4o-mini vs GPT-4o)
-    2. Use ElevenLabs or Cartesia for TTS (fastest options)
-    3. Keep system prompts concise
-    4. Check if provider services have any outages
+  <Accordion title="Can an assistant book appointments?">
+    Configure the supported Cal.com action, select an appointment type and use funded usage for a real booking.
+    The assistant should confirm the caller's date, timezone and details before creating it, and only report success
+    from the returned booking result. A simulated trial action does not create an appointment.
   </Accordion>
-  
-  <Accordion title="Audio quality is poor">
-    Burki has built-in audio denoising. If quality is still poor:
-    1. Check caller's phone connection
-    2. Ensure the call isn't being recorded by both parties
-    3. Try a different TTS voice
+  <Accordion title="Can I make outbound calls or transfer callers?">
+    Funded telephone calls require an eligible carrier route, a configured number and a ready assistant version.
+    Transfer behavior depends on the selected runtime, workflow and destination. Check the supported configuration and
+    test the specific handoff, including rejection or timeout, before using it with customers.
   </Accordion>
-  
-  <Accordion title="API requests return 401 Unauthorized">
-    Your API key may be invalid or expired:
-    1. Generate a new key in **Settings** → **API Keys**
-    2. Ensure you're using `Bearer YOUR_KEY` in the Authorization header
-    3. Check that the key has the required permissions
+  <Accordion title="Can I use fallback providers?">
+    Fallback behavior is configuration-specific. Do not assume a separate STT, LLM or TTS fallback applies to a GPT Live
+    speech-to-speech session. Review the options and readiness checks for the selected provider combination.
   </Accordion>
 </AccordionGroup>
 
----
+## Reviewing calls and troubleshooting
 
-## Need More Help?
+<AccordionGroup>
+  <Accordion title="Where are transcripts and recordings?">
+    Open **Calls** and select a call to inspect its transcript, available activity and cost. Recordings are available only
+    when recording was enabled with the required consent, permissions and storage configuration. Trial browser calls
+    retain transcripts; they do not include stored recordings. A completed call does not necessarily mean a booking or
+    other business action succeeded, so review the action result too.
+  </Accordion>
+  <Accordion title="My assistant is not responding. What should I check?">
+    Read the test or call error first. For browser practice, check microphone permission and trial allowance or available
+    funds. For telephone calls, also check the assigned and published assistant, carrier readiness and provider credentials.
+    Include the call or request ID when contacting support, without sharing keys or private caller details unnecessarily.
+  </Accordion>
+  <Accordion title="The conversation is slow or difficult to hear">
+    Compare a browser test in a quiet setting with the affected telephone call. Check the microphone, network connection,
+    selected model and provider status. Review the transcript and timing before changing providers. Avoid assuming
+    that a different TTS provider will affect a GPT Live session, which produces speech directly.
+  </Accordion>
+  <Accordion title="Why does the API return 401 Unauthorized?">
+    Check that the request uses a valid key for the correct workspace in the `Authorization: Bearer YOUR_KEY` header.
+    Review its access and expiration in **API keys**. Keep keys server-side and never paste them into a support ticket.
+  </Accordion>
+</AccordionGroup>
 
-<CardGroup cols={2}>
-  <Card
-    title="Contact Support"
-    icon="envelope"
-    href="mailto:support@burki.dev"
-  >
-    Email our support team for assistance
-  </Card>
-  <Card
-    title="Join Discord"
-    icon="discord"
-    href="https://discord.gg/burki"
-  >
-    Chat with the community and team
-  </Card>
-</CardGroup>
+## Need help?
+
+Use **Help** in your Burki workspace to review guidance or create a support ticket. You can also
+[contact the Burki team](mailto:meeran@burki.dev). Include the affected page, error message and request ID if available.
