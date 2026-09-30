@@ -10,7 +10,7 @@ Burki provides comprehensive phone number management capabilities, allowing you 
 With Burki's phone number management system, you can:
 
 - **Search** for available numbers across multiple providers
-- **Purchase** numbers instantly with automatic configuration
+- **Purchase** supported numbers and review their configuration
 - **Manage** your entire phone number inventory in one place
 - **Compare** costs between Twilio and Telnyx
 - **Release** unused numbers to optimize costs
@@ -58,9 +58,9 @@ Search for available phone numbers from both Twilio and Telnyx with a single API
 - Country codes
 - Capabilities (voice, SMS, MMS)
 
-### Instant Purchase & Configuration
+### Purchase & Configuration
 
-Purchase numbers with automatic setup:
+Purchase a supported number, then review its configuration and readiness:
 
 ```json
 {
@@ -71,12 +71,12 @@ Purchase numbers with automatic setup:
 }
 ```
 
-**Automatic Configuration**:
-- ✅ Webhook URLs configured
-- ✅ Voice capabilities enabled
-- ✅ SMS/MMS capabilities enabled
-- ✅ Database record created
-- ✅ Assistant assignment (optional)
+**Configuration to review after purchase**:
+- Carrier-specific webhook or connection settings
+- Required voice capabilities
+- Messaging capabilities and compliance, if messaging is needed
+- Number inventory record
+- Assignment to the intended assistant or flow
 
 ### Inventory Management
 
@@ -138,13 +138,14 @@ curl -X POST "https://api.burki.dev/api/v1/phone-numbers/purchase" \
   }'
 ```
 
-### 3. Start Using the Number
+### 3. Verify Readiness Before Using the Number
 
-The number is immediately ready to:
-- ✅ Receive incoming calls
-- ✅ Send and receive SMS/MMS
-- ✅ Be assigned to your AI assistant
-- ✅ Handle voice interactions
+An assigned number alone does not prove telephone readiness. Check carrier setup, provider credentials, available funds
+and the published assistant version in your workspace. Complete an authorized inbound telephone test before directing
+customer traffic to the number. Confirm messaging setup and compliance separately before using SMS or MMS.
+
+Number rental is separate from conversation usage and may continue while a number is idle. See the [Quickstart](/quickstart)
+for the current browser-practice-to-telephone setup path.
 
 ## Provider Comparison
 
