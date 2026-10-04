@@ -13986,7 +13986,7 @@
           "Billing"
         ],
         "summary": "Update Managed Services",
-        "description": "Update managed services configuration (Hybrid Mode).\n\nAllows users to selectively use Burki-managed credentials for some services\nwhile bringing their own API keys for others.\n\n- Setting a service to True: Burki provides credentials (billed as pass-through + 15%)\n- Setting a service to False: User provides their own API keys (BYO, no pass-through billing)\n\nOnly the services specified in the request will be updated. Other services\nremain unchanged.\n\n**Important:** If you set a service to False (BYO), make sure you have configured\nyour own API keys in the organization settings before making calls.\n\n**Billing Impact:**\n- Managed services: Pass-through cost + 15% management fee\n- BYO services: No pass-through billing (you pay the provider directly)\n- Platform fee ($0.03/min voice) always applies regardless of mode",
+        "description": "Update managed services configuration (Hybrid Mode).\n\nAllows users to selectively use Burki-managed credentials for some services\nwhile bringing their own API keys for others.\n\n- Setting a service to True: Burki provides credentials (billed as actual provider usage at cost, with no markup)\n- Setting a service to False: User provides their own API keys (BYO, no pass-through billing)\n\nOnly the services specified in the request will be updated. Other services\nremain unchanged.\n\n**Important:** If you set a service to False (BYO), make sure you have configured\nyour own API keys in the organization settings before making calls.\n\n**Billing Impact:**\n- Managed services: Actual provider usage at cost, with no management markup\n- BYO services: No pass-through billing (you pay the provider directly)\n- Platform fee ($0.03/min voice) always applies regardless of mode",
         "operationId": "update_managed_services_v1_billing_managed_services_patch",
         "requestBody": {
           "content": {
@@ -24418,8 +24418,11 @@
             "title": "Stt Cost Per Min"
           },
           "managed_fee_per_min": {
-            "type": "number",
-            "title": "Managed Fee Per Min"
+            "type": "integer",
+            "title": "Managed Fee Per Min",
+            "deprecated": true,
+            "description": "Retired surcharge; always zero",
+            "const": 0
           },
           "total_cost_per_min": {
             "type": "number",
@@ -28942,7 +28945,10 @@
           "managed_fee_percent": {
             "type": "integer",
             "title": "Managed Fee Percent",
-            "default": 15
+            "default": 0,
+            "deprecated": true,
+            "description": "Retired surcharge; always zero for new usage",
+            "const": 0
           },
           "number_mgmt_cents_per_number_per_month": {
             "type": "integer",

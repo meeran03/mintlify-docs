@@ -44,7 +44,7 @@ Returns wallet balance, reserved funds, available balance, auto top-up settings,
   "pricing": {
     "voice_platform_fee_cents_per_min": 3.0,
     "sms_platform_fee_cents_per_segment": 0.1,
-    "managed_fee_percent": 15,
+    "managed_fee_percent": 0,
     "number_mgmt_cents_per_number_per_month": 100
   }
 }
@@ -157,6 +157,8 @@ Authorization: Bearer YOUR_TOKEN
 }
 ```
 
+The `managed_fee_percent` compatibility field is always zero for current pricing. New provider usage has no management markup. Historical charges and statements retain their original recorded amounts; a historical `managed_fee` value is not a fee on new usage. The examples below illustrate zero-markup charges.
+
 ## Get Charges Summary
 
 ```http
@@ -167,13 +169,13 @@ Authorization: Bearer YOUR_TOKEN
 ```json Response
 {
   "month": "2026-04-01",
-  "total_cents": 4821,
-  "total_dollars": 48.21,
+  "total_cents": 4242,
+  "total_dollars": 42.42,
   "charge_count": 312,
   "breakdown": {
     "platform_fee": 384,
     "pass_through": 3858,
-    "managed_fee": 579
+    "managed_fee": 0
   }
 }
 ```
@@ -193,10 +195,10 @@ Authorization: Bearer YOUR_TOKEN
       "month": "2026-04-01",
       "total_platform_cents": 384,
       "total_pass_through_cents": 3858,
-      "total_managed_fee_cents": 579,
+      "total_managed_fee_cents": 0,
       "total_number_mgmt_cents": 100,
-      "total_cents": 4921,
-      "total_dollars": 49.21,
+      "total_cents": 4342,
+      "total_dollars": 43.42,
       "total_voice_minutes": 128,
       "total_sms_segments": 54,
       "status": "finalized"
@@ -221,10 +223,10 @@ The `month` path parameter must be a date string in `YYYY-MM-DD` format. Burki n
     "month": "2026-04-01",
     "total_platform_cents": 384,
     "total_pass_through_cents": 3858,
-    "total_managed_fee_cents": 579,
+    "total_managed_fee_cents": 0,
     "total_number_mgmt_cents": 100,
-    "total_cents": 4921,
-    "total_dollars": 49.21,
+    "total_cents": 4342,
+    "total_dollars": 43.42,
     "total_voice_minutes": 128,
     "total_sms_segments": 54,
     "status": "finalized"
@@ -232,7 +234,7 @@ The `month` path parameter must be a date string in `YYYY-MM-DD` format. Burki n
   "charges_breakdown": {
     "platform_fee": 384,
     "pass_through": 3858,
-    "managed_fee": 579
+    "managed_fee": 0
   }
 }
 ```

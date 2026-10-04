@@ -14,11 +14,11 @@ Every customer pays a simple platform fee based on usage:
 
 | Service | Platform Fee |
 |---------|-------------|
-| **Voice Calls** | $0.03 per connected minute |
+| **Voice Calls** | $0.03 per active voice minute |
 | **SMS Messages** | $0.001 per segment |
 
 <Info>
-**Connected minutes** are billed only when a call is actually answered. If a call isn't connected, you're not charged.
+The current voice runtime meters active seconds. The platform charge rounds up to the next cent per call; providers and carriers use their own measured usage units. SMS platform billing has a one-cent minimum for each nonzero message.
 </Info>
 
 ---
@@ -29,7 +29,7 @@ Every customer pays a simple platform fee based on usage:
   <Card title="Burki Cloud" icon="cloud">
     **Fully managed** - We handle everything
     
-    - Platform fee + pass-through costs + 15% managed fee
+    - Platform fee + actual provider usage, with no markup
     - No API keys to manage
     - Automatic provider selection
     - Best for: Teams who want simplicity
@@ -48,7 +48,7 @@ Every customer pays a simple platform fee based on usage:
 
 ## Burki Cloud Pricing
 
-When using Burki Cloud, we manage all AI providers for you:
+With supported Burki Cloud providers, you pay the platform fee plus actual AI and telephone usage. Burki adds no management markup:
 
 | Component | How It's Billed |
 |-----------|-----------------|
@@ -57,19 +57,19 @@ When using Burki Cloud, we manage all AI providers for you:
 | LLM (OpenAI, Anthropic, etc.) | Pass-through at cost |
 | STT (Deepgram, Azure) | Pass-through at cost |
 | TTS (Cartesia, ElevenLabs) | Pass-through at cost |
-| Managed Service Fee | +15% on all pass-through costs |
 | Phone Numbers | Recurring carrier rental and applicable management charges; review your workspace's quote |
 
-<Accordion title="Example: 5-minute Burki Cloud call">
-| Fee Type | Calculation | Amount |
-|----------|-------------|--------|
-| Platform Fee | 5 min × $0.03 | $0.15 |
-| Carrier Pass-through | Vonage cost | $0.10 |
-| LLM Pass-through | OpenAI cost | $0.10 |
-| STT Pass-through | Deepgram cost | $0.25 |
-| TTS Pass-through | Cartesia cost | $0.50 |
-| Managed Fee (15%) | ($0.10 + $0.10 + $0.25 + $0.50) × 15% | $0.14 |
-| **Total** | | **$1.24** |
+<Accordion title="Example: GPT Live 1 with GPT-5.4 mini, five minutes">
+This planning example assumes five active call minutes and five provider-session minutes, with 1,000 uncached input tokens and 200 output tokens per minute. Actual usage, session overhead and per-call rounding change the final charge.
+
+| Component | Calculation | Estimated amount |
+|-----------|-------------|------------------|
+| Platform | 5 minutes × $0.03 | $0.15 |
+| GPT Live 1 voice | 5 session minutes × $0.05 | $0.25 |
+| GPT-5.4 mini reasoning | 5 × ($0.00075 input + $0.00090 output) | $0.00825 |
+| **Total before telephone costs** | | **About $0.41** |
+
+Telephone usage, number rental/management, optional actions and applicable taxes are additional. GPT Live is a voice-session configuration with separate reasoning usage; this is not a universal STT/LLM/TTS tariff.
 </Accordion>
 
 ---
@@ -87,7 +87,7 @@ When you bring your own API keys, you only pay platform fees:
 | Fee Type | Calculation | Amount |
 |----------|-------------|--------|
 | Platform Fee | 5 min × $0.03 | $0.15 |
-| LLM/STT/TTS/Carrier | Paid directly to providers | $0.00 |
+| LLM/STT/TTS/Carrier | Paid directly to providers | Separate external bill |
 | **Total to Burki** | | **$0.15** |
 </Accordion>
 
@@ -97,20 +97,20 @@ When you bring your own API keys, you only pay platform fees:
 
 Mix and match! Use your own keys for some services while letting Burki manage others.
 
-<Accordion title="Example: BYO LLM + Managed STT/TTS (5-minute call)">
-| Fee Type | Calculation | Amount |
-|----------|-------------|--------|
-| Platform Fee | 5 min × $0.03 | $0.15 |
-| LLM (BYO) | User pays OpenAI directly | $0.00 |
-| STT Pass-through | Deepgram cost | $0.25 |
-| STT Managed Fee | $0.25 × 15% | $0.04 |
-| TTS Pass-through | Cartesia cost | $0.50 |
-| TTS Managed Fee | $0.50 × 15% | $0.08 |
-| **Total to Burki** | | **$1.02** |
+<Accordion title="Example: BYO LLM with Burki Cloud Nova-3 and Sonic-3">
+Assume five active minutes, five Nova-3 audio minutes and 5,000 billable Sonic-3 characters. Your LLM provider bills you separately.
+
+| Component | Calculation | Estimated amount |
+|-----------|-------------|------------------|
+| Platform | 5 minutes × $0.03 | $0.15 |
+| Nova-3 STT | 5 audio minutes × $0.0077 | $0.0385 |
+| Sonic-3 TTS | 5,000 characters × $0.05 / 1,000 | $0.25 |
+| **Total to Burki before telephone costs** | | **About $0.44** |
+| LLM with your own credentials | Provider's actual usage | Separate external bill |
 </Accordion>
 
 <Info>
-The 15% managed fee only applies to services that Burki manages. BYO services have no managed fee.
+For each supported Burki Cloud component, actual provider usage is passed through at cost. Components using your own verified credentials are billed directly by those providers. Neither mode adds a Burki management markup. Review the exact rates and telephone route in your workspace before going live.
 </Info>
 
 ---
@@ -150,7 +150,7 @@ Before funded usage, review the selected configuration's quote and available bal
 
 <AccordionGroup>
   <Accordion title="How is voice call duration calculated?">
-    We bill based on **connected minutes** only. Time is calculated from when the call is answered until it ends. Any non-zero connected call is billed as at least 1 minute, and longer calls round up to the next full minute. Unanswered calls are not billed.
+    The current voice runtime bills the platform from active seconds, rounded up to the next cent per call. At the standard $0.03/minute rate, 30 active seconds costs $0.02 in platform fees. Provider-session, audio, token, character and carrier usage are measured separately, so their billed durations may differ.
   </Accordion>
   
   <Accordion title="What counts as an SMS segment?">
